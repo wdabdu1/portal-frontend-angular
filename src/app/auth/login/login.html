@@ -1,0 +1,21 @@
+<div style="max-width: 360px; margin: 6rem auto; font-family: sans-serif;">
+  <h1 style="font-size: 20px; font-weight: 500; margin-bottom: 1.5rem;">CTC Group Supply Chain Portal</h1>
+
+  <form (ngSubmit)="submit()" #loginForm="ngForm">
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 13px; color: #555; margin-bottom: 4px;">Email</label>
+      <input type="email" name="email" [(ngModel)]="email" required
+        style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;" />
+    </div>
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 13px; color: #555; margin-bottom: 4px;">Password</label>
+      <input type="password" name="password" [(ngModel)]="password" required
+        style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;" />
+    </div>
+    <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+    <button type="submit" [disabled]="loginForm.invalid || loading"
+      style="width: 100%; padding: 10px; background: #0a3d62; color: white; border: none; border-radius: 6px; cursor: pointer;">
+      {{ loading ? 'Signing in...' : 'Sign in' }}
+    </button>
+  </form>
+</div>
