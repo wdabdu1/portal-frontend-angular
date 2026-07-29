@@ -1,11 +1,20 @@
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
-<!-- * * * * * * * to get started with your project! * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<div
+  *ngIf="auth.isLoggedIn()"
+  style="padding: 10px 20px; background: #0a3d62; color: white; font-family: sans-serif; display: flex; justify-content: space-between; align-items: center;"
+>
+  <strong>CTC Group Supply Chain Portal</strong>
+  <div style="display: flex; align-items: center; gap: 12px; font-size: 13px;">
+    <span>{{ auth.getDisplayName() }}</span>
+    <button
+      (click)="logout()"
+      style="background: transparent; border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer;"
+    >
+      Log out
+    </button>
+  </div>
+</div>
+
+<router-outlet />
 
 <style>
   :host {
