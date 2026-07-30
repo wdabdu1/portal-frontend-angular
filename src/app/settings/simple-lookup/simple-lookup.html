@@ -1,5 +1,6 @@
 <div style="max-width: 700px; margin: 3rem auto; font-family: sans-serif;">
-  <h1 style="font-size: 20px; font-weight: 500;">Settings — {{ title }}</h1>
+  <a routerLink="/settings" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Settings</a>
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Settings — {{ title }}</h1>
 
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
@@ -14,10 +15,8 @@
     <tbody>
       <tr *ngFor="let item of items" style="border-bottom: 1px solid #eee;">
         <td *ngFor="let f of fields" style="padding: 6px;">
-          <ng-container [ngSwitch]="f.type">
-            <span *ngSwitchCase="'checkbox'">{{ displayValue(item, f.key) ? 'Yes' : 'No' }}</span>
-            <span *ngSwitchDefault>{{ displayValue(item, f.key) }}</span>
-          </ng-container>
+          <span *ngIf="f.type === 'checkbox'">{{ item[f.key] ? 'Yes' : 'No' }}</span>
+          <span *ngIf="f.type !== 'checkbox'">{{ displayValue(item, f) }}</span>
         </td>
         <td style="padding: 6px;">{{ item['isActive'] ? 'Yes' : 'No' }}</td>
       </tr>
@@ -25,27 +24,13 @@
   </table>
 
   <div *ngIf="canEdit" style="margin-top: 1.5rem; display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
-    <div *ngFor="let f of fields">
+    <div *ngFor="let f of editableFields">
       <label style="display: block; font-size: 12px; color: #555;">{{ f.label }}</label>
-      <input
-        *ngIf="f.type !== 'checkbox'"
-        [type]="f.type"
-        [(ngModel)]="newItem[f.key]"
-        style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;"
-      />
-      <input
-        *ngIf="f.type === 'checkbox'"
-        type="checkbox"
-        [(ngModel)]="newItem[f.key]"
-        style="margin-top: 8px;"
-      />
+      <input *ngIf="f.type !== 'checkbox'" [type]="f.type" [(ngModel)]="newItem[f.key]" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;" />
+      <input *ngIf="f.type === 'checkbox'" type="checkbox" [(ngModel)]="newItem[f.key]" style="margin-top: 8px;" />
     </div>
-    <button (click)="add()" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
-      Add
-    </button>
+    <button (click)="add()" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">Add</button>
   </div>
 
-  <p *ngIf="!canEdit" style="margin-top: 1.5rem; color: #888; font-size: 13px;">
-    Your role doesn't have permission to add Settings entries (Manager or SuperUser required).
-  </p>
+  <p *ngIf="!canEdit" style="margin-top: 1.5rem; color: #888; font-size: 13px;">Your role doesn't have permission to add Settings entries (Manager or SuperUser required).</p>
 </div>
