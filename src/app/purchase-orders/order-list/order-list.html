@@ -1,0 +1,57 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Purchase Orders</h1>
+    <a routerLink="/orders/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
+      + New Supplier Order
+    </a>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">PO Number</th>
+        <th style="padding: 8px 6px;">Business Unit</th>
+        <th style="padding: 8px 6px;">Supplier</th>
+        <th style="padding: 8px 6px;">Line Items</th>
+        <th style="padding: 8px 6px;">Status</th>
+        <th style="padding: 8px 6px;">Created</th>
+        <th style="padding: 8px 6px;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let o of orders" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px 6px; font-family: monospace;">{{ o.poNumber }}</td>
+        <td style="padding: 8px 6px;">{{ o.businessUnit }}</td>
+        <td style="padding: 8px 6px;">{{ o.supplier }}</td>
+        <td style="padding: 8px 6px;">{{ o.lineItemCount }}</td>
+        <td style="padding: 8px 6px;">
+          <span
+            [style.background]="o.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
+            [style.color]="o.status === 'Confirmed' ? '#1e7e34' : '#a66a00'"
+            style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
+          >
+            {{ o.status }}
+          </span>
+        </td>
+        <td style="padding: 8px 6px; color: #888; font-size: 12px;">{{ o.createdAt | date: 'MMM d, y' }}</td>
+        <td style="padding: 8px 6px;">
+          <button
+            *ngIf="o.status === 'Draft'"
+            (click)="confirm(o.id)"
+            [disabled]="confirmingId === o.id"
+            style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;"
+          >
+            {{ confirmingId === o.id ? 'Confirming...' : 'Confirm' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && orders.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No purchase orders yet.
+  </p>
+</div>
