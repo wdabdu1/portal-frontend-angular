@@ -23,9 +23,10 @@ export class ThousandsInputDirective implements ControlValueAccessor {
     this.onTouched = fn;
   }
 
-  @HostListener('input', ['$event.target.value'])
-  onInput(value: string): void {
-    const raw = value.replace(/,/g, '').replace(/[^0-9.\-]/g, '');
+  @HostListener('input', ['$event'])
+  onInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const raw = target.value.replace(/,/g, '').replace(/[^0-9.\-]/g, '');
     this.renderer.setProperty(this.el.nativeElement, 'value', raw);
     this.onChange(raw === '' ? null : Number(raw));
   }
