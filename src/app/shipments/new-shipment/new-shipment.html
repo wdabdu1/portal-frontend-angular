@@ -1,0 +1,105 @@
+<div style="max-width: 800px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">New Shipment</h1>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+  <p *ngIf="success" style="color: #2a7d2a; font-size: 13px;">{{ success }}</p>
+
+  <form *ngIf="!loading" (ngSubmit)="submit()">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 1rem;">
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Purchase Order (Confirmed only) *</label>
+        <select [(ngModel)]="purchaseOrderId" name="purchaseOrderId" (change)="onOrderChange()" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let po of confirmedOrders" [ngValue]="po.id">{{ po.poNumber }} — {{ po.supplier }}</option>
+        </select>
+        <p *ngIf="confirmedOrders.length === 0" style="font-size:12px; color:#a66a00; margin-top:4px;">
+          No confirmed purchase orders available yet.
+        </p>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">BL/AWB Number *</label>
+        <input [(ngModel)]="blAwbNo" name="blAwbNo" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">BL/AWB Date</label>
+        <input type="date" [(ngModel)]="blAwbDate" name="blAwbDate" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Shipping Line *</label>
+        <select [(ngModel)]="shippingLineId" name="shippingLineId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let l of shippingLines" [ngValue]="l.id">{{ l['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">ETD</label>
+        <input type="date" [(ngModel)]="etd" name="etd" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">ETA</label>
+        <input type="date" [(ngModel)]="eta" name="eta" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">20' Containers</label>
+        <input type="number" [(ngModel)]="fcl20Count" name="fcl20Count" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">40' Containers</label>
+        <input type="number" [(ngModel)]="fcl40Count" name="fcl40Count" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">BL Free Days</label>
+        <input type="number" [(ngModel)]="blFreeDays" name="blFreeDays" style="width:100%; padding:6px;" />
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
+        <input type="checkbox" [(ngModel)]="soc" name="soc" id="soc" />
+        <label for="soc" style="font-size:13px;">SOC (Shipper Owned Container)</label>
+      </div>
+    </div>
+
+    <h3 style="font-size: 15px; margin-top: 1.5rem;">Line Items</h3>
+    <p *ngIf="loadingLineItems" style="color:#888; font-size:13px;">Loading line items...</p>
+    <p *ngIf="!loadingLineItems && purchaseOrderId && lineItems.length === 0" style="color:#888; font-size:13px;">
+      No line items on this order.
+    </p>
+
+    <table *ngIf="lineItems.length > 0" style="width:100%; border-collapse: collapse; font-size: 13px;">
+      <thead>
+        <tr style="text-align:left; border-bottom:1px solid #ddd;">
+          <th style="padding:6px;"></th>
+          <th style="padding:6px;">Product</th>
+          <th style="padding:6px;">Ordered</th>
+          <th style="padding:6px;">Remaining</th>
+          <th style="padding:6px;">Qty to Ship</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let li of lineItems" style="border-bottom:1px solid #eee;">
+          <td style="padding:6px;"><input type="checkbox" [(ngModel)]="li.selected" [name]="'sel'+li.id" /></td>
+          <td style="padding:6px;">{{ li.modelProduct }} ({{ li.productCategory }})</td>
+          <td style="padding:6px; color:#888;">{{ li.qty }} {{ li.unitOfMeasure }}</td>
+          <td style="padding:6px;" [style.color]="li.qtyRemaining === 0 ? '#c0392b' : '#2a7d2a'">
+            {{ li.qtyRemaining }} {{ li.unitOfMeasure }}
+          </td>
+          <td style="padding:6px;">
+            <input
+              type="number"
+              [(ngModel)]="li.qtyToShip"
+              [name]="'qty'+li.id"
+              [disabled]="!li.selected || li.qtyRemaining === 0"
+              [max]="li.qtyRemaining"
+              style="width:80px; padding:4px;"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 2rem;">
+      <button type="submit" [disabled]="saving" style="padding:10px 20px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+        {{ saving ? 'Saving...' : 'Save as Draft' }}
+      </button>
+    </div>
+  </form>
+</div>
