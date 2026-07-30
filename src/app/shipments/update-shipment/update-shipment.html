@@ -1,9 +1,11 @@
 <div style="max-width: 700px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
-  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
-  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+  <a routerLink="/shipments" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Shipments</a>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 12px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
 
   <div *ngIf="!loading && detail">
-    <h1 style="font-size: 20px; font-weight: 500;">Shipment {{ detail.blAwbNo }}</h1>
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Shipment {{ detail.blAwbNo }}</h1>
     <p style="color: #888; font-size: 13px;">PO {{ detail.poNumber }} — Status: {{ detail.status }}</p>
 
     <!-- Forwarder -->
@@ -374,18 +376,13 @@
             <input type="date" [(ngModel)]="bankingForm.imFormDate" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
         </div>
-        <p *ngIf="detail.banking?.remainingDues !== null && detail.banking?.remainingDues !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} — Remaining dues: {{ detail.banking!.remainingDues | number: '1.2-2' }}</p>
+        <p *ngIf="detail.banking?.remainingDues !== null && detail.banking?.remainingDues !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG — Remaining dues: {{ detail.banking!.remainingDues | number: '1.2-2' }} {{ collectionCurrencyCode }}</p>
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveBanking(false)" [disabled]="saving.banking" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
           <button (click)="saveBanking(true)" [disabled]="saving.banking" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.banking ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('banking')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
-    </div>
-
-    <div style="margin-top:1.5rem;">
-      <button (click)="confirmShipment()" [disabled]="confirming || detail.status !== 'Draft'" style="padding:8px 18px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer;">{{ confirming ? 'Confirming...' : 'Confirm Shipment' }}</button>
-      <span *ngIf="detail.status !== 'Draft'" style="font-size:12px; color:#888; margin-left:8px;">Already {{ detail.status }}</span>
     </div>
   </div>
 </div>
