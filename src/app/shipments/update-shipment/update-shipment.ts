@@ -129,6 +129,11 @@ export class UpdateShipment implements OnInit {
     return names.length > 0 ? names[names.length - 1] : 'Offshore';
   }
 
+  get collectionCurrencyCode(): string {
+    const currency = this.currencies.find((c) => c.id === this.bankingForm.collectionCurrencyId);
+    return (currency?.['code'] as string) ?? '';
+  }
+
   toggleSection(key: SectionKey): void {
     this.expandedSection = this.expandedSection === key ? null : key;
   }
