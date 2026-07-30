@@ -41,8 +41,9 @@ export class UpdateShipmentService {
 
   saveAcd(shipmentId: number, req: Partial<ShipmentAcd>) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/acd`, req);
+  }
+
   confirmShipment(shipmentId: number) {
     return this.http.post(`${API_URL}/shipments/${shipmentId}/confirm`, {});
-  }
   }
 }
