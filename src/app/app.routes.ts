@@ -183,8 +183,7 @@ export const routes: Routes = [
       fields: [
         { key: 'name', label: 'Name', type: 'text' },
         { key: 'bankChargeRate', label: 'Bank Charge Rate', type: 'number' },
-        { key: 'imChargeRate', label: 'IM Charge Rate', type: 'number' },
-        { key: 'totalChargeRate', label: 'Total Charge Rate', type: 'number' }
+        { key: 'imChargeRate', label: 'IM Charge Rate', type: 'number' }
       ]
     }
   },
