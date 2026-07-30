@@ -22,7 +22,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let s of shipments" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 8px 6px; font-family: monospace;">{{ s.blAwbNo }}</td>
+        <td style="padding: 8px 6px; font-family: monospace;"><a [routerLink]="['/shipments', s.id]" style="color: #0a3d62;">{{ s.blAwbNo }}</a></td>
         <td style="padding: 8px 6px;">{{ s.poNumber }}</td>
         <td style="padding: 8px 6px;">{{ s.shippingLine }}</td>
         <td style="padding: 8px 6px;">{{ s.lineItemCount }}</td>
