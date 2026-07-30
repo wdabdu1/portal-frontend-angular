@@ -98,6 +98,7 @@ export interface ShipmentDetail {
   supplierFullSet: ShipmentSupplierFullSet | null;
   supplierPayment: ShipmentSupplierPayment | null;
   banking: ShipmentBanking | null;
+  offshorePartnerNames: string[];
 }
 
 @Injectable({ providedIn: 'root' })
