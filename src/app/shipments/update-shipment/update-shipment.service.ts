@@ -50,15 +50,18 @@ export interface ShipmentSupplierFullSet {
 }
 
 export interface ShipmentSupplierPayment {
-  dueDate: string | null;
-  dueAmount: number | null;
   currencyId: number | null;
-  dueAmountUsd: number | null;
-  paymentExecutedDate: string | null;
-  paymentExecutedValue: number | null;
-  paymentExecutedCurrencyId: number | null;
-  paymentExecutedUsd: number | null;
-  dueBalanceUsd: number | null;
+  advanceValue: number | null;
+  advanceDueDate: string | null;
+  advanceActualPaymentDate: string | null;
+  advanceValueUsd: number | null;
+  remainingValue: number | null;
+  remainingDueDate: string | null;
+  remainingActualPaymentDate: string | null;
+  remainingValueUsd: number | null;
+  totalValueUsd: number | null;
+  totalPaidUsd: number | null;
+  balanceUsd: number | null;
   remarks: string | null;
 }
 
