@@ -202,6 +202,7 @@ export class NewSupplierOrder implements OnInit {
           this.saving = false;
           this.success = 'Purchase order created as Draft.';
           this.cdr.markForCheck();
+          setTimeout(() => this.router.navigate(['/orders']), 1000);
         },
         error: (err) => {
           this.saving = false;
