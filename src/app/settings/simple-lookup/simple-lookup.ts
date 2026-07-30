@@ -94,7 +94,7 @@ export class SimpleLookup implements OnInit {
     const raw = item[field.key];
     if (field.format === 'percent') {
       const num = Number(raw) || 0;
-      return `${(num / 100).toFixed(4)}%`;
+      return `${(num * 100).toFixed(2)}%`;
     }
     return String(raw ?? '');
   }
