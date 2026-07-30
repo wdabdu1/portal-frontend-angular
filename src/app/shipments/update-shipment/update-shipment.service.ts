@@ -18,6 +18,70 @@ export interface ShipmentAcd {
   refNumber: string | null;
 }
 
+export interface ShipmentDraftDocuments {
+  initialDraftReceivedDate: string | null;
+  finalDraftReceivedDate: string | null;
+  finalDraftConfirmedDate: string | null;
+}
+
+export interface ShipmentSsmo {
+  applicationDate: string | null;
+  cost: number | null;
+  costSettledDate: string | null;
+  refNumber: string | null;
+}
+
+export interface ShipmentMot {
+  processDate: string | null;
+  cost: number | null;
+  costSettledDate: string | null;
+  refNumber: string | null;
+  offshoreApprovedPiNumber: string | null;
+  offshoreApprovedPiDate: string | null;
+}
+
+export interface ShipmentSupplierFullSet {
+  supplierInvoiceNo: string | null;
+  supplierInvoiceDate: string | null;
+  fsDispatchDate: string | null;
+  fsDispatchedViaId: number | null;
+  fsTrackingNumber: string | null;
+  fsReceivedDate: string | null;
+}
+
+export interface ShipmentSupplierPayment {
+  dueDate: string | null;
+  dueAmount: number | null;
+  currencyId: number | null;
+  dueAmountUsd: number | null;
+  paymentExecutedDate: string | null;
+  paymentExecutedValue: number | null;
+  paymentExecutedCurrencyId: number | null;
+  paymentExecutedUsd: number | null;
+  dueBalanceUsd: number | null;
+  remarks: string | null;
+}
+
+export interface ShipmentBanking {
+  senderBankId: number | null;
+  osDocDispatchDate: string | null;
+  osDocDispatchedViaId: number | null;
+  osDocTrackingNumber: string | null;
+  senderBankCharges: number | null;
+  receivingBankId: number | null;
+  necessaryGoodType: boolean;
+  collectionRefNo: string | null;
+  collectionValue: number | null;
+  collectionCurrencyId: number | null;
+  tenorId: number | null;
+  collectionDueDate: string | null;
+  collectionAmountSettled: number | null;
+  remainingDues: number | null;
+  imFormNo: string | null;
+  imFormDate: string | null;
+  receiverBankCharges: number | null;
+}
+
 export interface ShipmentDetail {
   id: number;
   blAwbNo: string;
@@ -25,6 +89,12 @@ export interface ShipmentDetail {
   status: string;
   forwarder: ShipmentForwarder | null;
   acd: ShipmentAcd | null;
+  draftDocuments: ShipmentDraftDocuments | null;
+  ssmo: ShipmentSsmo | null;
+  mot: ShipmentMot | null;
+  supplierFullSet: ShipmentSupplierFullSet | null;
+  supplierPayment: ShipmentSupplierPayment | null;
+  banking: ShipmentBanking | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -41,6 +111,30 @@ export class UpdateShipmentService {
 
   saveAcd(shipmentId: number, req: Partial<ShipmentAcd>) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/acd`, req);
+  }
+
+  saveDraftDocuments(shipmentId: number, req: Partial<ShipmentDraftDocuments>) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/draft-documents`, req);
+  }
+
+  saveSsmo(shipmentId: number, req: Partial<ShipmentSsmo>) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/ssmo`, req);
+  }
+
+  saveMot(shipmentId: number, req: Partial<ShipmentMot>) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/mot`, req);
+  }
+
+  saveSupplierFullSet(shipmentId: number, req: Partial<ShipmentSupplierFullSet>) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/supplier-full-set`, req);
+  }
+
+  saveSupplierPayment(shipmentId: number, req: Partial<ShipmentSupplierPayment>) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/supplier-payment`, req);
+  }
+
+  saveBanking(shipmentId: number, req: Partial<ShipmentBanking>) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/banking`, req);
   }
 
   confirmShipment(shipmentId: number) {
