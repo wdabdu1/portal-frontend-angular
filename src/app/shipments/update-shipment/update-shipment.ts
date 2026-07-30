@@ -121,6 +121,14 @@ export class UpdateShipment implements OnInit {
     return this.detail[key] ? 'Saved' : 'Not Started';
   }
 
+  // MOT relates to whichever offshore entity hands off directly to Onshore —
+  // i.e. the last one in the chain, regardless of how many offshore hops
+  // this particular PO has (1, 2, or more).
+  get motRelatedOffshoreName(): string {
+    const names = this.detail?.offshorePartnerNames ?? [];
+    return names.length > 0 ? names[names.length - 1] : 'Offshore';
+  }
+
   toggleSection(key: SectionKey): void {
     this.expandedSection = this.expandedSection === key ? null : key;
   }
