@@ -237,43 +237,55 @@
         <span [style.background]="sectionStatus('supplierPayment') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('supplierPayment') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('supplierPayment') }}</span>
       </div>
       <div *ngIf="expandedSection === 'supplierPayment'" style="padding: 16px;">
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Currency</label>
+          <select [(ngModel)]="supplierPaymentForm.currencyId" style="width:200px; padding:6px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+          </select>
+        </div>
+
+        <h4 style="font-size:13px; margin:16px 0 8px; color:#333;">Advance Payment</h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
           <div>
-            <label style="display:block; font-size:12px; color:#555;">Due Date</label>
-            <input type="date" [(ngModel)]="supplierPaymentForm.dueDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <label style="display:block; font-size:12px; color:#555;">Advance Value</label>
+            <input type="text" appThousands [(ngModel)]="supplierPaymentForm.advanceValue" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
           <div>
-            <label style="display:block; font-size:12px; color:#555;">Due Amount</label>
-            <input type="text" appThousands [(ngModel)]="supplierPaymentForm.dueAmount" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <label style="display:block; font-size:12px; color:#555;">Advance Due Date</label>
+            <input type="date" [(ngModel)]="supplierPaymentForm.advanceDueDate" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
           <div>
-            <label style="display:block; font-size:12px; color:#555;">Currency</label>
-            <select [(ngModel)]="supplierPaymentForm.currencyId" style="width:100%; padding:6px;">
-              <option [ngValue]="null">-- select --</option>
-              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
-            </select>
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Payment Executed Date</label>
-            <input type="date" [(ngModel)]="supplierPaymentForm.paymentExecutedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Payment Executed Value</label>
-            <input type="text" appThousands [(ngModel)]="supplierPaymentForm.paymentExecutedValue" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Payment Executed Currency</label>
-            <select [(ngModel)]="supplierPaymentForm.paymentExecutedCurrencyId" style="width:100%; padding:6px;">
-              <option [ngValue]="null">-- select --</option>
-              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
-            </select>
-          </div>
-          <div style="grid-column: span 2;">
-            <label style="display:block; font-size:12px; color:#555;">Remarks</label>
-            <input [(ngModel)]="supplierPaymentForm.remarks" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <label style="display:block; font-size:12px; color:#555;">Advance Actual Payment Date</label>
+            <input type="date" [(ngModel)]="supplierPaymentForm.advanceActualPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
         </div>
-        <p *ngIf="detail.supplierPayment?.dueBalanceUsd !== null && detail.supplierPayment?.dueBalanceUsd !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Due Amount: {{ detail.supplierPayment!.dueAmountUsd | number: '1.2-2' }} USD — Paid: {{ detail.supplierPayment!.paymentExecutedUsd | number: '1.2-2' }} USD — Balance: {{ detail.supplierPayment!.dueBalanceUsd | number: '1.2-2' }} USD</p>
+
+        <h4 style="font-size:13px; margin:16px 0 8px; color:#333;">Remaining Payment</h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Rem. Payment Value</label>
+            <input type="text" appThousands [(ngModel)]="supplierPaymentForm.remainingValue" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Rem. Payment Due Date</label>
+            <input type="date" [(ngModel)]="supplierPaymentForm.remainingDueDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Rem. Actual Payment Date</label>
+            <input type="date" [(ngModel)]="supplierPaymentForm.remainingActualPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <label style="display:block; font-size:12px; color:#555;">Remarks</label>
+          <input [(ngModel)]="supplierPaymentForm.remarks" style="width:100%; padding:6px; box-sizing:border-box;" />
+        </div>
+
+        <p *ngIf="detail.supplierPayment?.totalValueUsd !== null && detail.supplierPayment?.totalValueUsd !== undefined" style="font-size:12px; color:#666; margin-top:12px; background:#f7f7f7; padding:8px; border-radius:4px;">
+          Total: {{ detail.supplierPayment!.totalValueUsd | number: '1.2-2' }} USD — Paid: {{ detail.supplierPayment!.totalPaidUsd | number: '1.2-2' }} USD — Balance: {{ detail.supplierPayment!.balanceUsd | number: '1.2-2' }} USD
+        </p>
+
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveSupplierPayment(false)" [disabled]="saving.supplierPayment" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
           <button (click)="saveSupplierPayment(true)" [disabled]="saving.supplierPayment" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.supplierPayment ? 'Saving...' : 'Save & Next' }}</button>
