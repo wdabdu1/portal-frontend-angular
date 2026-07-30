@@ -1,0 +1,46 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Shipments</h1>
+    <a routerLink="/shipments/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
+      + New Shipment
+    </a>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">BL/AWB No.</th>
+        <th style="padding: 8px 6px;">PO Number</th>
+        <th style="padding: 8px 6px;">Shipping Line</th>
+        <th style="padding: 8px 6px;">Line Items</th>
+        <th style="padding: 8px 6px;">ETA</th>
+        <th style="padding: 8px 6px;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of shipments" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px 6px; font-family: monospace;">{{ s.blAwbNo }}</td>
+        <td style="padding: 8px 6px;">{{ s.poNumber }}</td>
+        <td style="padding: 8px 6px;">{{ s.shippingLine }}</td>
+        <td style="padding: 8px 6px;">{{ s.lineItemCount }}</td>
+        <td style="padding: 8px 6px; color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 8px 6px;">
+          <span
+            [style.background]="s.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
+            [style.color]="s.status === 'Confirmed' ? '#1e7e34' : '#a66a00'"
+            style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
+          >
+            {{ s.status }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && shipments.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No shipments yet.
+  </p>
+</div>
