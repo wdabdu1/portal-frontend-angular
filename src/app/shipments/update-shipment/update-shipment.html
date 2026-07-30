@@ -6,64 +6,91 @@
     <h1 style="font-size: 20px; font-weight: 500;">Shipment {{ detail.blAwbNo }}</h1>
     <p style="color: #888; font-size: 13px;">PO {{ detail.poNumber }} — Status: {{ detail.status }}</p>
 
-    <div style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1.5rem;">
-      <h3 style="font-size: 15px; margin: 0 0 12px;">Forwarder</h3>
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Forwarder</label>
-          <select [(ngModel)]="forwarderForm.forwarderId" style="width:100%; padding:6px;">
-            <option [ngValue]="null">-- select --</option>
-            <option *ngFor="let f of forwarders" [ngValue]="f.id">{{ f['name'] }}</option>
-          </select>
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; overflow: hidden;">
+      <div (click)="toggleSection('forwarder')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Forwarder</strong>
+        <span [style.background]="sectionStatus('forwarder') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('forwarder') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('forwarder') }}</span>
+      </div>
+
+      <div *ngIf="expandedSection === 'forwarder'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Forwarder</label>
+            <select [(ngModel)]="forwarderForm.forwarderId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let f of forwarders" [ngValue]="f.id">{{ f['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Actual Shipping Cost</label>
+            <input type="text" appThousands [(ngModel)]="forwarderForm.actualShippingCost" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Currency</label>
+            <select [(ngModel)]="forwarderForm.currencyId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Amount Saved</label>
+            <input type="text" appThousands [(ngModel)]="forwarderForm.amountSaved" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
+            <input type="checkbox" [(ngModel)]="forwarderForm.marineInsurance" id="marine" />
+            <label for="marine" style="font-size:13px;">Marine Insurance</label>
+          </div>
         </div>
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Actual Shipping Cost</label>
-          <input type="number" [(ngModel)]="forwarderForm.actualShippingCost" style="width:100%; padding:6px;" />
-        </div>
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Currency</label>
-          <select [(ngModel)]="forwarderForm.currencyId" style="width:100%; padding:6px;">
-            <option [ngValue]="null">-- select --</option>
-            <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
-          </select>
-        </div>
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Amount Saved</label>
-          <input type="number" [(ngModel)]="forwarderForm.amountSaved" style="width:100%; padding:6px;" />
-        </div>
-        <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
-          <input type="checkbox" [(ngModel)]="forwarderForm.marineInsurance" id="marine" />
-          <label for="marine" style="font-size:13px;">Marine Insurance</label>
+
+        <p *ngIf="detail.forwarder?.actualShippingCostUsd" style="font-size:12px; color:#666; margin-top:8px;">Converted: {{ detail.forwarder!.actualShippingCostUsd | number: '1.2-2' }} USD</p>
+
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveForwarder(false)" [disabled]="forwarderSaving" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveForwarder(true)" [disabled]="forwarderSaving" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ forwarderSaving ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('forwarder')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
-      <button (click)="saveForwarder()" [disabled]="forwarderSaving" style="margin-top:12px; padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ forwarderSaving ? 'Saving...' : 'Save' }}</button>
-      <span *ngIf="forwarderSaved" style="color:#2a7d2a; font-size:12px; margin-left:8px;">Saved</span>
     </div>
 
-    <div style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1rem;">
-      <h3 style="font-size: 15px; margin: 0 0 12px;">ACD</h3>
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Process Date</label>
-          <input type="date" [(ngModel)]="acdForm.processDate" style="width:100%; padding:6px;" />
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('acd')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">ACD</strong>
+        <span [style.background]="sectionStatus('acd') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('acd') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('acd') }}</span>
+      </div>
+
+      <div *ngIf="expandedSection === 'acd'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Process Date</label>
+            <input type="date" [(ngModel)]="acdForm.processDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Cost (USD)</label>
+            <input type="text" appThousands [(ngModel)]="acdForm.costUsd" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Cost Settled Date</label>
+            <input type="date" [(ngModel)]="acdForm.costSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Reference Number</label>
+            <input [(ngModel)]="acdForm.refNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
         </div>
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Cost (USD)</label>
-          <input type="number" [(ngModel)]="acdForm.costUsd" style="width:100%; padding:6px;" />
-        </div>
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Cost Settled Date</label>
-          <input type="date" [(ngModel)]="acdForm.costSettledDate" style="width:100%; padding:6px;" />
-        </div>
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Reference Number</label>
-          <input [(ngModel)]="acdForm.refNumber" style="width:100%; padding:6px;" />
+
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveAcd(false)" [disabled]="acdSaving" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveAcd(true)" [disabled]="acdSaving" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ acdSaving ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('acd')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
-      <button (click)="saveAcd()" [disabled]="acdSaving" style="margin-top:12px; padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ acdSaving ? 'Saving...' : 'Save' }}</button>
-      <span *ngIf="acdSaved" style="color:#2a7d2a; font-size:12px; margin-left:8px;">Saved</span>
     </div>
 
     <p style="color:#888; font-size:12px; margin-top:1.5rem;">More sections (Draft Documents, SSMO, MOT, Supplier Full Set, Supplier Payment, Banking) coming next.</p>
+
+    <div style="margin-top:1.5rem;">
+      <button (click)="confirmShipment()" [disabled]="confirming || detail.status !== 'Draft'" style="padding:8px 18px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer;">{{ confirming ? 'Confirming...' : 'Confirm Shipment' }}</button>
+      <span *ngIf="detail.status !== 'Draft'" style="font-size:12px; color:#888; margin-left:8px;">Already {{ detail.status }}</span>
+    </div>
   </div>
 </div>
