@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { LookupEntity, SettingsLookupService } from '../settings-lookup.service';
@@ -16,6 +16,8 @@ interface BusinessUnit extends LookupEntity {
   templateUrl: './business-units.html'
 })
 export class BusinessUnits implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
   units: BusinessUnit[] = [];
   newCode = '';
   newName = '';
@@ -35,16 +37,31 @@ export class BusinessUnits implements OnInit {
   load(): void {
     this.loading = true;
     this.lookups.getAll<BusinessUnit>('business-units').subscribe({
-      next: (units) => { this.units = units; this.loading = false; },
-      error: () => { this.error = 'Could not load business units.'; this.loading = false; }
+      next: (units) => {
+        this.units = units;
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.error = 'Could not load business units.';
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
   add(): void {
     if (!this.newCode || !this.newName) return;
     this.lookups.create<BusinessUnit>('business-units', { code: this.newCode, name: this.newName, isActive: true }).subscribe({
-      next: () => { this.newCode = ''; this.newName = ''; this.load(); },
-      error: () => (this.error = 'Could not create business unit.')
+      next: () => {
+        this.newCode = '';
+        this.newName = '';
+        this.load();
+      },
+      error: () => {
+        this.error = 'Could not create business unit.';
+        this.cdr.markForCheck();
+      }
     });
   }
 }
