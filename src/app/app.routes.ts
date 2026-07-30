@@ -16,7 +16,6 @@ export const routes: Routes = [
 
   { path: 'settings', component: SettingsMenu, canActivate: [authGuard] },
   { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard] },
-  { path: 'shipments/:id', component: UpdateShipment, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
@@ -220,5 +219,6 @@ export const routes: Routes = [
   { path: 'orders', component: OrderList, canActivate: [authGuard] },
   { path: 'orders/new', component: NewSupplierOrder, canActivate: [authGuard] },
   { path: 'shipments', component: ShipmentList, canActivate: [authGuard] },
-  { path: 'shipments/new', component: NewShipment, canActivate: [authGuard] }
+  { path: 'shipments/new', component: NewShipment, canActivate: [authGuard] },
+  { path: 'shipments/:id', component: UpdateShipment, canActivate: [authGuard] }
 ];
