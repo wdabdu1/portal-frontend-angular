@@ -43,11 +43,29 @@ export interface CreatePurchaseOrderRequest {
   offshorePartners: OffshorePartnerRequest[];
 }
 
+export interface PurchaseOrderSummary {
+  id: number;
+  poNumber: string;
+  businessUnit: string;
+  supplier: string;
+  status: string;
+  lineItemCount: number;
+  createdAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PurchaseOrdersService {
   constructor(private http: HttpClient) {}
 
   create(req: CreatePurchaseOrderRequest) {
     return this.http.post(`${API_URL}/purchase-orders`, req);
+  }
+
+  getAll() {
+    return this.http.get<PurchaseOrderSummary[]>(`${API_URL}/purchase-orders`);
+  }
+
+  confirm(id: number) {
+    return this.http.post(`${API_URL}/purchase-orders/${id}/confirm`, {});
   }
 }
