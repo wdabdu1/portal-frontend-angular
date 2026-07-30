@@ -1,9 +1,14 @@
 <div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 style="font-size: 20px; font-weight: 500;">Purchase Orders</h1>
-    <a routerLink="/orders/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
-      + New Supplier Order
-    </a>
+      <div style="display: flex; gap: 8px;">
+      <a routerLink="/shipments" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px;">
+        View Shipments
+      </a>
+      <a routerLink="/orders/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
+        + New Supplier Order
+      </a>
+    </div>
   </div>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
