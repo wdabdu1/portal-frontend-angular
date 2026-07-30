@@ -6,12 +6,12 @@
     <h1 style="font-size: 20px; font-weight: 500;">Shipment {{ detail.blAwbNo }}</h1>
     <p style="color: #888; font-size: 13px;">PO {{ detail.poNumber }} — Status: {{ detail.status }}</p>
 
+    <!-- Forwarder -->
     <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; overflow: hidden;">
       <div (click)="toggleSection('forwarder')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
         <strong style="font-size: 14px;">Forwarder</strong>
         <span [style.background]="sectionStatus('forwarder') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('forwarder') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('forwarder') }}</span>
       </div>
-
       <div *ngIf="expandedSection === 'forwarder'" style="padding: 16px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
@@ -41,23 +41,21 @@
             <label for="marine" style="font-size:13px;">Marine Insurance</label>
           </div>
         </div>
-
         <p *ngIf="detail.forwarder?.actualShippingCostUsd" style="font-size:12px; color:#666; margin-top:8px;">Converted: {{ detail.forwarder!.actualShippingCostUsd | number: '1.2-2' }} USD</p>
-
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveForwarder(false)" [disabled]="forwarderSaving" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveForwarder(true)" [disabled]="forwarderSaving" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ forwarderSaving ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveForwarder(false)" [disabled]="saving.forwarder" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveForwarder(true)" [disabled]="saving.forwarder" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.forwarder ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('forwarder')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
     </div>
 
+    <!-- ACD -->
     <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
       <div (click)="toggleSection('acd')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
         <strong style="font-size: 14px;">ACD</strong>
         <span [style.background]="sectionStatus('acd') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('acd') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('acd') }}</span>
       </div>
-
       <div *ngIf="expandedSection === 'acd'" style="padding: 16px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
@@ -77,16 +75,301 @@
             <input [(ngModel)]="acdForm.refNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
         </div>
-
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveAcd(false)" [disabled]="acdSaving" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveAcd(true)" [disabled]="acdSaving" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ acdSaving ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveAcd(false)" [disabled]="saving.acd" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveAcd(true)" [disabled]="saving.acd" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.acd ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('acd')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
     </div>
 
-    <p style="color:#888; font-size:12px; margin-top:1.5rem;">More sections (Draft Documents, SSMO, MOT, Supplier Full Set, Supplier Payment, Banking) coming next.</p>
+    <!-- Draft Documents -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('draftDocuments')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Draft Documents</strong>
+        <span [style.background]="sectionStatus('draftDocuments') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('draftDocuments') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('draftDocuments') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'draftDocuments'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Initial Draft Received</label>
+            <input type="date" [(ngModel)]="draftDocumentsForm.initialDraftReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Final Draft Received</label>
+            <input type="date" [(ngModel)]="draftDocumentsForm.finalDraftReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Final Draft Confirmed</label>
+            <input type="date" [(ngModel)]="draftDocumentsForm.finalDraftConfirmedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveDraftDocuments(false)" [disabled]="saving.draftDocuments" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveDraftDocuments(true)" [disabled]="saving.draftDocuments" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.draftDocuments ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('draftDocuments')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SSMO -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('ssmo')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">SSMO</strong>
+        <span [style.background]="sectionStatus('ssmo') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('ssmo') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('ssmo') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'ssmo'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Application Date</label>
+            <input type="date" [(ngModel)]="ssmoForm.applicationDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Cost</label>
+            <input type="text" appThousands [(ngModel)]="ssmoForm.cost" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Cost Settled Date</label>
+            <input type="date" [(ngModel)]="ssmoForm.costSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Reference Number</label>
+            <input [(ngModel)]="ssmoForm.refNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveSsmo(false)" [disabled]="saving.ssmo" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveSsmo(true)" [disabled]="saving.ssmo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.ssmo ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('ssmo')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOT -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('mot')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">MOT</strong>
+        <span [style.background]="sectionStatus('mot') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('mot') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('mot') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'mot'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Process Date</label>
+            <input type="date" [(ngModel)]="motForm.processDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Cost</label>
+            <input type="text" appThousands [(ngModel)]="motForm.cost" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Cost Settled Date</label>
+            <input type="date" [(ngModel)]="motForm.costSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Reference Number</label>
+            <input [(ngModel)]="motForm.refNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Offshore Approved PI Number</label>
+            <input [(ngModel)]="motForm.offshoreApprovedPiNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Offshore Approved PI Date</label>
+            <input type="date" [(ngModel)]="motForm.offshoreApprovedPiDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveMot(false)" [disabled]="saving.mot" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveMot(true)" [disabled]="saving.mot" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.mot ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('mot')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supplier Full Set -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('supplierFullSet')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Supplier Full Set</strong>
+        <span [style.background]="sectionStatus('supplierFullSet') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('supplierFullSet') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('supplierFullSet') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'supplierFullSet'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Supplier Invoice No.</label>
+            <input [(ngModel)]="supplierFullSetForm.supplierInvoiceNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Supplier Invoice Date</label>
+            <input type="date" [(ngModel)]="supplierFullSetForm.supplierInvoiceDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">FS Dispatch Date</label>
+            <input type="date" [(ngModel)]="supplierFullSetForm.fsDispatchDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Dispatched Via</label>
+            <select [(ngModel)]="supplierFullSetForm.fsDispatchedViaId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of couriers" [ngValue]="c.id">{{ c['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Tracking Number</label>
+            <input [(ngModel)]="supplierFullSetForm.fsTrackingNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">FS Received Date</label>
+            <input type="date" [(ngModel)]="supplierFullSetForm.fsReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveSupplierFullSet(false)" [disabled]="saving.supplierFullSet" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveSupplierFullSet(true)" [disabled]="saving.supplierFullSet" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.supplierFullSet ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('supplierFullSet')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supplier Payment -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('supplierPayment')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Supplier Payment</strong>
+        <span [style.background]="sectionStatus('supplierPayment') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('supplierPayment') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('supplierPayment') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'supplierPayment'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Due Date</label>
+            <input type="date" [(ngModel)]="supplierPaymentForm.dueDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Due Amount</label>
+            <input type="text" appThousands [(ngModel)]="supplierPaymentForm.dueAmount" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Currency</label>
+            <select [(ngModel)]="supplierPaymentForm.currencyId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Payment Executed Date</label>
+            <input type="date" [(ngModel)]="supplierPaymentForm.paymentExecutedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Payment Executed Value</label>
+            <input type="text" appThousands [(ngModel)]="supplierPaymentForm.paymentExecutedValue" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Payment Executed Currency</label>
+            <select [(ngModel)]="supplierPaymentForm.paymentExecutedCurrencyId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+            </select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label style="display:block; font-size:12px; color:#555;">Remarks</label>
+            <input [(ngModel)]="supplierPaymentForm.remarks" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+        <p *ngIf="detail.supplierPayment?.dueBalanceUsd !== null && detail.supplierPayment?.dueBalanceUsd !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Due Amount: {{ detail.supplierPayment!.dueAmountUsd | number: '1.2-2' }} USD — Paid: {{ detail.supplierPayment!.paymentExecutedUsd | number: '1.2-2' }} USD — Balance: {{ detail.supplierPayment!.dueBalanceUsd | number: '1.2-2' }} USD</p>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveSupplierPayment(false)" [disabled]="saving.supplierPayment" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveSupplierPayment(true)" [disabled]="saving.supplierPayment" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.supplierPayment ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('supplierPayment')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banking -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('banking')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Banking</strong>
+        <span [style.background]="sectionStatus('banking') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('banking') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('banking') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'banking'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Sender Bank</label>
+            <select [(ngModel)]="bankingForm.senderBankId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let b of senderBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">OS Doc Dispatch Date</label>
+            <input type="date" [(ngModel)]="bankingForm.osDocDispatchDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Dispatched Via</label>
+            <select [(ngModel)]="bankingForm.osDocDispatchedViaId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of couriers" [ngValue]="c.id">{{ c['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">OS Doc Tracking Number</label>
+            <input [(ngModel)]="bankingForm.osDocTrackingNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Receiving Bank</label>
+            <select [(ngModel)]="bankingForm.receivingBankId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let b of receiverBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+            </select>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
+            <input type="checkbox" [(ngModel)]="bankingForm.necessaryGoodType" id="necgood" />
+            <label for="necgood" style="font-size:13px;">Necessary Good Type</label>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Ref No.</label>
+            <input [(ngModel)]="bankingForm.collectionRefNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Value</label>
+            <input type="text" appThousands [(ngModel)]="bankingForm.collectionValue" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Currency</label>
+            <select [(ngModel)]="bankingForm.collectionCurrencyId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Tenor</label>
+            <select [(ngModel)]="bankingForm.tenorId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Due Date</label>
+            <input type="date" [(ngModel)]="bankingForm.collectionDueDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Amount Settled</label>
+            <input type="text" appThousands [(ngModel)]="bankingForm.collectionAmountSettled" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">IM Form No.</label>
+            <input [(ngModel)]="bankingForm.imFormNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">IM Form Date</label>
+            <input type="date" [(ngModel)]="bankingForm.imFormDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+        <p *ngIf="detail.banking?.remainingDues !== null && detail.banking?.remainingDues !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} — Remaining dues: {{ detail.banking!.remainingDues | number: '1.2-2' }}</p>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveBanking(false)" [disabled]="saving.banking" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveBanking(true)" [disabled]="saving.banking" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.banking ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('banking')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
 
     <div style="margin-top:1.5rem;">
       <button (click)="confirmShipment()" [disabled]="confirming || detail.status !== 'Draft'" style="padding:8px 18px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer;">{{ confirming ? 'Confirming...' : 'Confirm Shipment' }}</button>
