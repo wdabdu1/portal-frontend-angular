@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
@@ -10,7 +10,7 @@ type SectionKey = 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'sup
 
 @Component({
   selector: 'app-update-shipment',
-  imports: [CommonModule, FormsModule, ThousandsInputDirective],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective, RouterLink],
   templateUrl: './update-shipment.html'
 })
 export class UpdateShipment implements OnInit {
