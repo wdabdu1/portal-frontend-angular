@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -10,6 +10,8 @@ import { AuthService } from '../auth.service';
   templateUrl: './login.html'
 })
 export class Login {
+  private cdr = inject(ChangeDetectorRef);
+
   email = '';
   password = '';
   error = '';
@@ -28,6 +30,7 @@ export class Login {
       error: () => {
         this.loading = false;
         this.error = 'Invalid email or password.';
+        this.cdr.markForCheck();
       }
     });
   }
