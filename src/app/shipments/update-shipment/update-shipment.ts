@@ -43,8 +43,12 @@ export class UpdateShipment implements OnInit {
   ssmoForm = { applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '' };
   motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', offshoreApprovedPiNumber: '', offshoreApprovedPiDate: '' };
   supplierFullSetForm = { supplierInvoiceNo: '', supplierInvoiceDate: '', fsDispatchDate: '', fsDispatchedViaId: null as number | null, fsTrackingNumber: '', fsReceivedDate: '' };
-  supplierPaymentForm = { dueDate: '', dueAmount: null as number | null, currencyId: null as number | null, paymentExecutedDate: '', paymentExecutedValue: null as number | null, paymentExecutedCurrencyId: null as number | null, remarks: '' };
-  bankingForm = {
+  supplierPaymentForm = {
+    currencyId: null as number | null,
+    advanceValue: null as number | null, advanceDueDate: '', advanceActualPaymentDate: '',
+    remainingValue: null as number | null, remainingDueDate: '', remainingActualPaymentDate: '',
+    remarks: ''
+  };  bankingForm = {
     senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
     receivingBankId: null as number | null, necessaryGoodType: false, collectionRefNo: '', collectionValue: null as number | null, collectionCurrencyId: null as number | null,
     tenorId: null as number | null, collectionDueDate: '', collectionAmountSettled: null as number | null, imFormNo: '', imFormDate: ''
@@ -88,9 +92,10 @@ export class UpdateShipment implements OnInit {
           fsTrackingNumber: detail.supplierFullSet.fsTrackingNumber ?? '', fsReceivedDate: detail.supplierFullSet.fsReceivedDate ?? ''
         };
         if (detail.supplierPayment) this.supplierPaymentForm = {
-          dueDate: detail.supplierPayment.dueDate ?? '', dueAmount: detail.supplierPayment.dueAmount, currencyId: detail.supplierPayment.currencyId,
-          paymentExecutedDate: detail.supplierPayment.paymentExecutedDate ?? '', paymentExecutedValue: detail.supplierPayment.paymentExecutedValue,
-          paymentExecutedCurrencyId: detail.supplierPayment.paymentExecutedCurrencyId, remarks: detail.supplierPayment.remarks ?? ''
+          currencyId: detail.supplierPayment.currencyId,
+          advanceValue: detail.supplierPayment.advanceValue, advanceDueDate: detail.supplierPayment.advanceDueDate ?? '', advanceActualPaymentDate: detail.supplierPayment.advanceActualPaymentDate ?? '',
+          remainingValue: detail.supplierPayment.remainingValue, remainingDueDate: detail.supplierPayment.remainingDueDate ?? '', remainingActualPaymentDate: detail.supplierPayment.remainingActualPaymentDate ?? '',
+          remarks: detail.supplierPayment.remarks ?? ''
         };
         if (detail.banking) this.bankingForm = {
           senderBankId: detail.banking.senderBankId, osDocDispatchDate: detail.banking.osDocDispatchDate ?? '', osDocDispatchedViaId: detail.banking.osDocDispatchedViaId,
@@ -191,9 +196,10 @@ export class UpdateShipment implements OnInit {
 
   saveSupplierPayment(andNext: boolean): void {
     this.genericSave('supplierPayment', () => this.service.saveSupplierPayment(this.shipmentId, {
-      dueDate: this.supplierPaymentForm.dueDate || null, dueAmount: this.supplierPaymentForm.dueAmount, currencyId: this.supplierPaymentForm.currencyId,
-      paymentExecutedDate: this.supplierPaymentForm.paymentExecutedDate || null, paymentExecutedValue: this.supplierPaymentForm.paymentExecutedValue,
-      paymentExecutedCurrencyId: this.supplierPaymentForm.paymentExecutedCurrencyId, remarks: this.supplierPaymentForm.remarks || null
+      currencyId: this.supplierPaymentForm.currencyId,
+      advanceValue: this.supplierPaymentForm.advanceValue, advanceDueDate: this.supplierPaymentForm.advanceDueDate || null, advanceActualPaymentDate: this.supplierPaymentForm.advanceActualPaymentDate || null,
+      remainingValue: this.supplierPaymentForm.remainingValue, remainingDueDate: this.supplierPaymentForm.remainingDueDate || null, remainingActualPaymentDate: this.supplierPaymentForm.remainingActualPaymentDate || null,
+      remarks: this.supplierPaymentForm.remarks || null
     }), andNext);
   }
 
