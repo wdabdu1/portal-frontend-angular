@@ -6,7 +6,7 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
 
-type SectionKey = 'forwarder' | 'acd';
+type SectionKey = 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'supplierPayment' | 'banking';
 
 @Component({
   selector: 'app-update-shipment',
@@ -25,17 +25,30 @@ export class UpdateShipment implements OnInit {
 
   forwarders: LookupEntity[] = [];
   currencies: LookupEntity[] = [];
+  couriers: LookupEntity[] = [];
+  senderBanks: LookupEntity[] = [];
+  receiverBanks: LookupEntity[] = [];
+  tenors: LookupEntity[] = [];
 
-  sectionOrder: SectionKey[] = ['forwarder', 'acd'];
+  sectionOrder: SectionKey[] = ['forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'supplierPayment', 'banking'];
   expandedSection: SectionKey | null = 'forwarder';
+  saving: Record<SectionKey, boolean> = {
+    forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, supplierPayment: false, banking: false
+  };
+  confirming = false;
 
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
-  forwarderSaving = false;
-
   acdForm = { processDate: '', costUsd: null as number | null, costSettledDate: '', refNumber: '' };
-  acdSaving = false;
-
-  confirming = false;
+  draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
+  ssmoForm = { applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '' };
+  motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', offshoreApprovedPiNumber: '', offshoreApprovedPiDate: '' };
+  supplierFullSetForm = { supplierInvoiceNo: '', supplierInvoiceDate: '', fsDispatchDate: '', fsDispatchedViaId: null as number | null, fsTrackingNumber: '', fsReceivedDate: '' };
+  supplierPaymentForm = { dueDate: '', dueAmount: null as number | null, currencyId: null as number | null, paymentExecutedDate: '', paymentExecutedValue: null as number | null, paymentExecutedCurrencyId: null as number | null, remarks: '' };
+  bankingForm = {
+    senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
+    receivingBankId: null as number | null, necessaryGoodType: false, collectionRefNo: '', collectionValue: null as number | null, collectionCurrencyId: null as number | null,
+    tenorId: null as number | null, collectionDueDate: '', collectionAmountSettled: null as number | null, imFormNo: '', imFormDate: ''
+  };
 
   constructor(private lookups: SettingsLookupService, private service: UpdateShipmentService) {}
 
@@ -44,6 +57,10 @@ export class UpdateShipment implements OnInit {
 
     this.lookups.getAll<LookupEntity>('forwarders').subscribe({ next: (r) => { this.forwarders = r; this.cdr.markForCheck(); } });
     this.lookups.getAll<LookupEntity>('currencies').subscribe({ next: (r) => { this.currencies = r; this.cdr.markForCheck(); } });
+    this.lookups.getAll<LookupEntity>('couriers').subscribe({ next: (r) => { this.couriers = r; this.cdr.markForCheck(); } });
+    this.lookups.getAll<LookupEntity>('sender-banks').subscribe({ next: (r) => { this.senderBanks = r; this.cdr.markForCheck(); } });
+    this.lookups.getAll<LookupEntity>('receiver-banks').subscribe({ next: (r) => { this.receiverBanks = r; this.cdr.markForCheck(); } });
+    this.lookups.getAll<LookupEntity>('tenors').subscribe({ next: (r) => { this.tenors = r; this.cdr.markForCheck(); } });
 
     this.loadDetail();
   }
@@ -52,23 +69,37 @@ export class UpdateShipment implements OnInit {
     this.service.getDetail(this.shipmentId).subscribe({
       next: (detail) => {
         this.detail = detail;
-        if (detail.forwarder) {
-          this.forwarderForm = {
-            forwarderId: detail.forwarder.forwarderId,
-            actualShippingCost: detail.forwarder.actualShippingCost,
-            currencyId: detail.forwarder.currencyId,
-            amountSaved: detail.forwarder.amountSaved,
-            marineInsurance: detail.forwarder.marineInsurance
-          };
-        }
-        if (detail.acd) {
-          this.acdForm = {
-            processDate: detail.acd.processDate ?? '',
-            costUsd: detail.acd.costUsd,
-            costSettledDate: detail.acd.costSettledDate ?? '',
-            refNumber: detail.acd.refNumber ?? ''
-          };
-        }
+
+        if (detail.forwarder) this.forwarderForm = { ...detail.forwarder };
+        if (detail.acd) this.acdForm = { processDate: detail.acd.processDate ?? '', costUsd: detail.acd.costUsd, costSettledDate: detail.acd.costSettledDate ?? '', refNumber: detail.acd.refNumber ?? '' };
+        if (detail.draftDocuments) this.draftDocumentsForm = {
+          initialDraftReceivedDate: detail.draftDocuments.initialDraftReceivedDate ?? '',
+          finalDraftReceivedDate: detail.draftDocuments.finalDraftReceivedDate ?? '',
+          finalDraftConfirmedDate: detail.draftDocuments.finalDraftConfirmedDate ?? ''
+        };
+        if (detail.ssmo) this.ssmoForm = { applicationDate: detail.ssmo.applicationDate ?? '', cost: detail.ssmo.cost, costSettledDate: detail.ssmo.costSettledDate ?? '', refNumber: detail.ssmo.refNumber ?? '' };
+        if (detail.mot) this.motForm = {
+          processDate: detail.mot.processDate ?? '', cost: detail.mot.cost, costSettledDate: detail.mot.costSettledDate ?? '', refNumber: detail.mot.refNumber ?? '',
+          offshoreApprovedPiNumber: detail.mot.offshoreApprovedPiNumber ?? '', offshoreApprovedPiDate: detail.mot.offshoreApprovedPiDate ?? ''
+        };
+        if (detail.supplierFullSet) this.supplierFullSetForm = {
+          supplierInvoiceNo: detail.supplierFullSet.supplierInvoiceNo ?? '', supplierInvoiceDate: detail.supplierFullSet.supplierInvoiceDate ?? '',
+          fsDispatchDate: detail.supplierFullSet.fsDispatchDate ?? '', fsDispatchedViaId: detail.supplierFullSet.fsDispatchedViaId,
+          fsTrackingNumber: detail.supplierFullSet.fsTrackingNumber ?? '', fsReceivedDate: detail.supplierFullSet.fsReceivedDate ?? ''
+        };
+        if (detail.supplierPayment) this.supplierPaymentForm = {
+          dueDate: detail.supplierPayment.dueDate ?? '', dueAmount: detail.supplierPayment.dueAmount, currencyId: detail.supplierPayment.currencyId,
+          paymentExecutedDate: detail.supplierPayment.paymentExecutedDate ?? '', paymentExecutedValue: detail.supplierPayment.paymentExecutedValue,
+          paymentExecutedCurrencyId: detail.supplierPayment.paymentExecutedCurrencyId, remarks: detail.supplierPayment.remarks ?? ''
+        };
+        if (detail.banking) this.bankingForm = {
+          senderBankId: detail.banking.senderBankId, osDocDispatchDate: detail.banking.osDocDispatchDate ?? '', osDocDispatchedViaId: detail.banking.osDocDispatchedViaId,
+          osDocTrackingNumber: detail.banking.osDocTrackingNumber ?? '', receivingBankId: detail.banking.receivingBankId, necessaryGoodType: detail.banking.necessaryGoodType,
+          collectionRefNo: detail.banking.collectionRefNo ?? '', collectionValue: detail.banking.collectionValue, collectionCurrencyId: detail.banking.collectionCurrencyId,
+          tenorId: detail.banking.tenorId, collectionDueDate: detail.banking.collectionDueDate ?? '', collectionAmountSettled: detail.banking.collectionAmountSettled,
+          imFormNo: detail.banking.imFormNo ?? '', imFormDate: detail.banking.imFormDate ?? ''
+        };
+
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -82,9 +113,7 @@ export class UpdateShipment implements OnInit {
 
   sectionStatus(key: SectionKey): 'Not Started' | 'Saved' {
     if (!this.detail) return 'Not Started';
-    if (key === 'forwarder') return this.detail.forwarder ? 'Saved' : 'Not Started';
-    if (key === 'acd') return this.detail.acd ? 'Saved' : 'Not Started';
-    return 'Not Started';
+    return this.detail[key] ? 'Saved' : 'Not Started';
   }
 
   toggleSection(key: SectionKey): void {
@@ -93,48 +122,91 @@ export class UpdateShipment implements OnInit {
 
   goToNext(current: SectionKey): void {
     const idx = this.sectionOrder.indexOf(current);
-    const next = this.sectionOrder[idx + 1] ?? null;
-    this.expandedSection = next;
+    this.expandedSection = this.sectionOrder[idx + 1] ?? null;
     this.cdr.markForCheck();
   }
 
-  saveForwarder(andNext: boolean): void {
-    this.forwarderSaving = true;
-    this.service.saveForwarder(this.shipmentId, this.forwarderForm).subscribe({
+  private genericSave<K extends SectionKey>(
+    key: K,
+    save$: () => import('rxjs').Observable<any>,
+    andNext: boolean
+  ): void {
+    this.saving[key] = true;
+    save$().subscribe({
       next: (updated) => {
-        this.forwarderSaving = false;
-        if (this.detail) this.detail = { ...this.detail, forwarder: updated as any };
-        if (andNext) this.goToNext('forwarder');
+        this.saving[key] = false;
+        if (this.detail) this.detail = { ...this.detail, [key]: updated };
+        if (andNext) this.goToNext(key);
         this.cdr.markForCheck();
       },
       error: () => {
-        this.forwarderSaving = false;
-        this.error = 'Could not save Forwarder section.';
+        this.saving[key] = false;
+        this.error = `Could not save this section.`;
         this.cdr.markForCheck();
       }
     });
   }
 
+  saveForwarder(andNext: boolean): void {
+    this.genericSave('forwarder', () => this.service.saveForwarder(this.shipmentId, this.forwarderForm), andNext);
+  }
+
   saveAcd(andNext: boolean): void {
-    this.acdSaving = true;
-    this.service.saveAcd(this.shipmentId, {
-      processDate: this.acdForm.processDate || null,
-      costUsd: this.acdForm.costUsd,
-      costSettledDate: this.acdForm.costSettledDate || null,
-      refNumber: this.acdForm.refNumber || null
-    }).subscribe({
-      next: (updated) => {
-        this.acdSaving = false;
-        if (this.detail) this.detail = { ...this.detail, acd: updated as any };
-        if (andNext) this.goToNext('acd');
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.acdSaving = false;
-        this.error = 'Could not save ACD section.';
-        this.cdr.markForCheck();
-      }
-    });
+    this.genericSave('acd', () => this.service.saveAcd(this.shipmentId, {
+      processDate: this.acdForm.processDate || null, costUsd: this.acdForm.costUsd,
+      costSettledDate: this.acdForm.costSettledDate || null, refNumber: this.acdForm.refNumber || null
+    }), andNext);
+  }
+
+  saveDraftDocuments(andNext: boolean): void {
+    this.genericSave('draftDocuments', () => this.service.saveDraftDocuments(this.shipmentId, {
+      initialDraftReceivedDate: this.draftDocumentsForm.initialDraftReceivedDate || null,
+      finalDraftReceivedDate: this.draftDocumentsForm.finalDraftReceivedDate || null,
+      finalDraftConfirmedDate: this.draftDocumentsForm.finalDraftConfirmedDate || null
+    }), andNext);
+  }
+
+  saveSsmo(andNext: boolean): void {
+    this.genericSave('ssmo', () => this.service.saveSsmo(this.shipmentId, {
+      applicationDate: this.ssmoForm.applicationDate || null, cost: this.ssmoForm.cost,
+      costSettledDate: this.ssmoForm.costSettledDate || null, refNumber: this.ssmoForm.refNumber || null
+    }), andNext);
+  }
+
+  saveMot(andNext: boolean): void {
+    this.genericSave('mot', () => this.service.saveMot(this.shipmentId, {
+      processDate: this.motForm.processDate || null, cost: this.motForm.cost, costSettledDate: this.motForm.costSettledDate || null,
+      refNumber: this.motForm.refNumber || null, offshoreApprovedPiNumber: this.motForm.offshoreApprovedPiNumber || null,
+      offshoreApprovedPiDate: this.motForm.offshoreApprovedPiDate || null
+    }), andNext);
+  }
+
+  saveSupplierFullSet(andNext: boolean): void {
+    this.genericSave('supplierFullSet', () => this.service.saveSupplierFullSet(this.shipmentId, {
+      supplierInvoiceNo: this.supplierFullSetForm.supplierInvoiceNo || null, supplierInvoiceDate: this.supplierFullSetForm.supplierInvoiceDate || null,
+      fsDispatchDate: this.supplierFullSetForm.fsDispatchDate || null, fsDispatchedViaId: this.supplierFullSetForm.fsDispatchedViaId,
+      fsTrackingNumber: this.supplierFullSetForm.fsTrackingNumber || null, fsReceivedDate: this.supplierFullSetForm.fsReceivedDate || null
+    }), andNext);
+  }
+
+  saveSupplierPayment(andNext: boolean): void {
+    this.genericSave('supplierPayment', () => this.service.saveSupplierPayment(this.shipmentId, {
+      dueDate: this.supplierPaymentForm.dueDate || null, dueAmount: this.supplierPaymentForm.dueAmount, currencyId: this.supplierPaymentForm.currencyId,
+      paymentExecutedDate: this.supplierPaymentForm.paymentExecutedDate || null, paymentExecutedValue: this.supplierPaymentForm.paymentExecutedValue,
+      paymentExecutedCurrencyId: this.supplierPaymentForm.paymentExecutedCurrencyId, remarks: this.supplierPaymentForm.remarks || null
+    }), andNext);
+  }
+
+  saveBanking(andNext: boolean): void {
+    this.genericSave('banking', () => this.service.saveBanking(this.shipmentId, {
+      senderBankId: this.bankingForm.senderBankId, osDocDispatchDate: this.bankingForm.osDocDispatchDate || null,
+      osDocDispatchedViaId: this.bankingForm.osDocDispatchedViaId, osDocTrackingNumber: this.bankingForm.osDocTrackingNumber || null,
+      receivingBankId: this.bankingForm.receivingBankId, necessaryGoodType: this.bankingForm.necessaryGoodType,
+      collectionRefNo: this.bankingForm.collectionRefNo || null, collectionValue: this.bankingForm.collectionValue,
+      collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId,
+      collectionDueDate: this.bankingForm.collectionDueDate || null, collectionAmountSettled: this.bankingForm.collectionAmountSettled,
+      imFormNo: this.bankingForm.imFormNo || null, imFormDate: this.bankingForm.imFormDate || null
+    }), andNext);
   }
 
   confirmShipment(): void {
