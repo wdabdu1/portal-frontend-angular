@@ -1,0 +1,181 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">New Supplier Order</h1>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading form data...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+  <p *ngIf="success" style="color: #2a7d2a; font-size: 13px;">{{ success }}</p>
+
+  <form *ngIf="!loading" (ngSubmit)="submit()">
+    <h3 style="font-size: 15px; margin-top: 1.5rem;">Order Identity</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">PO Number *</label>
+        <input [(ngModel)]="poNumber" name="poNumber" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Business Unit *</label>
+        <select [(ngModel)]="businessUnitId" name="businessUnitId" (change)="onBusinessUnitChange()" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Division *</label>
+        <select [(ngModel)]="divisionId" name="divisionId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let d of filteredDivisions" [ngValue]="d.id">{{ d.name }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Supplier *</label>
+        <select [(ngModel)]="supplierId" name="supplierId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Brand/Manufacturer</label>
+        <select [(ngModel)]="brandManufacturerId" name="brandManufacturerId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let b of brands" [ngValue]="b.id">{{ b['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Approval Type</label>
+        <select [(ngModel)]="approvalTypeId" name="approvalTypeId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let a of approvalTypes" [ngValue]="a.id">{{ a['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Consignee</label>
+        <select [(ngModel)]="consigneeId" name="consigneeId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let c of consignees" [ngValue]="c.id">{{ c['name'] }}</option>
+        </select>
+      </div>
+    </div>
+
+    <h3 style="font-size: 15px; margin-top: 1.5rem;">Supplier & PO Details</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Supplier PI No.</label>
+        <input [(ngModel)]="supplierPiNo" name="supplierPiNo" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Supplier PI Date</label>
+        <input type="date" [(ngModel)]="supplierPiDate" name="supplierPiDate" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Payment Term</label>
+        <select [(ngModel)]="supplierPaymentTermId" name="supplierPaymentTermId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let p of paymentTerms" [ngValue]="p.id">{{ p['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Incoterm</label>
+        <select [(ngModel)]="incotermId" name="incotermId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let i of incoterms" [ngValue]="i.id">{{ i['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Origin Country</label>
+        <select [(ngModel)]="originCountryId" name="originCountryId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let o of originCountries" [ngValue]="o.id">{{ o['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Shipment Mode</label>
+        <select [(ngModel)]="shipmentModeId" name="shipmentModeId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let m of shipmentModes" [ngValue]="m.id">{{ m['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">BU Shipping Budget</label>
+        <input type="number" [(ngModel)]="buShippingBudget" name="buShippingBudget" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Offshore PO No.</label>
+        <input [(ngModel)]="offshorePoNo" name="offshorePoNo" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Offshore PO Date</label>
+        <input type="date" [(ngModel)]="offshorePoDate" name="offshorePoDate" style="width:100%; padding:6px;" />
+      </div>
+    </div>
+
+    <h3 style="font-size: 15px; margin-top: 1.5rem;">Key Milestone Dates</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Received Signed PI</label>
+        <input type="date" [(ngModel)]="receivedSignedPiDate" name="receivedSignedPiDate" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Sent Signed PI</label>
+        <input type="date" [(ngModel)]="sentSignedPiDate" name="sentSignedPiDate" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">BU PO Date</label>
+        <input type="date" [(ngModel)]="buPoDate" name="buPoDate" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Order Execution Date</label>
+        <input type="date" [(ngModel)]="orderExecutionDate" name="orderExecutionDate" style="width:100%; padding:6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Latest Shipping Date</label>
+        <input type="date" [(ngModel)]="latestShippingDate" name="latestShippingDate" style="width:100%; padding:6px;" />
+      </div>
+    </div>
+
+    <h3 style="font-size: 15px; margin-top: 1.5rem;">Line Items *</h3>
+    <div *ngFor="let li of lineItems; let i = index" style="display:grid; grid-template-columns: repeat(7, 1fr) auto; gap:6px; margin-bottom:6px; align-items:center;">
+      <select [(ngModel)]="li.productCategoryId" [name]="'cat'+i" style="padding:5px;">
+        <option [ngValue]="null">Category</option>
+        <option *ngFor="let c of productCategories" [ngValue]="c.id">{{ c['name'] }}</option>
+      </select>
+      <select [(ngModel)]="li.modelProductId" [name]="'model'+i" style="padding:5px;">
+        <option [ngValue]="null">Model/Product</option>
+        <option *ngFor="let m of modelProducts" [ngValue]="m.id">{{ m['name'] }}</option>
+      </select>
+      <select [(ngModel)]="li.productTypeId" [name]="'type'+i" style="padding:5px;">
+        <option [ngValue]="null">Type</option>
+        <option *ngFor="let t of productTypes" [ngValue]="t.id">{{ t['name'] }}</option>
+      </select>
+      <input type="number" [(ngModel)]="li.qty" [name]="'qty'+i" placeholder="Qty" style="padding:5px;" />
+      <select [(ngModel)]="li.unitOfMeasureId" [name]="'unit'+i" style="padding:5px;">
+        <option [ngValue]="null">Unit</option>
+        <option *ngFor="let u of unitsOfMeasure" [ngValue]="u.id">{{ u['code'] }}</option>
+      </select>
+      <input type="number" [(ngModel)]="li.unitPrice" [name]="'price'+i" placeholder="Unit Price" style="padding:5px;" />
+      <select [(ngModel)]="li.currencyId" [name]="'cur'+i" style="padding:5px;">
+        <option [ngValue]="null">Currency</option>
+        <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+      </select>
+      <button type="button" (click)="removeLineItem(i)" style="color:#c0392b; background:none; border:none; cursor:pointer;">✕</button>
+    </div>
+    <button type="button" (click)="addLineItem()" style="margin-top:4px; padding:5px 10px; font-size:13px;">+ Add line item</button>
+
+    <h3 style="font-size: 15px; margin-top: 1.5rem;">Offshore Chain (Supplier → Offshore(s) → Onshore)</h3>
+    <p style="font-size:12px; color:#888;">Order matters — first row receives directly from the Supplier.</p>
+    <div *ngFor="let row of offshoreRows; let i = index" style="display:flex; gap:8px; margin-bottom:6px; align-items:center;">
+      <span style="font-size:12px; color:#888; width:20px;">{{ i + 1 }}.</span>
+      <select [(ngModel)]="row.businessPartnerId" [name]="'offshore'+i" style="padding:5px; flex:1;">
+        <option [ngValue]="null">-- select offshore company --</option>
+        <option *ngFor="let o of offshoreEntities" [ngValue]="o.id">{{ o['name'] }}</option>
+      </select>
+      <button type="button" (click)="removeOffshoreRow(i)" style="color:#c0392b; background:none; border:none; cursor:pointer;">✕</button>
+    </div>
+    <button type="button" (click)="addOffshoreRow()" style="margin-top:4px; padding:5px 10px; font-size:13px;">+ Add offshore partner</button>
+
+    <div style="margin-top: 2rem;">
+      <button type="submit" [disabled]="saving" style="padding:10px 20px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+        {{ saving ? 'Saving...' : 'Save as Draft' }}
+      </button>
+    </div>
+  </form>
+</div>
