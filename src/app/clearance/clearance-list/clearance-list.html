@@ -1,0 +1,55 @@
+<div style="max-width: 1000px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Clearance — Select Shipment</h1>
+  <p style="color: #888; font-size: 13px;">Sorted by ETA — shipments arriving soonest appear first.</p>
+
+  <input
+    [(ngModel)]="searchText"
+    (ngModelChange)="onSearchChange()"
+    placeholder="Search by BL/AWB or Declaration No."
+    style="width: 100%; max-width: 400px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+  />
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;"></th>
+        <th style="padding: 8px 6px;">BL/AWB</th>
+        <th style="padding: 8px 6px;">BU</th>
+        <th style="padding: 8px 6px;">Category</th>
+        <th style="padding: 8px 6px;">ETA</th>
+        <th style="padding: 8px 6px;">FCL</th>
+        <th style="padding: 8px 6px;">Declaration No.</th>
+        <th style="padding: 8px 6px;">Product/Model</th>
+        <th style="padding: 8px 6px;">Qty</th>
+        <th style="padding: 8px 6px;">Route</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let s of shipments"
+        (click)="select(s.shipmentId)"
+        style="border-bottom: 1px solid #eee; cursor: pointer;"
+      >
+        <td style="padding: 8px 6px;">
+          <span [style.background]="trafficColor(s.trafficLight)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+        </td>
+        <td style="padding: 8px 6px; font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</td>
+        <td style="padding: 8px 6px;">{{ s.businessUnit }}</td>
+        <td style="padding: 8px 6px;">{{ s.category }}</td>
+        <td style="padding: 8px 6px; color: #888;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 8px 6px;">{{ s.fclCount }}</td>
+        <td style="padding: 8px 6px;">{{ s.declarationNo || '—' }}</td>
+        <td style="padding: 8px 6px;">{{ s.product }}</td>
+        <td style="padding: 8px 6px;">{{ s.qty }}</td>
+        <td style="padding: 8px 6px; font-size: 12px; color: #666;">{{ s.routeStatus }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && shipments.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No confirmed shipments match.
+  </p>
+</div>
