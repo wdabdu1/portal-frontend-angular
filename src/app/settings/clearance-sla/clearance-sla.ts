@@ -90,8 +90,11 @@ export class ClearanceSla implements OnInit {
     return general ? this.groupTotal(general) : 0;
   }
 
-  // Fully computed, never user-editable: General subtotal + this route's own total.
+  // Fully computed, never user-editable: General subtotal + this route's
+  // own total — except Route 3, which starts from goods already cleared
+  // into the FZ, so the General clearance steps don't reapply there.
   combinedRouteTotal(group: DivisionGroup): number {
+    if (group.division === 'Route3') return this.groupTotal(group);
     return this.generalTotal + this.groupTotal(group);
   }
 
