@@ -2,20 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { API_URL } from '../api-config';
 
-export interface ClearanceShipmentSummary {
-  shipmentId: number;
-  blAwbNo: string;
-  businessUnit: string;
-  category: string;
-  eta: string | null;
-  fclCount: number;
-  declarationNo: string | null;
-  product: string;
-  qty: number;
-  trafficLight: 'Green' | 'Amber' | 'Red' | 'Grey';
-  routeStatus: string;
-}
-
 export interface ClearanceRoute1Details {
   moveRequestDate: string | null; billAmountSdg: number | null; billSettlementDate: string | null;
   ssmoFileRequestDate: string | null; ssmoInspectionAmountSdg: number | null; ssmoFeesSettlementDate: string | null;
@@ -42,6 +28,20 @@ export interface ClearanceRoute3Details {
   ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null;
   custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null;
   truckPortEntryPermitDate: string | null; clearanceActualCompletedDate: string | null;
+}
+
+export interface ClearanceShipmentSummary {
+  shipmentId: number;
+  blAwbNo: string;
+  businessUnit: string;
+  category: string;
+  eta: string | null;
+  fclCount: number;
+  declarationNo: string | null;
+  product: string;
+  qty: number;
+  trafficLight: 'Green' | 'Amber' | 'Red' | 'Grey';
+  routeStatus: string;
 }
 
 export interface ClearanceDetail {
@@ -98,5 +98,4 @@ export class ClearanceService {
   saveRoute3(shipmentId: number, req: Partial<ClearanceRoute3Details>) {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/route3`, req);
   }
-}
 }
