@@ -1,290 +1,535 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
-import {
-  ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
-  ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details,
-  ClearanceService, ScheduleItem
-} from '../clearance.service';
+<div style="max-width: 750px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/clearance" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Clearance list</a>
 
-interface GroupItemDef {
-  key: string;       // matches ScheduleItem.groupItem
-  label: string;
-}
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 12px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
 
-@Component({
-  selector: 'app-clearance-detail',
-  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
-  templateUrl: './clearance-detail.html'
-})
-export class ClearanceDetailComponent implements OnInit {
-  private cdr = inject(ChangeDetectorRef);
-  private route = inject(ActivatedRoute);
+  <div *ngIf="!loading && detail">
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Clearance — {{ detail.blAwbNo }}</h1>
+    <p style="color: #888; font-size: 13px;">PO {{ detail.poNumber }} — ETA: {{ detail.eta ? (detail.eta | date: 'MMM d, y') : '—' }}</p>
 
-  shipmentId!: number;
-  detail: ClearanceDetail | null = null;
-  loading = true;
-  error = '';
+    <!-- Route selector (moved to top) -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; overflow: hidden;">
+      <div (click)="toggle('route')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Clearance Route</strong>
+        <span style="font-size: 12px; color: #666;">{{ routeName(detail.route) }}</span>
+      </div>
+      <div *ngIf="expanded === 'route'" style="padding: 16px;">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="radio" name="route" [value]="1" [(ngModel)]="selectedRoute" /> Route 1 — Clear at Port
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="radio" name="route" [value]="2" [(ngModel)]="selectedRoute" /> Route 2 — FZ Deposit
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="radio" name="route" [value]="3" [(ngModel)]="selectedRoute" /> Route 3 — Clear from FZ
+          </label>
+        </div>
 
-  schedule: ScheduleItem[] = [];
-  estimatedCompletionDate: string | null = null;
+        <p *ngIf="estimatedCompletionDate" style="margin-top:12px; font-size:13px; background:#f0f6fb; padding:8px; border-radius:4px;">
+          Estimated Clearance Complete Date: <strong>{{ estimatedCompletionDate | date: 'MMM d, y' }}</strong>
+        </p>
 
-  expanded: string | null = 'route';
-  savingRoute = false;
-  savingDeliveryOrder = false;
-  savingCostEstimate = false;
-  savingCertificateEntry = false;
-  savingRouteDetail = false;
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveRoute(false)" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveRoute(true)" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRoute ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
 
-  selectedRoute: number = 0;
+    <!-- General sub-sections: skipped for Route 3 -->
+    <ng-container *ngIf="detail.route === 1 || detail.route === 2">
 
-  deliveryOrderForm: ClearanceDeliveryOrder = { copyOfDoCollectedDate: null, receiveDoDate: null, actualArrivalDate: null, doFeesSdg: null, doFeesSettledDate: null, doReceivedDate: null };
-  costEstimateForm: ClearanceCostEstimate = { estimateDate: null, estimateValueSdg: null, notifyBuDate: null, amountSettledDate: null };
-  certificateEntryForm: ClearanceCertificateEntry = { certificateEntryDate: null, scudaDeclarationNo: null };
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('deliveryOrder')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Delivery Order</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('ClearanceGeneral','Delivery Order')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('ClearanceGeneral','Delivery Order')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'deliveryOrder'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Copy of DO Collected Date</label><input type="date" [(ngModel)]="deliveryOrderForm.copyOfDoCollectedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Receive DO Date</label><input type="date" [(ngModel)]="deliveryOrderForm.receiveDoDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Actual Arrival Date</label><input type="date" [(ngModel)]="deliveryOrderForm.actualArrivalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">DO Fees (SDG)</label><input type="text" appThousands [(ngModel)]="deliveryOrderForm.doFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">DO Fees Settled Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doFeesSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">DO Received Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveDeliveryOrder(false)" [disabled]="savingDeliveryOrder" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveDeliveryOrder(true)" [disabled]="savingDeliveryOrder" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingDeliveryOrder ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('costEstimate')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  route1Form: ClearanceRoute1Details = this.emptyRoute1();
-  route2Form: ClearanceRoute2Details = this.emptyRoute2();
-  route3Form: ClearanceRoute3Details = this.emptyRoute3();
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('costEstimate')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Clearance Cost Estimate</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('ClearanceGeneral','Clearance Cost Estimate')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('ClearanceGeneral','Clearance Cost Estimate')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'costEstimate'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Estimate Date</label><input type="date" [(ngModel)]="costEstimateForm.estimateDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Estimate Value (SDG)</label><input type="text" appThousands [(ngModel)]="costEstimateForm.estimateValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Notify BU Date</label><input type="date" [(ngModel)]="costEstimateForm.notifyBuDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Amount Settled Date</label><input type="date" [(ngModel)]="costEstimateForm.amountSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveCostEstimate(false)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveCostEstimate(true)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCostEstimate ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('certificateEntry')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  route1Groups: GroupItemDef[] = [
-    { key: 'Containers Move Process', label: 'Containers Move Process' },
-    { key: 'SSMO File Process', label: 'SSMO File Process' },
-    { key: 'Customs Examination (Form 48)', label: 'Customs Examination (Form 48)' },
-    { key: 'Customs Lab', label: 'Customs Lab' },
-    { key: 'SSMO Examination', label: 'SSMO Examination' },
-    { key: 'Customs Evaluation', label: 'Customs Evaluation' },
-    { key: 'SPC Bill', label: 'SPC Bill' },
-    { key: 'Truck & Containers', label: 'Truck & Containers' }
-  ];
-  route2Groups: GroupItemDef[] = [
-    { key: 'FZ Deposit Request', label: 'FZ Deposit Request' },
-    { key: 'Customs Inspection', label: 'Customs Inspection' },
-    { key: 'SPC Bill', label: 'SPC Bill' },
-    { key: 'Truck & Containers', label: 'Truck & Containers' }
-  ];
-  route3Groups: GroupItemDef[] = [
-    { key: 'Customs Certificate Entry', label: 'Customs Certificate Entry' },
-    { key: 'SSMO File Process', label: 'SSMO File Process' },
-    { key: 'Customs Examination (Form 48)', label: 'Customs Examination (Form 48)' },
-    { key: 'Customs Lab', label: 'Customs Lab' },
-    { key: 'SSMO Examination', label: 'SSMO Examination' },
-    { key: 'Customs Evaluation', label: 'Customs Evaluation' },
-    { key: 'Truck & Containers', label: 'Truck & Containers' }
-  ];
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('certificateEntry')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Certificate Entry</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('ClearanceGeneral','Customs Certificate Entry')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('ClearanceGeneral','Customs Certificate Entry')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'certificateEntry'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Certificate Entry Date</label><input type="date" [(ngModel)]="certificateEntryForm.certificateEntryDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SCUDA Declaration No.</label><input [(ngModel)]="certificateEntryForm.scudaDeclarationNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveCertificateEntry(false)" [disabled]="savingCertificateEntry" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveCertificateEntry(true)" [disabled]="savingCertificateEntry" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCertificateEntry ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle(activeRouteGroups[0]?.key ?? '')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
 
-  constructor(private service: ClearanceService) {}
+    <!-- Route 1 Group Items -->
+    <ng-container *ngIf="detail.route === 1">
 
-  ngOnInit(): void {
-    this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
-    this.load();
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Containers Move Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Containers Move Process</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','Containers Move Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Containers Move Process')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Containers Move Process'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Move Request Date</label><input type="date" [(ngModel)]="route1Form.moveRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Bill Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.billAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.billSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Containers Move Process'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('SSMO File Process')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  emptyRoute1(): ClearanceRoute1Details {
-    return {
-      moveRequestDate: null, billAmountSdg: null, billSettlementDate: null,
-      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null,
-      custExamStartDate: null, custExamCompletedDate: null,
-      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null,
-      ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
-      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
-      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null,
-      truckPortEntryPermitDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
-    };
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('SSMO File Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">SSMO File Process</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO File Process')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'SSMO File Process'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO File Request Date</label><input type="date" [(ngModel)]="route1Form.ssmoFileRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Inspection Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.ssmoInspectionAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="route1Form.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO File Process'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Customs Examination (Form 48)')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  emptyRoute2(): ClearanceRoute2Details {
-    return {
-      depositRequestDate: null, requestApprovalDate: null,
-      inspectionDate: null,
-      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, policeSecurityAppointedDate: null,
-      truckPortEntryPermitDate: null, containersReceivedAtFzDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
-    };
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Examination (Form 48)')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Examination (Form 48)</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Examination (Form 48)')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Examination (Form 48)'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Start Date</label><input type="date" [(ngModel)]="route1Form.custExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route1Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Examination (Form 48)'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Customs Lab')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  emptyRoute3(): ClearanceRoute3Details {
-    return {
-      certificateEntryDate: null, scudaDeclarationNo: null,
-      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null,
-      custExamStartDate: null, custExamCompletedDate: null,
-      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null,
-      ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
-      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
-      truckPortEntryPermitDate: null, clearanceActualCompletedDate: null
-    };
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Lab')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Lab</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Lab')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="route1Form.customsLabRequired" id="r1lab" /><label for="r1lab" style="font-size:13px;">Customs Lab Required</label></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsLabFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route1Form.labFeesPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route1Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Lab'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('SSMO Examination')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  load(): void {
-    this.service.getDetail(this.shipmentId).subscribe({
-      next: (detail) => {
-        this.detail = detail;
-        this.selectedRoute = detail.route;
-        this.loading = false;
-        this.loadGeneralSubSections();
-        this.loadRouteDetail();
-        this.loadSchedule();
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.error = 'Could not load clearance details.';
-        this.loading = false;
-        this.cdr.markForCheck();
-      }
-    });
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('SSMO Examination')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">SSMO Examination</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO Examination')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'SSMO Examination'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Exam. Start Date</label><input type="date" [(ngModel)]="route1Form.ssmoExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route1Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO Examination'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Customs Evaluation')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  loadSchedule(): void {
-    this.service.getSchedule(this.shipmentId).subscribe({
-      next: (r) => {
-        this.schedule = r.items;
-        this.estimatedCompletionDate = r.estimatedCompletionDate;
-        this.cdr.markForCheck();
-      }
-    });
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Evaluation')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Evaluation</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Evaluation')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Evaluation'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Cust. Evaluation Date</label><input type="date" [(ngModel)]="route1Form.custEvaluationDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Duty (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsDutySdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Settlement Date</label><input type="date" [(ngModel)]="route1Form.customsSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route1Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Evaluation'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('SPC Bill')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  loadGeneralSubSections(): void {
-    this.service.getDeliveryOrder(this.shipmentId).subscribe({ next: (r) => { if (r) this.deliveryOrderForm = r; this.cdr.markForCheck(); } });
-    this.service.getCostEstimate(this.shipmentId).subscribe({ next: (r) => { if (r) this.costEstimateForm = r; this.cdr.markForCheck(); } });
-    this.service.getCertificateEntry(this.shipmentId).subscribe({ next: (r) => { if (r) this.certificateEntryForm = r; this.cdr.markForCheck(); } });
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('SPC Bill')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">SPC Bill</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SPC Bill')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'SPC Bill'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Request Date</label><input type="date" [(ngModel)]="route1Form.spcBillRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Value (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.spcBillValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.spcBillSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SPC Bill'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Truck & Containers')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  loadRouteDetail(): void {
-    if (this.selectedRoute === 1) {
-      this.service.getRoute1(this.shipmentId).subscribe({ next: (r) => { if (r) this.route1Form = r; this.cdr.markForCheck(); } });
-    } else if (this.selectedRoute === 2) {
-      this.service.getRoute2(this.shipmentId).subscribe({ next: (r) => { if (r) this.route2Form = r; this.cdr.markForCheck(); } });
-    } else if (this.selectedRoute === 3) {
-      this.service.getRoute3(this.shipmentId).subscribe({ next: (r) => { if (r) this.route3Form = r; this.cdr.markForCheck(); } });
-    }
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Truck & Containers</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route1','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Truck & Containers')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route1Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route1Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route1Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
 
-  toggle(section: string): void {
-    this.expanded = this.expanded === section ? null : section;
-  }
+    <!-- Route 2 Group Items -->
+    <ng-container *ngIf="detail.route === 2">
 
-  scheduleFor(division: string, groupItem: string): ScheduleItem | undefined {
-    return this.schedule.find((s) => s.division === division && s.groupItem === groupItem);
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('FZ Deposit Request')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">FZ Deposit Request</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route2','FZ Deposit Request')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','FZ Deposit Request')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'FZ Deposit Request'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Deposit Request Date</label><input type="date" [(ngModel)]="route2Form.depositRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Request Approval Date</label><input type="date" [(ngModel)]="route2Form.requestApprovalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('FZ Deposit Request'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Customs Inspection')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  lightColor(light: string | undefined): string {
-    switch (light) {
-      case 'Green': return '#2a7d2a';
-      case 'Amber': return '#c98a00';
-      case 'Red': return '#c0392b';
-      default: return '#ccc';
-    }
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Inspection')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Inspection</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route2','Customs Inspection')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Customs Inspection')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Inspection'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Inspection Date</label><input type="date" [(ngModel)]="route2Form.inspectionDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Inspection'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('SPC Bill')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  get routeDivision(): string {
-    if (this.selectedRoute === 1) return 'Route1';
-    if (this.selectedRoute === 2) return 'Route2';
-    if (this.selectedRoute === 3) return 'Route3';
-    return '';
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('SPC Bill')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">SPC Bill</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route2','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','SPC Bill')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'SPC Bill'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Request Date</label><input type="date" [(ngModel)]="route2Form.spcBillRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Value (SDG)</label><input type="text" appThousands [(ngModel)]="route2Form.spcBillValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Settlement Date</label><input type="date" [(ngModel)]="route2Form.spcBillSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Police Security Appointed Date</label><input type="date" [(ngModel)]="route2Form.policeSecurityAppointedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SPC Bill'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Truck & Containers')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  get activeRouteGroups(): GroupItemDef[] {
-    if (this.selectedRoute === 1) return this.route1Groups;
-    if (this.selectedRoute === 2) return this.route2Groups;
-    if (this.selectedRoute === 3) return this.route3Groups;
-    return [];
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Truck & Containers</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route2','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Truck & Containers')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route2Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Containers Received at FZ Date</label><input type="date" [(ngModel)]="route2Form.containersReceivedAtFzDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route2Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route2Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
 
-  saveRoute(andNext: boolean): void {
-    if (!this.selectedRoute) return;
-    this.savingRoute = true;
-    this.service.setRoute(this.shipmentId, this.selectedRoute).subscribe({
-      next: () => {
-        this.savingRoute = false;
-        if (this.detail) this.detail = { ...this.detail, route: this.selectedRoute };
-        this.loadRouteDetail();
-        this.loadSchedule();
-        if (andNext) this.expanded = this.selectedRoute === 3 ? this.activeRouteGroups[0]?.key ?? null : 'deliveryOrder';
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.savingRoute = false;
-        this.error = 'Could not save route.';
-        this.cdr.markForCheck();
-      }
-    });
-  }
+    <!-- Route 3 Group Items -->
+    <ng-container *ngIf="detail.route === 3">
 
-  saveDeliveryOrder(andNext: boolean): void {
-    this.savingDeliveryOrder = true;
-    this.service.saveDeliveryOrder(this.shipmentId, this.deliveryOrderForm).subscribe({
-      next: () => {
-        this.savingDeliveryOrder = false;
-        this.loadSchedule();
-        if (andNext) this.expanded = 'costEstimate';
-        this.cdr.markForCheck();
-      },
-      error: () => { this.savingDeliveryOrder = false; this.error = 'Could not save Delivery Order.'; this.cdr.markForCheck(); }
-    });
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Certificate Entry')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Certificate Entry</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route3','Customs Certificate Entry')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Certificate Entry')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Certificate Entry'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Certificate Entry Date</label><input type="date" [(ngModel)]="route3Form.certificateEntryDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SCUDA Declaration No.</label><input [(ngModel)]="route3Form.scudaDeclarationNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Certificate Entry'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('SSMO File Process')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  saveCostEstimate(andNext: boolean): void {
-    this.savingCostEstimate = true;
-    this.service.saveCostEstimate(this.shipmentId, this.costEstimateForm).subscribe({
-      next: () => {
-        this.savingCostEstimate = false;
-        this.loadSchedule();
-        if (andNext) this.expanded = 'certificateEntry';
-        this.cdr.markForCheck();
-      },
-      error: () => { this.savingCostEstimate = false; this.error = 'Could not save Cost Estimate.'; this.cdr.markForCheck(); }
-    });
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('SSMO File Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">SSMO File Process</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route3','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO File Process')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'SSMO File Process'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO File Request Date</label><input type="date" [(ngModel)]="route3Form.ssmoFileRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Inspection Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.ssmoInspectionAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="route3Form.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO File Process'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Customs Examination (Form 48)')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  saveCertificateEntry(andNext: boolean): void {
-    this.savingCertificateEntry = true;
-    this.service.saveCertificateEntry(this.shipmentId, this.certificateEntryForm).subscribe({
-      next: () => {
-        this.savingCertificateEntry = false;
-        this.loadSchedule();
-        if (andNext) this.expanded = this.activeRouteGroups[0]?.key ?? null;
-        this.cdr.markForCheck();
-      },
-      error: () => { this.savingCertificateEntry = false; this.error = 'Could not save Certificate Entry.'; this.cdr.markForCheck(); }
-    });
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Examination (Form 48)')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Examination (Form 48)</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route3','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Examination (Form 48)')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Examination (Form 48)'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Start Date</label><input type="date" [(ngModel)]="route3Form.custExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route3Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Examination (Form 48)'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Customs Lab')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  saveRouteDetail(andNext: boolean, nextGroupKey: string | null): void {
-    this.savingRouteDetail = true;
-    const save$ = this.selectedRoute === 1
-      ? this.service.saveRoute1(this.shipmentId, this.route1Form)
-      : this.selectedRoute === 2
-      ? this.service.saveRoute2(this.shipmentId, this.route2Form)
-      : this.service.saveRoute3(this.shipmentId, this.route3Form);
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Lab')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Lab</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route3','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Lab')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="route3Form.customsLabRequired" id="r3lab" /><label for="r3lab" style="font-size:13px;">Customs Lab Required</label></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsLabFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route3Form.labFeesPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route3Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Lab'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('SSMO Examination')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-    save$.subscribe({
-      next: () => {
-        this.savingRouteDetail = false;
-        this.loadSchedule();
-        if (andNext) this.expanded = nextGroupKey;
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.savingRouteDetail = false;
-        this.error = 'Could not save route details.';
-        this.cdr.markForCheck();
-      }
-    });
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('SSMO Examination')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">SSMO Examination</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route3','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO Examination')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'SSMO Examination'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Exam. Start Date</label><input type="date" [(ngModel)]="route3Form.ssmoExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route3Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO Examination'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Customs Evaluation')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  nextGroupKey(currentKey: string): string | null {
-    const groups = this.activeRouteGroups;
-    const idx = groups.findIndex((g) => g.key === currentKey);
-    return groups[idx + 1]?.key ?? null;
-  }
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Customs Evaluation')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Customs Evaluation</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route3','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Evaluation')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Customs Evaluation'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Cust. Evaluation Date</label><input type="date" [(ngModel)]="route3Form.custEvaluationDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Duty (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsDutySdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Settlement Date</label><input type="date" [(ngModel)]="route3Form.customsSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route3Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Evaluation'))" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('Truck & Containers')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
 
-  routeName(route: number): string {
-    switch (route) {
-      case 1: return 'Route 1 — Clear at Port';
-      case 2: return 'Route 2 — FZ Deposit';
-      case 3: return 'Route 3 — Clear from FZ';
-      default: return 'Not selected';
-    }
-  }
-}
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Truck & Containers</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('Route3','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Truck & Containers')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route3Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route3Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px;">
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
