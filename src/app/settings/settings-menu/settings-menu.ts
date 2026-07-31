@@ -18,6 +18,7 @@ export class SettingsMenu {
       title: 'Organization',
       links: [
         { label: 'Business Units', path: '/settings/business-units' },
+        { label: 'Divisions', path: '/settings/divisions' },
         { label: 'Business Partners (Suppliers/Consignees/Brands/Offshore)', path: '/settings/business-partners' }
       ]
     },
@@ -33,7 +34,8 @@ export class SettingsMenu {
         { label: 'Product Categories', path: '/settings/product-categories' },
         { label: 'Product Types', path: '/settings/product-types' },
         { label: 'Model/Product', path: '/settings/model-products' },
-        { label: 'Currencies', path: '/settings/currencies' }
+        { label: 'Currencies', path: '/settings/currencies' },
+        { label: 'FX Rates', path: '/settings/fx-rates' }
       ]
     },
     {
