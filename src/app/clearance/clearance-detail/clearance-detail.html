@@ -1,0 +1,78 @@
+<div style="max-width: 700px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/clearance" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Clearance list</a>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 12px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
+
+  <div *ngIf="!loading && detail">
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Clearance — {{ detail.blAwbNo }}</h1>
+    <p style="color: #888; font-size: 13px;">PO {{ detail.poNumber }} — Current route: {{ routeName(detail.route) }}</p>
+
+    <!-- General Info -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; overflow: hidden;">
+      <div (click)="toggle('generalInfo')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">General Info</strong>
+      </div>
+      <div *ngIf="expanded === 'generalInfo'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Copy of BL Received Date</label>
+            <input type="date" [(ngModel)]="generalInfoForm.copyOfBlReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Original Shipment Set Received Date</label>
+            <input type="date" [(ngModel)]="generalInfoForm.originalShipmentSetReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">LC No.</label>
+            <input [(ngModel)]="generalInfoForm.lcNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Declaration No.</label>
+            <input [(ngModel)]="generalInfoForm.declarationNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Clearance Complete Date</label>
+            <input type="date" [(ngModel)]="generalInfoForm.clearanceCompleteDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div style="grid-column: span 2;">
+            <label style="display:block; font-size:12px; color:#555;">Notes</label>
+            <input [(ngModel)]="generalInfoForm.notes" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveGeneralInfo(false)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveGeneralInfo(true)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingGeneralInfo ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="toggle('route')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route selector -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('route')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Clearance Route</strong>
+      </div>
+      <div *ngIf="expanded === 'route'" style="padding: 16px;">
+        <p style="font-size:12px; color:#888; margin-bottom:8px;">Choosing a route locks in which clearance path this shipment follows. Route-specific detail sections are added next.</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="radio" name="route" [value]="1" [(ngModel)]="selectedRoute" />
+            Route 1 — Clear at Port
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="radio" name="route" [value]="2" [(ngModel)]="selectedRoute" />
+            Route 2 — FZ Deposit
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="radio" name="route" [value]="3" [(ngModel)]="selectedRoute" />
+            Route 3 — Clear from FZ
+          </label>
+        </div>
+        <div style="margin-top:16px;">
+          <button (click)="saveRoute()" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRoute ? 'Saving...' : 'Save Route' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
