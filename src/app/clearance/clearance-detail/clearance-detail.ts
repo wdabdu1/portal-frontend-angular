@@ -151,4 +151,48 @@ export class ClearanceDetailComponent implements OnInit {
     this.service.setRoute(this.shipmentId, this.selectedRoute).subscribe({
       next: () => {
         this.savingRoute = false;
-        if (this.detail)
+        if (this.detail) {
+          this.detail = { ...this.detail, route: this.selectedRoute };
+        }
+        this.loadRouteDetail();
+        this.expanded = 'routeDetail';
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.savingRoute = false;
+        this.error = 'Could not save route.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  saveRouteDetail(): void {
+    this.savingRouteDetail = true;
+    const save$ = this.selectedRoute === 1
+      ? this.service.saveRoute1(this.shipmentId, this.route1Form)
+      : this.selectedRoute === 2
+      ? this.service.saveRoute2(this.shipmentId, this.route2Form)
+      : this.service.saveRoute3(this.shipmentId, this.route3Form);
+
+    save$.subscribe({
+      next: () => {
+        this.savingRouteDetail = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.savingRouteDetail = false;
+        this.error = 'Could not save route details.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  routeName(route: number): string {
+    switch (route) {
+      case 1: return 'Route 1 — Clear at Port';
+      case 2: return 'Route 2 — FZ Deposit';
+      case 3: return 'Route 3 — Clear from FZ';
+      default: return 'Not selected';
+    }
+  }
+}
