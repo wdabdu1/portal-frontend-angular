@@ -1,39 +1,39 @@
 <div style="max-width: 700px; margin: 3rem auto; font-family: sans-serif;">
   <a routerLink="/settings" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Settings</a>
   <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Settings — Clearance SLA</h1>
-  <p style="color: #888; font-size: 13px;">Target days for each clearance process. These drive the traffic-light status shown on shipments awaiting clearance — adjust as needed, the process list itself is fixed.</p>
+  <p style="color: #888; font-size: 13px;">Target days per process step. Each route's total is the sum of its steps below — not separately editable.</p>
 
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
 
-  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
-    <thead>
-      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 6px;">Process</th>
-        <th style="padding: 6px;">Target Days</th>
-        <th style="padding: 6px;" *ngIf="canEdit"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let s of settings" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 6px;">{{ s.label }}</td>
-        <td style="padding: 6px;">
-          <input
-            type="number"
-            [(ngModel)]="s.targetDays"
-            [disabled]="!canEdit"
-            style="width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
-          />
-        </td>
-        <td style="padding: 6px;" *ngIf="canEdit">
-          <button (click)="save(s)" [disabled]="savingId === s.id" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            {{ savingId === s.id ? 'Saving...' : 'Save' }}
-          </button>
-          <span *ngIf="savedId === s.id" style="color: #2a7d2a; font-size: 12px; margin-left: 6px;">Saved</span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div *ngFor="let group of groups" style="margin-top: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
+      <h3 style="font-size: 14px; color: #333; margin: 0;">{{ group.label }}</h3>
+      <span style="font-size: 12px; color: #666;">Total: {{ groupTotal(group) }} days</span>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px;">
+      <tbody>
+        <tr *ngFor="let s of group.rows" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">{{ s.groupItem }}</td>
+          <td style="padding: 6px; width: 90px;">
+            <input
+              type="number"
+              [(ngModel)]="s.targetDays"
+              [disabled]="!canEdit"
+              style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
+            />
+          </td>
+          <td style="padding: 6px; width: 100px;" *ngIf="canEdit">
+            <button (click)="save(s)" [disabled]="savingId === s.id" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              {{ savingId === s.id ? 'Saving...' : 'Save' }}
+            </button>
+            <span *ngIf="savedId === s.id" style="color: #2a7d2a; font-size: 12px; margin-left: 6px;">✓</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <p *ngIf="!canEdit" style="margin-top: 1.5rem; color: #888; font-size: 13px;">
     Your role doesn't have permission to edit SLA targets (Manager or SuperUser required).
