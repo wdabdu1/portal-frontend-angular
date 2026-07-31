@@ -1,7 +1,7 @@
 <div style="max-width: 700px; margin: 3rem auto; font-family: sans-serif;">
   <a routerLink="/settings" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Settings</a>
   <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Settings — Clearance SLA</h1>
-  <p style="color: #888; font-size: 13px;">Target days per process step. Each route's total is the sum of its steps below — not separately editable.</p>
+  <p style="color: #888; font-size: 13px;">Target days per process step (fractions allowed, e.g. 0.25). Totals are fully computed — never directly editable.</p>
 
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
@@ -9,7 +9,9 @@
   <div *ngFor="let group of groups" style="margin-top: 1.5rem;">
     <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
       <h3 style="font-size: 14px; color: #333; margin: 0;">{{ group.label }}</h3>
-      <span style="font-size: 12px; color: #666;">Total: {{ groupTotal(group) }} days</span>
+      <span style="font-size: 12px; color: #666; font-weight: 600;">
+        {{ group.isRoute ? 'Total Duration' : 'Subtotal' }}: {{ (group.isRoute ? combinedRouteTotal(group) : groupTotal(group)) }} days
+      </span>
     </div>
 
     <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px;">
@@ -19,6 +21,7 @@
           <td style="padding: 6px; width: 90px;">
             <input
               type="number"
+              step="0.25"
               [(ngModel)]="s.targetDays"
               [disabled]="!canEdit"
               style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
