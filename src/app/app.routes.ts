@@ -9,6 +9,8 @@ import { OrderList } from './purchase-orders/order-list/order-list';
 import { NewShipment } from './shipments/new-shipment/new-shipment';
 import { ShipmentList } from './shipments/shipment-list/shipment-list';
 import { UpdateShipment } from './shipments/update-shipment/update-shipment';
+import { Divisions } from './settings/divisions/divisions';
+import { FxRates } from './settings/fx-rates/fx-rates';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'orders', pathMatch: 'full' },
@@ -16,6 +18,8 @@ export const routes: Routes = [
 
   { path: 'settings', component: SettingsMenu, canActivate: [authGuard] },
   { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard] },
+  { path: 'settings/divisions', component: Divisions, canActivate: [authGuard] },
+  { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
