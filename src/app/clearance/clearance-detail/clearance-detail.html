@@ -1,4 +1,4 @@
-<div style="max-width: 700px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 750px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <a routerLink="/clearance" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Clearance list</a>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 12px;">Loading...</p>
@@ -54,7 +54,6 @@
         <strong style="font-size: 14px;">Clearance Route</strong>
       </div>
       <div *ngIf="expanded === 'route'" style="padding: 16px;">
-        <p style="font-size:12px; color:#888; margin-bottom:8px;">Choosing a route locks in which clearance path this shipment follows. Route-specific detail sections are added next.</p>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
             <input type="radio" name="route" [value]="1" [(ngModel)]="selectedRoute" />
@@ -69,8 +68,178 @@
             Route 3 — Clear from FZ
           </label>
         </div>
-        <div style="margin-top:16px;">
+        <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveRoute()" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRoute ? 'Saving...' : 'Save Route' }}</button>
+          <button *ngIf="detail.route" (click)="toggle('routeDetail')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route 1 detail -->
+    <div *ngIf="detail.route === 1" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('routeDetail')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Route 1 — Clear at Port Details</strong>
+      </div>
+      <div *ngIf="expanded === 'routeDetail'" style="padding: 16px;">
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Containers Move Process</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Move Request Date</label><input type="date" [(ngModel)]="route1Form.moveRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Bill Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.billAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.billSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">SSMO File Process</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO File Request Date</label><input type="date" [(ngModel)]="route1Form.ssmoFileRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Inspection Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.ssmoInspectionAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="route1Form.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Examination (Form 48)</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Start Date</label><input type="date" [(ngModel)]="route1Form.custExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route1Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Lab</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="route1Form.customsLabRequired" id="r1lab" /><label for="r1lab" style="font-size:13px;">Customs Lab Required</label></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsLabFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route1Form.labFeesPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route1Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">SSMO Examination</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Exam. Start Date</label><input type="date" [(ngModel)]="route1Form.ssmoExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route1Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Evaluation</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Evaluation Date</label><input type="date" [(ngModel)]="route1Form.custEvaluationDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Duty (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsDutySdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Settlement Date</label><input type="date" [(ngModel)]="route1Form.customsSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route1Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">SPC Bill</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Request Date</label><input type="date" [(ngModel)]="route1Form.spcBillRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Value (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.spcBillValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.spcBillSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Truck & Containers</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route1Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route1Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route1Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button (click)="saveRouteDetail()" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route 2 detail -->
+    <div *ngIf="detail.route === 2" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('routeDetail')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Route 2 — FZ Deposit Details</strong>
+      </div>
+      <div *ngIf="expanded === 'routeDetail'" style="padding: 16px;">
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">FZ Deposit Request</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Deposit Request Date</label><input type="date" [(ngModel)]="route2Form.depositRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Request Approval Date</label><input type="date" [(ngModel)]="route2Form.requestApprovalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Inspection</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Inspection Date</label><input type="date" [(ngModel)]="route2Form.inspectionDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">SPC Bill</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Request Date</label><input type="date" [(ngModel)]="route2Form.spcBillRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Value (SDG)</label><input type="text" appThousands [(ngModel)]="route2Form.spcBillValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Settlement Date</label><input type="date" [(ngModel)]="route2Form.spcBillSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Police Security Appointed Date</label><input type="date" [(ngModel)]="route2Form.policeSecurityAppointedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Truck & Containers</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route2Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Containers Received at FZ Date</label><input type="date" [(ngModel)]="route2Form.containersReceivedAtFzDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route2Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route2Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button (click)="saveRouteDetail()" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route 3 detail -->
+    <div *ngIf="detail.route === 3" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('routeDetail')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Route 3 — Clear from FZ Details</strong>
+      </div>
+      <div *ngIf="expanded === 'routeDetail'" style="padding: 16px;">
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Certificate Entry</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Certificate Entry Date</label><input type="date" [(ngModel)]="route3Form.certificateEntryDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SCUDA Declaration No.</label><input [(ngModel)]="route3Form.scudaDeclarationNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">SSMO File Process</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO File Request Date</label><input type="date" [(ngModel)]="route3Form.ssmoFileRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Inspection Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.ssmoInspectionAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="route3Form.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Examination (Form 48)</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Start Date</label><input type="date" [(ngModel)]="route3Form.custExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route3Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Lab</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="route3Form.customsLabRequired" id="r3lab" /><label for="r3lab" style="font-size:13px;">Customs Lab Required</label></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsLabFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route3Form.labFeesPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route3Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">SSMO Examination</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Exam. Start Date</label><input type="date" [(ngModel)]="route3Form.ssmoExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route3Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Customs Evaluation</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Evaluation Date</label><input type="date" [(ngModel)]="route3Form.custEvaluationDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Duty (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsDutySdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Settlement Date</label><input type="date" [(ngModel)]="route3Form.customsSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route3Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:0 0 8px; color:#333;">Truck & Containers</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route3Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route3Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button (click)="saveRouteDetail()" [disabled]="savingRouteDetail" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
         </div>
       </div>
     </div>
