@@ -1,27 +1,30 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ClearanceDetail, ClearanceService } from '../clearance.service';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
+import {
+  ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details, ClearanceService
+} from '../clearance.service';
 
 @Component({
   selector: 'app-clearance-detail',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
   templateUrl: './clearance-detail.html'
 })
 export class ClearanceDetailComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
 
   shipmentId!: number;
   detail: ClearanceDetail | null = null;
   loading = true;
   error = '';
 
-  expanded: 'generalInfo' | 'route' | null = 'generalInfo';
+  expanded: 'generalInfo' | 'route' | 'routeDetail' | null = 'generalInfo';
   savingGeneralInfo = false;
   savingRoute = false;
+  savingRouteDetail = false;
 
   generalInfoForm = {
     copyOfBlReceivedDate: '', originalShipmentSetReceivedDate: '', lcNo: '', declarationNo: '', notes: '', clearanceCompleteDate: ''
@@ -29,11 +32,49 @@ export class ClearanceDetailComponent implements OnInit {
 
   selectedRoute: number = 0;
 
+  route1Form: ClearanceRoute1Details = this.emptyRoute1();
+  route2Form: ClearanceRoute2Details = this.emptyRoute2();
+  route3Form: ClearanceRoute3Details = this.emptyRoute3();
+
   constructor(private service: ClearanceService) {}
 
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
     this.load();
+  }
+
+  emptyRoute1(): ClearanceRoute1Details {
+    return {
+      moveRequestDate: null, billAmountSdg: null, billSettlementDate: null,
+      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null,
+      custExamStartDate: null, custExamCompletedDate: null,
+      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null,
+      ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
+      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
+      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null,
+      truckPortEntryPermitDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
+    };
+  }
+
+  emptyRoute2(): ClearanceRoute2Details {
+    return {
+      depositRequestDate: null, requestApprovalDate: null,
+      inspectionDate: null,
+      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, policeSecurityAppointedDate: null,
+      truckPortEntryPermitDate: null, containersReceivedAtFzDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
+    };
+  }
+
+  emptyRoute3(): ClearanceRoute3Details {
+    return {
+      certificateEntryDate: null, scudaDeclarationNo: null,
+      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null,
+      custExamStartDate: null, custExamCompletedDate: null,
+      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null,
+      ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
+      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
+      truckPortEntryPermitDate: null, clearanceActualCompletedDate: null
+    };
   }
 
   load(): void {
@@ -50,6 +91,7 @@ export class ClearanceDetailComponent implements OnInit {
         };
         this.selectedRoute = detail.route;
         this.loading = false;
+        this.loadRouteDetail();
         this.cdr.markForCheck();
       },
       error: () => {
@@ -60,7 +102,23 @@ export class ClearanceDetailComponent implements OnInit {
     });
   }
 
-  toggle(section: 'generalInfo' | 'route'): void {
+  loadRouteDetail(): void {
+    if (this.selectedRoute === 1) {
+      this.service.getRoute1(this.shipmentId).subscribe({
+        next: (r) => { if (r) this.route1Form = r; this.cdr.markForCheck(); }
+      });
+    } else if (this.selectedRoute === 2) {
+      this.service.getRoute2(this.shipmentId).subscribe({
+        next: (r) => { if (r) this.route2Form = r; this.cdr.markForCheck(); }
+      });
+    } else if (this.selectedRoute === 3) {
+      this.service.getRoute3(this.shipmentId).subscribe({
+        next: (r) => { if (r) this.route3Form = r; this.cdr.markForCheck(); }
+      });
+    }
+  }
+
+  toggle(section: 'generalInfo' | 'route' | 'routeDetail'): void {
     this.expanded = this.expanded === section ? null : section;
   }
 
@@ -93,23 +151,4 @@ export class ClearanceDetailComponent implements OnInit {
     this.service.setRoute(this.shipmentId, this.selectedRoute).subscribe({
       next: () => {
         this.savingRoute = false;
-        if (this.detail) this.detail = { ...this.detail, route: this.selectedRoute };
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.savingRoute = false;
-        this.error = 'Could not save route.';
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
-  routeName(route: number): string {
-    switch (route) {
-      case 1: return 'Route 1 — Clear at Port';
-      case 2: return 'Route 2 — FZ Deposit';
-      case 3: return 'Route 3 — Clear from FZ';
-      default: return 'Not selected';
-    }
-  }
-}
+        if (this.detail)
