@@ -11,6 +11,9 @@ import { ShipmentList } from './shipments/shipment-list/shipment-list';
 import { UpdateShipment } from './shipments/update-shipment/update-shipment';
 import { Divisions } from './settings/divisions/divisions';
 import { FxRates } from './settings/fx-rates/fx-rates';
+import { ClearanceList } from './clearance/clearance-list/clearance-list';
+import { ClearanceDetailComponent } from './clearance/clearance-detail/clearance-detail';
+import { ClearanceSla } from './settings/clearance-sla/clearance-sla';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'orders', pathMatch: 'full' },
@@ -20,6 +23,9 @@ export const routes: Routes = [
   { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard] },
   { path: 'settings/divisions', component: Divisions, canActivate: [authGuard] },
   { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard] },
+  { path: 'clearance', component: ClearanceList, canActivate: [authGuard] },
+  { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard] },
+  { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
