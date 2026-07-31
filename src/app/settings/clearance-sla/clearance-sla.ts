@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-import { LookupEntity, SettingsLookupService } from '../settings-lookup.service';
+import { API_URL } from '../../api-config';
 
-interface ClearanceSlaSetting extends LookupEntity {
+interface ClearanceSlaSetting {
+  id: number;
   milestoneKey: string;
   label: string;
   targetDays: number;
@@ -23,12 +25,10 @@ export class ClearanceSla implements OnInit {
   settings: ClearanceSlaSetting[] = [];
   loading = true;
   error = '';
+  savingId: number | null = null;
+  savedId: number | null = null;
 
-  newMilestoneKey = '';
-  newLabel = '';
-  newTargetDays: number | null = null;
-
-  constructor(private lookups: SettingsLookupService, public auth: AuthService) {}
+  constructor(private http: HttpClient, public auth: AuthService) {}
 
   get canEdit(): boolean {
     return this.auth.hasRole('Manager') || this.auth.hasRole('SuperUser');
@@ -40,24 +40,26 @@ export class ClearanceSla implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.lookups.getAll<ClearanceSlaSetting>('clearance-sla-settings').subscribe({
+    this.http.get<ClearanceSlaSetting[]>(`${API_URL}/settings/clearance-sla-settings`).subscribe({
       next: (r) => { this.settings = r; this.loading = false; this.cdr.markForCheck(); },
       error: () => { this.error = 'Could not load SLA settings.'; this.loading = false; this.cdr.markForCheck(); }
     });
   }
 
-  add(): void {
-    if (!this.newMilestoneKey || !this.newLabel || !this.newTargetDays) return;
-    this.lookups.create<ClearanceSlaSetting>('clearance-sla-settings', {
-      milestoneKey: this.newMilestoneKey, label: this.newLabel, targetDays: this.newTargetDays, isActive: true
-    }).subscribe({
+  save(setting: ClearanceSlaSetting): void {
+    this.savingId = setting.id;
+    this.savedId = null;
+    this.http.put(`${API_URL}/settings/clearance-sla-settings/${setting.id}`, { targetDays: setting.targetDays }).subscribe({
       next: () => {
-        this.newMilestoneKey = '';
-        this.newLabel = '';
-        this.newTargetDays = null;
-        this.load();
+        this.savingId = null;
+        this.savedId = setting.id;
+        this.cdr.markForCheck();
       },
-      error: () => { this.error = 'Could not create SLA setting.'; this.cdr.markForCheck(); }
+      error: () => {
+        this.savingId = null;
+        this.error = 'Could not save this SLA setting.';
+        this.cdr.markForCheck();
+      }
     });
   }
 }
