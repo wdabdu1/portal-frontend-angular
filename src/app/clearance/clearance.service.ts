@@ -30,6 +30,19 @@ export interface ClearanceRoute3Details {
   truckPortEntryPermitDate: string | null; clearanceActualCompletedDate: string | null;
 }
 
+export interface ClearanceDeliveryOrder {
+  copyOfDoCollectedDate: string | null; receiveDoDate: string | null; actualArrivalDate: string | null;
+  doFeesSdg: number | null; doFeesSettledDate: string | null; doReceivedDate: string | null;
+}
+
+export interface ClearanceCostEstimate {
+  estimateDate: string | null; estimateValueSdg: number | null; notifyBuDate: string | null; amountSettledDate: string | null;
+}
+
+export interface ClearanceCertificateEntry {
+  certificateEntryDate: string | null; scudaDeclarationNo: string | null;
+}
+
 export interface ClearanceShipmentSummary {
   shipmentId: number;
   blAwbNo: string;
@@ -48,6 +61,7 @@ export interface ClearanceDetail {
   shipmentId: number;
   blAwbNo: string;
   poNumber: string;
+  eta: string | null;
   copyOfBlReceivedDate: string | null;
   originalShipmentSetReceivedDate: string | null;
   lcNo: string | null;
@@ -55,6 +69,21 @@ export interface ClearanceDetail {
   notes: string | null;
   route: number;
   clearanceCompleteDate: string | null;
+}
+
+export interface ScheduleItem {
+  division: string;
+  groupItem: string;
+  targetDays: number;
+  targetDate: string;
+  actualDate: string | null;
+  status: string;
+  light: 'Green' | 'Amber' | 'Red';
+}
+
+export interface ClearanceScheduleResponse {
+  estimatedCompletionDate: string | null;
+  items: ScheduleItem[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -76,6 +105,31 @@ export class ClearanceService {
 
   setRoute(shipmentId: number, route: number) {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/route`, { route });
+  }
+
+  getSchedule(shipmentId: number) {
+    return this.http.get<ClearanceScheduleResponse>(`${API_URL}/clearance/${shipmentId}/sla-schedule`);
+  }
+
+  getDeliveryOrder(shipmentId: number) {
+    return this.http.get<ClearanceDeliveryOrder | null>(`${API_URL}/clearance/${shipmentId}/delivery-order`);
+  }
+  saveDeliveryOrder(shipmentId: number, req: Partial<ClearanceDeliveryOrder>) {
+    return this.http.put(`${API_URL}/clearance/${shipmentId}/delivery-order`, req);
+  }
+
+  getCostEstimate(shipmentId: number) {
+    return this.http.get<ClearanceCostEstimate | null>(`${API_URL}/clearance/${shipmentId}/cost-estimate`);
+  }
+  saveCostEstimate(shipmentId: number, req: Partial<ClearanceCostEstimate>) {
+    return this.http.put(`${API_URL}/clearance/${shipmentId}/cost-estimate`, req);
+  }
+
+  getCertificateEntry(shipmentId: number) {
+    return this.http.get<ClearanceCertificateEntry | null>(`${API_URL}/clearance/${shipmentId}/certificate-entry`);
+  }
+  saveCertificateEntry(shipmentId: number, req: Partial<ClearanceCertificateEntry>) {
+    return this.http.put(`${API_URL}/clearance/${shipmentId}/certificate-entry`, req);
   }
 
   getRoute1(shipmentId: number) {
