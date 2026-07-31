@@ -1,0 +1,47 @@
+<div style="max-width: 700px; margin: 3rem auto; font-family: sans-serif;">
+  <a routerLink="/settings" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Settings</a>
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Settings — Clearance SLA</h1>
+  <p style="color: #888; font-size: 13px;">Target days used to drive the traffic-light status on shipments awaiting clearance. Use milestone key <code>TotalClearance</code> for the overall ETA-to-cleared target.</p>
+
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 6px;">Milestone Key</th>
+        <th style="padding: 6px;">Label</th>
+        <th style="padding: 6px;">Target Days</th>
+        <th style="padding: 6px;">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of settings" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 6px; font-family: monospace;">{{ s.milestoneKey }}</td>
+        <td style="padding: 6px;">{{ s.label }}</td>
+        <td style="padding: 6px;">{{ s.targetDays }}</td>
+        <td style="padding: 6px;">{{ s.isActive ? 'Yes' : 'No' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="canEdit" style="margin-top: 1.5rem; display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
+    <div>
+      <label style="display: block; font-size: 12px; color: #555;">Milestone Key</label>
+      <input [(ngModel)]="newMilestoneKey" placeholder="TotalClearance" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;" />
+    </div>
+    <div>
+      <label style="display: block; font-size: 12px; color: #555;">Label</label>
+      <input [(ngModel)]="newLabel" placeholder="Total Clearance Time" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;" />
+    </div>
+    <div>
+      <label style="display: block; font-size: 12px; color: #555;">Target Days</label>
+      <input type="number" [(ngModel)]="newTargetDays" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 90px;" />
+    </div>
+    <button (click)="add()" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">Add</button>
+  </div>
+
+  <p *ngIf="!canEdit" style="margin-top: 1.5rem; color: #888; font-size: 13px;">
+    Your role doesn't have permission to add Settings entries (Manager or SuperUser required).
+  </p>
+</div>
