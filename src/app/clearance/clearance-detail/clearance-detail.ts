@@ -4,8 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import {
-  ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details, ClearanceService
+  ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
+  ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details,
+  ClearanceService, ScheduleItem
 } from '../clearance.service';
+
+interface GroupItemDef {
+  key: string;       // matches ScheduleItem.groupItem
+  label: string;
+}
 
 @Component({
   selector: 'app-clearance-detail',
@@ -21,20 +28,51 @@ export class ClearanceDetailComponent implements OnInit {
   loading = true;
   error = '';
 
-  expanded: 'generalInfo' | 'route' | 'routeDetail' | null = 'generalInfo';
-  savingGeneralInfo = false;
+  schedule: ScheduleItem[] = [];
+  estimatedCompletionDate: string | null = null;
+
+  expanded: string | null = 'route';
   savingRoute = false;
+  savingDeliveryOrder = false;
+  savingCostEstimate = false;
+  savingCertificateEntry = false;
   savingRouteDetail = false;
 
-  generalInfoForm = {
-    copyOfBlReceivedDate: '', originalShipmentSetReceivedDate: '', lcNo: '', declarationNo: '', notes: '', clearanceCompleteDate: ''
-  };
-
   selectedRoute: number = 0;
+
+  deliveryOrderForm: ClearanceDeliveryOrder = { copyOfDoCollectedDate: null, receiveDoDate: null, actualArrivalDate: null, doFeesSdg: null, doFeesSettledDate: null, doReceivedDate: null };
+  costEstimateForm: ClearanceCostEstimate = { estimateDate: null, estimateValueSdg: null, notifyBuDate: null, amountSettledDate: null };
+  certificateEntryForm: ClearanceCertificateEntry = { certificateEntryDate: null, scudaDeclarationNo: null };
 
   route1Form: ClearanceRoute1Details = this.emptyRoute1();
   route2Form: ClearanceRoute2Details = this.emptyRoute2();
   route3Form: ClearanceRoute3Details = this.emptyRoute3();
+
+  route1Groups: GroupItemDef[] = [
+    { key: 'Containers Move Process', label: 'Containers Move Process' },
+    { key: 'SSMO File Process', label: 'SSMO File Process' },
+    { key: 'Customs Examination (Form 48)', label: 'Customs Examination (Form 48)' },
+    { key: 'Customs Lab', label: 'Customs Lab' },
+    { key: 'SSMO Examination', label: 'SSMO Examination' },
+    { key: 'Customs Evaluation', label: 'Customs Evaluation' },
+    { key: 'SPC Bill', label: 'SPC Bill' },
+    { key: 'Truck & Containers', label: 'Truck & Containers' }
+  ];
+  route2Groups: GroupItemDef[] = [
+    { key: 'FZ Deposit Request', label: 'FZ Deposit Request' },
+    { key: 'Customs Inspection', label: 'Customs Inspection' },
+    { key: 'SPC Bill', label: 'SPC Bill' },
+    { key: 'Truck & Containers', label: 'Truck & Containers' }
+  ];
+  route3Groups: GroupItemDef[] = [
+    { key: 'Customs Certificate Entry', label: 'Customs Certificate Entry' },
+    { key: 'SSMO File Process', label: 'SSMO File Process' },
+    { key: 'Customs Examination (Form 48)', label: 'Customs Examination (Form 48)' },
+    { key: 'Customs Lab', label: 'Customs Lab' },
+    { key: 'SSMO Examination', label: 'SSMO Examination' },
+    { key: 'Customs Evaluation', label: 'Customs Evaluation' },
+    { key: 'Truck & Containers', label: 'Truck & Containers' }
+  ];
 
   constructor(private service: ClearanceService) {}
 
@@ -81,17 +119,11 @@ export class ClearanceDetailComponent implements OnInit {
     this.service.getDetail(this.shipmentId).subscribe({
       next: (detail) => {
         this.detail = detail;
-        this.generalInfoForm = {
-          copyOfBlReceivedDate: detail.copyOfBlReceivedDate ?? '',
-          originalShipmentSetReceivedDate: detail.originalShipmentSetReceivedDate ?? '',
-          lcNo: detail.lcNo ?? '',
-          declarationNo: detail.declarationNo ?? '',
-          notes: detail.notes ?? '',
-          clearanceCompleteDate: detail.clearanceCompleteDate ?? ''
-        };
         this.selectedRoute = detail.route;
         this.loading = false;
+        this.loadGeneralSubSections();
         this.loadRouteDetail();
+        this.loadSchedule();
         this.cdr.markForCheck();
       },
       error: () => {
@@ -102,60 +134,73 @@ export class ClearanceDetailComponent implements OnInit {
     });
   }
 
-  loadRouteDetail(): void {
-    if (this.selectedRoute === 1) {
-      this.service.getRoute1(this.shipmentId).subscribe({
-        next: (r) => { if (r) this.route1Form = r; this.cdr.markForCheck(); }
-      });
-    } else if (this.selectedRoute === 2) {
-      this.service.getRoute2(this.shipmentId).subscribe({
-        next: (r) => { if (r) this.route2Form = r; this.cdr.markForCheck(); }
-      });
-    } else if (this.selectedRoute === 3) {
-      this.service.getRoute3(this.shipmentId).subscribe({
-        next: (r) => { if (r) this.route3Form = r; this.cdr.markForCheck(); }
-      });
-    }
-  }
-
-  toggle(section: 'generalInfo' | 'route' | 'routeDetail'): void {
-    this.expanded = this.expanded === section ? null : section;
-  }
-
-  saveGeneralInfo(andNext: boolean): void {
-    this.savingGeneralInfo = true;
-    this.service.saveGeneralInfo(this.shipmentId, {
-      copyOfBlReceivedDate: this.generalInfoForm.copyOfBlReceivedDate || null,
-      originalShipmentSetReceivedDate: this.generalInfoForm.originalShipmentSetReceivedDate || null,
-      lcNo: this.generalInfoForm.lcNo || null,
-      declarationNo: this.generalInfoForm.declarationNo || null,
-      notes: this.generalInfoForm.notes || null,
-      clearanceCompleteDate: this.generalInfoForm.clearanceCompleteDate || null
-    }).subscribe({
-      next: () => {
-        this.savingGeneralInfo = false;
-        if (andNext) this.expanded = 'route';
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.savingGeneralInfo = false;
-        this.error = 'Could not save General Info.';
+  loadSchedule(): void {
+    this.service.getSchedule(this.shipmentId).subscribe({
+      next: (r) => {
+        this.schedule = r.items;
+        this.estimatedCompletionDate = r.estimatedCompletionDate;
         this.cdr.markForCheck();
       }
     });
   }
 
-  saveRoute(): void {
+  loadGeneralSubSections(): void {
+    this.service.getDeliveryOrder(this.shipmentId).subscribe({ next: (r) => { if (r) this.deliveryOrderForm = r; this.cdr.markForCheck(); } });
+    this.service.getCostEstimate(this.shipmentId).subscribe({ next: (r) => { if (r) this.costEstimateForm = r; this.cdr.markForCheck(); } });
+    this.service.getCertificateEntry(this.shipmentId).subscribe({ next: (r) => { if (r) this.certificateEntryForm = r; this.cdr.markForCheck(); } });
+  }
+
+  loadRouteDetail(): void {
+    if (this.selectedRoute === 1) {
+      this.service.getRoute1(this.shipmentId).subscribe({ next: (r) => { if (r) this.route1Form = r; this.cdr.markForCheck(); } });
+    } else if (this.selectedRoute === 2) {
+      this.service.getRoute2(this.shipmentId).subscribe({ next: (r) => { if (r) this.route2Form = r; this.cdr.markForCheck(); } });
+    } else if (this.selectedRoute === 3) {
+      this.service.getRoute3(this.shipmentId).subscribe({ next: (r) => { if (r) this.route3Form = r; this.cdr.markForCheck(); } });
+    }
+  }
+
+  toggle(section: string): void {
+    this.expanded = this.expanded === section ? null : section;
+  }
+
+  scheduleFor(division: string, groupItem: string): ScheduleItem | undefined {
+    return this.schedule.find((s) => s.division === division && s.groupItem === groupItem);
+  }
+
+  lightColor(light: string | undefined): string {
+    switch (light) {
+      case 'Green': return '#2a7d2a';
+      case 'Amber': return '#c98a00';
+      case 'Red': return '#c0392b';
+      default: return '#ccc';
+    }
+  }
+
+  get routeDivision(): string {
+    if (this.selectedRoute === 1) return 'Route1';
+    if (this.selectedRoute === 2) return 'Route2';
+    if (this.selectedRoute === 3) return 'Route3';
+    return '';
+  }
+
+  get activeRouteGroups(): GroupItemDef[] {
+    if (this.selectedRoute === 1) return this.route1Groups;
+    if (this.selectedRoute === 2) return this.route2Groups;
+    if (this.selectedRoute === 3) return this.route3Groups;
+    return [];
+  }
+
+  saveRoute(andNext: boolean): void {
     if (!this.selectedRoute) return;
     this.savingRoute = true;
     this.service.setRoute(this.shipmentId, this.selectedRoute).subscribe({
       next: () => {
         this.savingRoute = false;
-        if (this.detail) {
-          this.detail = { ...this.detail, route: this.selectedRoute };
-        }
+        if (this.detail) this.detail = { ...this.detail, route: this.selectedRoute };
         this.loadRouteDetail();
-        this.expanded = 'routeDetail';
+        this.loadSchedule();
+        if (andNext) this.expanded = this.selectedRoute === 3 ? this.activeRouteGroups[0]?.key ?? null : 'deliveryOrder';
         this.cdr.markForCheck();
       },
       error: () => {
@@ -166,7 +211,46 @@ export class ClearanceDetailComponent implements OnInit {
     });
   }
 
-  saveRouteDetail(): void {
+  saveDeliveryOrder(andNext: boolean): void {
+    this.savingDeliveryOrder = true;
+    this.service.saveDeliveryOrder(this.shipmentId, this.deliveryOrderForm).subscribe({
+      next: () => {
+        this.savingDeliveryOrder = false;
+        this.loadSchedule();
+        if (andNext) this.expanded = 'costEstimate';
+        this.cdr.markForCheck();
+      },
+      error: () => { this.savingDeliveryOrder = false; this.error = 'Could not save Delivery Order.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveCostEstimate(andNext: boolean): void {
+    this.savingCostEstimate = true;
+    this.service.saveCostEstimate(this.shipmentId, this.costEstimateForm).subscribe({
+      next: () => {
+        this.savingCostEstimate = false;
+        this.loadSchedule();
+        if (andNext) this.expanded = 'certificateEntry';
+        this.cdr.markForCheck();
+      },
+      error: () => { this.savingCostEstimate = false; this.error = 'Could not save Cost Estimate.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveCertificateEntry(andNext: boolean): void {
+    this.savingCertificateEntry = true;
+    this.service.saveCertificateEntry(this.shipmentId, this.certificateEntryForm).subscribe({
+      next: () => {
+        this.savingCertificateEntry = false;
+        this.loadSchedule();
+        if (andNext) this.expanded = this.activeRouteGroups[0]?.key ?? null;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.savingCertificateEntry = false; this.error = 'Could not save Certificate Entry.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveRouteDetail(andNext: boolean, nextGroupKey: string | null): void {
     this.savingRouteDetail = true;
     const save$ = this.selectedRoute === 1
       ? this.service.saveRoute1(this.shipmentId, this.route1Form)
@@ -177,6 +261,8 @@ export class ClearanceDetailComponent implements OnInit {
     save$.subscribe({
       next: () => {
         this.savingRouteDetail = false;
+        this.loadSchedule();
+        if (andNext) this.expanded = nextGroupKey;
         this.cdr.markForCheck();
       },
       error: () => {
@@ -185,6 +271,12 @@ export class ClearanceDetailComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  nextGroupKey(currentKey: string): string | null {
+    const groups = this.activeRouteGroups;
+    const idx = groups.findIndex((g) => g.key === currentKey);
+    return groups[idx + 1]?.key ?? null;
   }
 
   routeName(route: number): string {
