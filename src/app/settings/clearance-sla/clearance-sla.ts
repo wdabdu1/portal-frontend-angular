@@ -18,6 +18,7 @@ interface ClearanceSlaSetting {
 interface DivisionGroup {
   division: string;
   label: string;
+  isRoute: boolean;
   rows: ClearanceSlaSetting[];
 }
 
@@ -64,6 +65,7 @@ export class ClearanceSla implements OnInit {
         this.groups = Array.from(byDivision.entries()).map(([division, groupRows]) => ({
           division,
           label: DIVISION_LABELS[division] ?? division,
+          isRoute: division !== 'ClearanceGeneral',
           rows: groupRows.sort((a, b) => a.sequenceOrder - b.sequenceOrder)
         }));
         this.loading = false;
@@ -77,8 +79,20 @@ export class ClearanceSla implements OnInit {
     });
   }
 
+  // Sum for this division only.
   groupTotal(group: DivisionGroup): number {
     return group.rows.reduce((sum, r) => sum + (r.targetDays || 0), 0);
+  }
+
+  // Clearance General's own subtotal, used to add onto each route's total.
+  get generalTotal(): number {
+    const general = this.groups.find((g) => g.division === 'ClearanceGeneral');
+    return general ? this.groupTotal(general) : 0;
+  }
+
+  // Fully computed, never user-editable: General subtotal + this route's own total.
+  combinedRouteTotal(group: DivisionGroup): number {
+    return this.generalTotal + this.groupTotal(group);
   }
 
   save(setting: ClearanceSlaSetting): void {
