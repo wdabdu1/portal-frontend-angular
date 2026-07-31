@@ -8,11 +8,25 @@ import { API_URL } from '../../api-config';
 
 interface ClearanceSlaSetting {
   id: number;
-  milestoneKey: string;
-  label: string;
+  division: string;
+  groupItem: string;
+  sequenceOrder: number;
   targetDays: number;
   isActive: boolean;
 }
+
+interface DivisionGroup {
+  division: string;
+  label: string;
+  rows: ClearanceSlaSetting[];
+}
+
+const DIVISION_LABELS: Record<string, string> = {
+  ClearanceGeneral: 'Clearance General',
+  Route1: 'Route 1 — Clear at Port',
+  Route2: 'Route 2 — FZ Deposit',
+  Route3: 'Route 3 — Clear from FZ'
+};
 
 @Component({
   selector: 'app-clearance-sla',
@@ -22,7 +36,7 @@ interface ClearanceSlaSetting {
 export class ClearanceSla implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  settings: ClearanceSlaSetting[] = [];
+  groups: DivisionGroup[] = [];
   loading = true;
   error = '';
   savingId: number | null = null;
@@ -41,9 +55,30 @@ export class ClearanceSla implements OnInit {
   load(): void {
     this.loading = true;
     this.http.get<ClearanceSlaSetting[]>(`${API_URL}/settings/clearance-sla-settings`).subscribe({
-      next: (r) => { this.settings = r; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.error = 'Could not load SLA settings.'; this.loading = false; this.cdr.markForCheck(); }
+      next: (rows) => {
+        const byDivision = new Map<string, ClearanceSlaSetting[]>();
+        for (const row of rows) {
+          if (!byDivision.has(row.division)) byDivision.set(row.division, []);
+          byDivision.get(row.division)!.push(row);
+        }
+        this.groups = Array.from(byDivision.entries()).map(([division, groupRows]) => ({
+          division,
+          label: DIVISION_LABELS[division] ?? division,
+          rows: groupRows.sort((a, b) => a.sequenceOrder - b.sequenceOrder)
+        }));
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.error = 'Could not load SLA settings.';
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
+  }
+
+  groupTotal(group: DivisionGroup): number {
+    return group.rows.reduce((sum, r) => sum + (r.targetDays || 0), 0);
   }
 
   save(setting: ClearanceSlaSetting): void {
