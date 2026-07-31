@@ -45,7 +45,8 @@ export class SettingsMenu {
         { label: 'Couriers', path: '/settings/couriers' },
         { label: 'Forwarders', path: '/settings/forwarders' },
         { label: 'Shipment Destinations', path: '/settings/shipment-destinations' },
-        { label: 'Public Holidays', path: '/settings/public-holidays' }
+        { label: 'Public Holidays', path: '/settings/public-holidays' },
+        { label: 'Clearance SLA', path: '/settings/clearance-sla' }
       ]
     },
     {
