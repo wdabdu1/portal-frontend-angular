@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { Login } from './auth/login/login';
+import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
 import { BusinessUnits } from './settings/business-units/business-units';
 import { SettingsMenu } from './settings/settings-menu/settings-menu';
 import { SimpleLookup } from './settings/simple-lookup/simple-lookup';
@@ -14,6 +15,7 @@ import { FxRates } from './settings/fx-rates/fx-rates';
 import { ClearanceList } from './clearance/clearance-list/clearance-list';
 import { ClearanceDetailComponent } from './clearance/clearance-detail/clearance-detail';
 import { ClearanceSla } from './settings/clearance-sla/clearance-sla';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: 'orders', pathMatch: 'full' },
@@ -30,6 +32,7 @@ export const routes: Routes = [
   { path: 'settings/divisions', component: Divisions, canActivate: [authGuard] },
   { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard] },
   { path: 'clearance', component: ClearanceList, canActivate: [authGuard] },
+  { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard] },
   { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard] },
 
