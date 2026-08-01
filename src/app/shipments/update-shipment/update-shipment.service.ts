@@ -75,7 +75,6 @@ export interface ShipmentDetail {
   ssmo: ShipmentSsmo | null;
   mot: ShipmentMot | null;
   supplierFullSet: ShipmentSupplierFullSet | null;
-  supplierPayment: ShipmentSupplierPayment | null;
   banking: ShipmentBanking | null;
   offshorePartnerNames: string[];
   businessUnit: string;
