@@ -251,90 +251,6 @@
       </div>
     </div>
 
-    <!-- Supplier Payment -->
-    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
-      <div (click)="toggleSection('supplierPayment')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
-        <strong style="font-size: 14px;">Supplier Payment</strong>
-        <span [style.background]="sectionStatus('supplierPayment') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('supplierPayment') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('supplierPayment') }}</span>
-      </div>
-      <div *ngIf="expandedSection === 'supplierPayment'" style="padding: 16px;">
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Supplier Invoice No.</label>
-            <input [(ngModel)]="supplierPaymentForm.supplierInvoiceNo" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Invoice Currency</label>
-            <select [(ngModel)]="supplierPaymentForm.invoiceCurrencyId" style="width:100%; padding:6px;">
-              <option [ngValue]="null">-- select --</option>
-              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
-            </select>
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Invoice Value</label>
-            <input type="text" appThousands [(ngModel)]="supplierPaymentForm.invoiceValue" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Remarks</label>
-            <input [(ngModel)]="supplierPaymentForm.remarks" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
-        </div>
-
-        <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveSupplierPayment(false)" [disabled]="saving.supplierPayment" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveSupplierPayment(true)" [disabled]="saving.supplierPayment" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.supplierPayment ? 'Saving...' : 'Save & Next' }}</button>
-          <button (click)="goToNext('supplierPayment')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
-        </div>
-
-        <h4 style="font-size:13px; margin:20px 0 8px; color:#333;">Payments Made</h4>
-        <table style="width:100%; border-collapse:collapse; font-size:13px;">
-          <thead>
-            <tr style="text-align:left; border-bottom:1px solid #ddd;">
-              <th style="padding:5px;">Date</th>
-              <th style="padding:5px;">Currency</th>
-              <th style="padding:5px;">Value</th>
-              <th style="padding:5px;">Value (USD)</th>
-              <th style="padding:5px;"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let p of paymentRecords" style="border-bottom:1px solid #eee;">
-              <td style="padding:5px;">{{ p.paymentDate | date: 'MMM d, y' }}</td>
-              <td style="padding:5px;">{{ p.currencyCode }}</td>
-              <td style="padding:5px;">{{ p.value | number: '1.2-2' }}</td>
-              <td style="padding:5px;">{{ p.valueUsd | number: '1.2-2' }}</td>
-              <td style="padding:5px;"><button (click)="removePaymentRecord(p.id)" style="color:#c0392b; background:none; border:none; cursor:pointer; font-size:12px;">Remove</button></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style="margin-top:10px; display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Date</label>
-            <input type="date" [(ngModel)]="newPaymentDate" style="padding:6px;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Currency</label>
-            <select [(ngModel)]="newPaymentCurrencyId" style="padding:6px;">
-              <option [ngValue]="null">-- select --</option>
-              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
-            </select>
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Value</label>
-            <input type="text" appThousands [(ngModel)]="newPaymentValue" style="padding:6px; width:120px; box-sizing:border-box;" />
-          </div>
-          <button (click)="addPaymentRecord()" [disabled]="addingPayment" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
-            {{ addingPayment ? 'Adding...' : 'Add Payment' }}
-          </button>
-        </div>
-
-        <p *ngIf="detail.supplierPayment?.invoiceValueUsd !== null && detail.supplierPayment?.invoiceValueUsd !== undefined" style="font-size:12px; color:#666; margin-top:14px; background:#f7f7f7; padding:8px; border-radius:4px;">
-          Invoice Value: {{ detail.supplierPayment!.invoiceValueUsd | number: '1.2-2' }} USD — Paid: {{ detail.supplierPayment!.totalPaidUsd | number: '1.2-2' }} USD — Balance: {{ detail.supplierPayment!.balanceUsd | number: '1.2-2' }} USD
-        </p>
-      </div>
-    </div>
-
     <!-- Banking -->
     <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
       <div (click)="toggleSection('banking')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
@@ -395,19 +311,11 @@
             <label style="display:block; font-size:12px; color:#555;">Tenor</label>
             <select [(ngModel)]="bankingForm.tenorId" style="width:100%; padding:6px;">
               <option [ngValue]="null">-- select --</option>
-              <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['name'] }}</option>
+              <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['days'] }} days</option>
             </select>
           </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Collection Due Date</label>
-            <input type="date" [(ngModel)]="bankingForm.collectionDueDate" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; color:#555;">Collection Amount Settled</label>
-            <input type="text" appThousands [(ngModel)]="bankingForm.collectionAmountSettled" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
         </div>
-        <p *ngIf="detail.banking?.remainingDues !== null && detail.banking?.remainingDues !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG — Remaining dues: {{ detail.banking!.remainingDues | number: '1.2-2' }} {{ collectionCurrencyCode }}</p>
+        <p *ngIf="detail.banking?.senderBankCharges !== null && detail.banking?.senderBankCharges !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG</p>
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveBanking(false)" [disabled]="saving.banking" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
           <button (click)="saveBanking(true)" [disabled]="saving.banking" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.banking ? 'Saving...' : 'Save & Next' }}</button>
