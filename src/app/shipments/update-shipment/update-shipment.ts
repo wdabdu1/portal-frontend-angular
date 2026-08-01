@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
-import { ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
+import { PaymentRecord, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
 
-type SectionKey = 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'supplierPayment' | 'banking';
+type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'supplierPayment' | 'banking';
 
 @Component({
   selector: 'app-update-shipment',
@@ -30,11 +30,19 @@ export class UpdateShipment implements OnInit {
   receiverBanks: LookupEntity[] = [];
   tenors: LookupEntity[] = [];
 
-  sectionOrder: SectionKey[] = ['forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'supplierPayment', 'banking'];
-  expandedSection: SectionKey | null = 'forwarder';
+  sectionOrder: SectionKey[] = ['shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'supplierPayment', 'banking'];
+  expandedSection: SectionKey | null = 'shipOnBoard';
   saving: Record<SectionKey, boolean> = {
-    forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, supplierPayment: false, banking: false
+    shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, supplierPayment: false, banking: false
   };
+
+  shipOnBoardForm = { sobActualDate: '' };
+
+  paymentRecords: PaymentRecord[] = [];
+  newPaymentDate = '';
+  newPaymentCurrencyId: number | null = null;
+  newPaymentValue: number | null = null;
+  addingPayment = false;
   confirming = false;
 
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
@@ -44,11 +52,8 @@ export class UpdateShipment implements OnInit {
   motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', offshoreApprovedPiNumber: '', offshoreApprovedPiDate: '' };
   supplierFullSetForm = { supplierInvoiceNo: '', supplierInvoiceDate: '', fsDispatchDate: '', fsDispatchedViaId: null as number | null, fsTrackingNumber: '', fsReceivedDate: '' };
   supplierPaymentForm = {
-    currencyId: null as number | null,
-    advanceValue: null as number | null, advanceDueDate: '', advanceActualPaymentDate: '',
-    remainingValue: null as number | null, remainingDueDate: '', remainingActualPaymentDate: '',
-    remarks: ''
-  }; 
+    supplierInvoiceNo: '', invoiceValue: null as number | null, invoiceCurrencyId: null as number | null, remarks: ''
+  };
   bankingForm = {
     senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
     receivingBankId: null as number | null, necessaryGoodType: false, collectionRefNo: '', collectionValue: null as number | null, collectionCurrencyId: null as number | null,
@@ -93,11 +98,13 @@ export class UpdateShipment implements OnInit {
           fsTrackingNumber: detail.supplierFullSet.fsTrackingNumber ?? '', fsReceivedDate: detail.supplierFullSet.fsReceivedDate ?? ''
         };
         if (detail.supplierPayment) this.supplierPaymentForm = {
-          currencyId: detail.supplierPayment.currencyId,
-          advanceValue: detail.supplierPayment.advanceValue, advanceDueDate: detail.supplierPayment.advanceDueDate ?? '', advanceActualPaymentDate: detail.supplierPayment.advanceActualPaymentDate ?? '',
-          remainingValue: detail.supplierPayment.remainingValue, remainingDueDate: detail.supplierPayment.remainingDueDate ?? '', remainingActualPaymentDate: detail.supplierPayment.remainingActualPaymentDate ?? '',
+          supplierInvoiceNo: detail.supplierPayment.supplierInvoiceNo ?? '',
+          invoiceValue: detail.supplierPayment.invoiceValue,
+          invoiceCurrencyId: detail.supplierPayment.invoiceCurrencyId,
           remarks: detail.supplierPayment.remarks ?? ''
         };
+        this.shipOnBoardForm = { sobActualDate: detail.sobActualDate ?? '' };
+        this.loadPaymentRecords();
         if (detail.banking) this.bankingForm = {
           senderBankId: detail.banking.senderBankId, osDocDispatchDate: detail.banking.osDocDispatchDate ?? '', osDocDispatchedViaId: detail.banking.osDocDispatchedViaId,
           osDocTrackingNumber: detail.banking.osDocTrackingNumber ?? '', receivingBankId: detail.banking.receivingBankId, necessaryGoodType: detail.banking.necessaryGoodType,
@@ -165,6 +172,49 @@ export class UpdateShipment implements OnInit {
     });
   }
 
+  loadPaymentRecords(): void {
+    this.service.getPaymentRecords(this.shipmentId).subscribe({
+      next: (r) => { this.paymentRecords = r; this.cdr.markForCheck(); }
+    });
+  }
+
+  addPaymentRecord(): void {
+    if (!this.newPaymentDate || !this.newPaymentCurrencyId || !this.newPaymentValue) return;
+    this.addingPayment = true;
+    this.service.addPaymentRecord(this.shipmentId, {
+      paymentDate: this.newPaymentDate, currencyId: this.newPaymentCurrencyId, value: this.newPaymentValue
+    }).subscribe({
+      next: () => {
+        this.addingPayment = false;
+        this.newPaymentDate = '';
+        this.newPaymentCurrencyId = null;
+        this.newPaymentValue = null;
+        this.loadPaymentRecords();
+        this.loadDetail();
+      },
+      error: () => { this.addingPayment = false; this.error = 'Could not add payment.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  removePaymentRecord(recordId: number): void {
+    this.service.deletePaymentRecord(this.shipmentId, recordId).subscribe({
+      next: () => { this.loadPaymentRecords(); this.loadDetail(); },
+      error: () => { this.error = 'Could not remove payment.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveShipOnBoard(andNext: boolean): void {
+    this.saving.shipOnBoard = true;
+    this.service.saveShipOnBoard(this.shipmentId, { sobActualDate: this.shipOnBoardForm.sobActualDate || null }).subscribe({
+      next: () => {
+        this.saving.shipOnBoard = false;
+        if (andNext) this.goToNext('shipOnBoard');
+        this.cdr.markForCheck();
+      },
+      error: () => { this.saving.shipOnBoard = false; this.error = 'Could not save Ship on Board.'; this.cdr.markForCheck(); }
+    });
+  }
+
   saveForwarder(andNext: boolean): void {
     this.genericSave('forwarder', () => this.service.saveForwarder(this.shipmentId, this.forwarderForm), andNext);
   }
@@ -209,9 +259,9 @@ export class UpdateShipment implements OnInit {
 
   saveSupplierPayment(andNext: boolean): void {
     this.genericSave('supplierPayment', () => this.service.saveSupplierPayment(this.shipmentId, {
-      currencyId: this.supplierPaymentForm.currencyId,
-      advanceValue: this.supplierPaymentForm.advanceValue, advanceDueDate: this.supplierPaymentForm.advanceDueDate || null, advanceActualPaymentDate: this.supplierPaymentForm.advanceActualPaymentDate || null,
-      remainingValue: this.supplierPaymentForm.remainingValue, remainingDueDate: this.supplierPaymentForm.remainingDueDate || null, remainingActualPaymentDate: this.supplierPaymentForm.remainingActualPaymentDate || null,
+      supplierInvoiceNo: this.supplierPaymentForm.supplierInvoiceNo || null,
+      invoiceValue: this.supplierPaymentForm.invoiceValue,
+      invoiceCurrencyId: this.supplierPaymentForm.invoiceCurrencyId,
       remarks: this.supplierPaymentForm.remarks || null
     }), andNext);
   }
