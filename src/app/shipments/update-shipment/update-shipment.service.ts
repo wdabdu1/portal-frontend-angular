@@ -80,8 +80,6 @@ export interface ShipmentBanking {
   collectionDueDate: string | null;
   collectionAmountSettled: number | null;
   remainingDues: number | null;
-  imFormNo: string | null;
-  imFormDate: string | null;
   receiverBankCharges: number | null;
 }
 
