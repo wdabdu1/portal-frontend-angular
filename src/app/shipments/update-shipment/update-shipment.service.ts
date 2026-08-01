@@ -50,19 +50,22 @@ export interface ShipmentSupplierFullSet {
 }
 
 export interface ShipmentSupplierPayment {
-  currencyId: number | null;
-  advanceValue: number | null;
-  advanceDueDate: string | null;
-  advanceActualPaymentDate: string | null;
-  advanceValueUsd: number | null;
-  remainingValue: number | null;
-  remainingDueDate: string | null;
-  remainingActualPaymentDate: string | null;
-  remainingValueUsd: number | null;
-  totalValueUsd: number | null;
+  supplierInvoiceNo: string | null;
+  invoiceValue: number | null;
+  invoiceCurrencyId: number | null;
+  invoiceValueUsd: number | null;
   totalPaidUsd: number | null;
   balanceUsd: number | null;
   remarks: string | null;
+}
+
+export interface PaymentRecord {
+  id: number;
+  paymentDate: string;
+  currencyId: number;
+  currencyCode: string;
+  value: number;
+  valueUsd: number;
 }
 
 export interface ShipmentBanking {
@@ -97,6 +100,10 @@ export interface ShipmentDetail {
   supplierPayment: ShipmentSupplierPayment | null;
   banking: ShipmentBanking | null;
   offshorePartnerNames: string[];
+  businessUnit: string;
+  supplier: string;
+  category: string;
+  sobActualDate: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -133,6 +140,16 @@ export class UpdateShipmentService {
 
   saveSupplierPayment(shipmentId: number, req: Partial<ShipmentSupplierPayment>) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/supplier-payment`, req);
+  }
+
+  getPaymentRecords(shipmentId: number) {
+    return this.http.get<PaymentRecord[]>(`${API_URL}/shipments/${shipmentId}/supplier-payment/records`);
+  }
+  addPaymentRecord(shipmentId: number, req: { paymentDate: string; currencyId: number; value: number }) {
+    return this.http.post<PaymentRecord>(`${API_URL}/shipments/${shipmentId}/supplier-payment/records`, req);
+  }
+  deletePaymentRecord(shipmentId: number, recordId: number) {
+    return this.http.delete(`${API_URL}/shipments/${shipmentId}/supplier-payment/records/${recordId}`);
   }
 
   saveBanking(shipmentId: number, req: Partial<ShipmentBanking>) {
