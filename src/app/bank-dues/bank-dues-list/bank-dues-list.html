@@ -1,0 +1,129 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Collecting Bank Dues</h1>
+  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding collection balance. Click a row to view and record collections.</p>
+
+  <input
+    [(ngModel)]="searchText"
+    placeholder="Search by Consignee, Receiver Bank, BL/AWB, or IM Number"
+    style="width: 100%; max-width: 450px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+  />
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th (click)="sortBy('consignee')" style="padding: 8px 6px; cursor: pointer;">Consignee</th>
+        <th (click)="sortBy('receiverBank')" style="padding: 8px 6px; cursor: pointer;">Receiver Bank</th>
+        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB</th>
+        <th (click)="sortBy('sob')" style="padding: 8px 6px; cursor: pointer;">Actual SOB</th>
+        <th (click)="sortBy('lastOffshoreInvoiceNo')" style="padding: 8px 6px; cursor: pointer;">Last Offshore Invoice No.</th>
+        <th (click)="sortBy('tenorDays')" style="padding: 8px 6px; cursor: pointer;">Tenor</th>
+        <th (click)="sortBy('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date</th>
+        <th (click)="sortBy('imFormNo')" style="padding: 8px 6px; cursor: pointer;">IM Form No.</th>
+        <th (click)="sortBy('imFormDate')" style="padding: 8px 6px; cursor: pointer;">IM Form Date</th>
+        <th (click)="sortBy('value')" style="padding: 8px 6px; cursor: pointer;">Value</th>
+        <th (click)="sortBy('currency')" style="padding: 8px 6px; cursor: pointer;">Currency</th>
+        <th (click)="sortBy('valueAed')" style="padding: 8px 6px; cursor: pointer;">Value (AED)</th>
+        <th (click)="sortBy('paidAed')" style="padding: 8px 6px; cursor: pointer;">Paid (AED)</th>
+        <th (click)="sortBy('balanceAed')" style="padding: 8px 6px; cursor: pointer;">Balance (AED)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let r of rows"
+        (click)="select(r)"
+        [style.background]="selectedShipmentId === r.shipmentId ? '#f0f6fb' : 'transparent'"
+        style="border-bottom: 1px solid #eee; cursor: pointer;"
+      >
+        <td style="padding: 8px 6px;">{{ r.consignee }}</td>
+        <td style="padding: 8px 6px;">{{ r.receiverBank || '—' }}</td>
+        <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
+        <td style="padding: 8px 6px; color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.lastOffshoreInvoiceNo || '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.tenorDays ? (r.tenorDays + ' days') : '—' }}</td>
+        <td style="padding: 8px 6px; color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.imFormNo || '—' }}</td>
+        <td style="padding: 8px 6px; color: #888;">{{ r.imFormDate ? (r.imFormDate | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.value | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;">{{ r.currency }}</td>
+        <td style="padding: 8px 6px;">{{ r.valueAed | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;">{{ r.paidAed | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px; font-weight: 600; color: #c0392b;">{{ r.balanceAed | number: '1.2-2' }}</td>
+      </tr>
+    </tbody>
+    <tfoot *ngIf="rows.length > 0">
+      <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+        <td colspan="11" style="padding: 8px 6px; text-align: right;">Totals:</td>
+        <td style="padding: 8px 6px;">{{ totalValueAed | number: '1.2-2' }}</td>
+        <td></td>
+        <td style="padding: 8px 6px; color: #c0392b;">{{ totalBalanceAed | number: '1.2-2' }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No open bank dues.
+  </p>
+
+  <!-- Inline detail panel -->
+  <div *ngIf="selectedRow" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 16px;">
+    <h3 style="font-size: 15px; margin: 0 0 8px;">{{ selectedRow.blAwbNo }} — {{ selectedRow.consignee }}</h3>
+    <p style="font-size: 13px; color: #666; background: #f7f7f7; padding: 8px; border-radius: 4px;">
+      Value: {{ selectedRow.value | number: '1.2-2' }} {{ selectedRow.currency }}
+      ({{ selectedRow.valueAed | number: '1.2-2' }} AED)
+      — Paid: {{ selectedRow.paidAed | number: '1.2-2' }} AED
+      — Balance: {{ selectedRow.balanceAed | number: '1.2-2' }} AED
+    </p>
+
+    <p *ngIf="loadingDetail" style="color: #888; font-size: 13px;">Loading...</p>
+
+    <div *ngIf="!loadingDetail">
+      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Collections Made</h4>
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="text-align:left; border-bottom:1px solid #ddd;">
+            <th style="padding:5px;">Date</th>
+            <th style="padding:5px;">Currency</th>
+            <th style="padding:5px;">Value</th>
+            <th style="padding:5px;">Value (AED)</th>
+            <th style="padding:5px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of records" style="border-bottom:1px solid #eee;">
+            <td style="padding:5px;">{{ p.paymentDate | date: 'MMM d, y' }}</td>
+            <td style="padding:5px;">{{ p.currencyCode }}</td>
+            <td style="padding:5px;">{{ p.value | number: '1.2-2' }}</td>
+            <td style="padding:5px;">{{ p.valueAed | number: '1.2-2' }}</td>
+            <td style="padding:5px;"><button (click)="removePayment(p.id)" style="color:#c0392b; background:none; border:none; cursor:pointer; font-size:12px;">Remove</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Date</label>
+          <input type="date" [(ngModel)]="newPaymentDate" style="padding:6px;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Currency</label>
+          <select [(ngModel)]="newPaymentCurrencyId" style="padding:6px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Value</label>
+          <input type="text" appThousands [(ngModel)]="newPaymentValue" style="padding:6px; width:120px; box-sizing:border-box;" />
+        </div>
+        <button (click)="addPayment()" [disabled]="addingPayment" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+          {{ addingPayment ? 'Adding...' : 'Add Collection' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
