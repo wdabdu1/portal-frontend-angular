@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import {
   ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
@@ -22,6 +22,7 @@ interface GroupItemDef {
 export class ClearanceDetailComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   shipmentId!: number;
   detail: ClearanceDetail | null = null;
@@ -33,6 +34,7 @@ export class ClearanceDetailComponent implements OnInit {
 
   expanded: string | null = 'route';
   savingRoute = false;
+  savingGeneralInfo = false;
   savingDeliveryOrder = false;
   savingCostEstimate = false;
   savingCertificateEntry = false;
@@ -40,8 +42,14 @@ export class ClearanceDetailComponent implements OnInit {
 
   selectedRoute: number = 0;
 
-  deliveryOrderForm: ClearanceDeliveryOrder = { copyOfDoCollectedDate: null, receiveDoDate: null, actualArrivalDate: null, doFeesSdg: null, doFeesSettledDate: null, doReceivedDate: null };
-  costEstimateForm: ClearanceCostEstimate = { estimateDate: null, estimateValueSdg: null, notifyBuDate: null, amountSettledDate: null };
+  generalInfoForm = {
+    copyOfBlReceivedDate: '', originalShipmentSetReceivedDate: '', shipmentEta: '',
+    lcNo: '', imFormNo: '', imFormDate: ''
+  };
+
+  deliveryOrderForm: ClearanceDeliveryOrder = { copyOfDoCollectedDate: null, receiveDoDate: null, actualArrivalDate: null, depositRequired: false, doActualFeesSdg: null, doFeesSettledDate: null, doReceivedDate: null };
+  costEstimateForm: ClearanceCostEstimate = { estimateDate: null, notifyBuDate: null, amountSettledDate: null };
+  estimateTotalSdg = 0;
   certificateEntryForm: ClearanceCertificateEntry = { certificateEntryDate: null, scudaDeclarationNo: null };
 
   route1Form: ClearanceRoute1Details = this.emptyRoute1();
@@ -90,7 +98,8 @@ export class ClearanceDetailComponent implements OnInit {
       ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
       custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
       spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null,
-      truckPortEntryPermitDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
+      truckPortEntryPermitDate: null, containersReturnedDate: null,
+      shippingLineDepositReturnDate: null, depositValue: null, clearanceActualCompletedDate: null
     };
   }
 
@@ -99,7 +108,8 @@ export class ClearanceDetailComponent implements OnInit {
       depositRequestDate: null, requestApprovalDate: null,
       inspectionDate: null,
       spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, policeSecurityAppointedDate: null,
-      truckPortEntryPermitDate: null, containersReceivedAtFzDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
+      truckPortEntryPermitDate: null, containersReceivedAtFzDate: null, containersReturnedDate: null,
+      shippingLineDepositReturnDate: null, depositValue: null, clearanceActualCompletedDate: null
     };
   }
 
@@ -120,6 +130,14 @@ export class ClearanceDetailComponent implements OnInit {
       next: (detail) => {
         this.detail = detail;
         this.selectedRoute = detail.route;
+        this.generalInfoForm = {
+          copyOfBlReceivedDate: detail.copyOfBlReceivedDate ?? '',
+          originalShipmentSetReceivedDate: detail.originalShipmentSetReceivedDate ?? '',
+          shipmentEta: detail.eta ?? '',
+          lcNo: detail.lcNo ?? '',
+          imFormNo: detail.imFormNo ?? '',
+          imFormDate: detail.imFormDate ?? ''
+        };
         this.loading = false;
         this.loadGeneralSubSections();
         this.loadRouteDetail();
@@ -146,7 +164,13 @@ export class ClearanceDetailComponent implements OnInit {
 
   loadGeneralSubSections(): void {
     this.service.getDeliveryOrder(this.shipmentId).subscribe({ next: (r) => { if (r) this.deliveryOrderForm = r; this.cdr.markForCheck(); } });
-    this.service.getCostEstimate(this.shipmentId).subscribe({ next: (r) => { if (r) this.costEstimateForm = r; this.cdr.markForCheck(); } });
+    this.service.getCostEstimate(this.shipmentId).subscribe({
+      next: (r) => {
+        if (r.estimate) this.costEstimateForm = r.estimate;
+        this.estimateTotalSdg = r.totalSdg;
+        this.cdr.markForCheck();
+      }
+    });
     this.service.getCertificateEntry(this.shipmentId).subscribe({ next: (r) => { if (r) this.certificateEntryForm = r; this.cdr.markForCheck(); } });
   }
 
@@ -177,18 +201,31 @@ export class ClearanceDetailComponent implements OnInit {
     }
   }
 
-  get routeDivision(): string {
-    if (this.selectedRoute === 1) return 'Route1';
-    if (this.selectedRoute === 2) return 'Route2';
-    if (this.selectedRoute === 3) return 'Route3';
-    return '';
-  }
-
   get activeRouteGroups(): GroupItemDef[] {
     if (this.selectedRoute === 1) return this.route1Groups;
     if (this.selectedRoute === 2) return this.route2Groups;
     if (this.selectedRoute === 3) return this.route3Groups;
     return [];
+  }
+
+  saveGeneralInfo(andNext: boolean): void {
+    this.savingGeneralInfo = true;
+    this.service.saveGeneralInfo(this.shipmentId, {
+      copyOfBlReceivedDate: this.generalInfoForm.copyOfBlReceivedDate || null,
+      originalShipmentSetReceivedDate: this.generalInfoForm.originalShipmentSetReceivedDate || null,
+      lcNo: this.generalInfoForm.lcNo || null,
+      imFormNo: this.generalInfoForm.imFormNo || null,
+      imFormDate: this.generalInfoForm.imFormDate || null,
+      shipmentEta: this.generalInfoForm.shipmentEta || null
+    } as any).subscribe({
+      next: () => {
+        this.savingGeneralInfo = false;
+        this.loadSchedule();
+        if (andNext) this.expanded = 'costEstimate';
+        this.cdr.markForCheck();
+      },
+      error: () => { this.savingGeneralInfo = false; this.error = 'Could not save General Info.'; this.cdr.markForCheck(); }
+    });
   }
 
   saveRoute(andNext: boolean): void {
@@ -200,7 +237,7 @@ export class ClearanceDetailComponent implements OnInit {
         if (this.detail) this.detail = { ...this.detail, route: this.selectedRoute };
         this.loadRouteDetail();
         this.loadSchedule();
-        if (andNext) this.expanded = this.selectedRoute === 3 ? this.activeRouteGroups[0]?.key ?? null : 'deliveryOrder';
+        if (andNext) this.expanded = 'generalInfo';
         this.cdr.markForCheck();
       },
       error: () => {
@@ -211,29 +248,29 @@ export class ClearanceDetailComponent implements OnInit {
     });
   }
 
-  saveDeliveryOrder(andNext: boolean): void {
-    this.savingDeliveryOrder = true;
-    this.service.saveDeliveryOrder(this.shipmentId, this.deliveryOrderForm).subscribe({
-      next: () => {
-        this.savingDeliveryOrder = false;
-        this.loadSchedule();
-        if (andNext) this.expanded = 'costEstimate';
-        this.cdr.markForCheck();
-      },
-      error: () => { this.savingDeliveryOrder = false; this.error = 'Could not save Delivery Order.'; this.cdr.markForCheck(); }
-    });
-  }
-
   saveCostEstimate(andNext: boolean): void {
     this.savingCostEstimate = true;
     this.service.saveCostEstimate(this.shipmentId, this.costEstimateForm).subscribe({
       next: () => {
         this.savingCostEstimate = false;
         this.loadSchedule();
-        if (andNext) this.expanded = 'certificateEntry';
+        if (andNext) this.expanded = 'deliveryOrder';
         this.cdr.markForCheck();
       },
       error: () => { this.savingCostEstimate = false; this.error = 'Could not save Cost Estimate.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveDeliveryOrder(andNext: boolean): void {
+    this.savingDeliveryOrder = true;
+    this.service.saveDeliveryOrder(this.shipmentId, this.deliveryOrderForm).subscribe({
+      next: () => {
+        this.savingDeliveryOrder = false;
+        this.loadSchedule();
+        if (andNext) this.expanded = 'certificateEntry';
+        this.cdr.markForCheck();
+      },
+      error: () => { this.savingDeliveryOrder = false; this.error = 'Could not save Delivery Order.'; this.cdr.markForCheck(); }
     });
   }
 
@@ -286,5 +323,16 @@ export class ClearanceDetailComponent implements OnInit {
       case 3: return 'Route 3 — Clear from FZ';
       default: return 'Not selected';
     }
+  }
+
+  get plannedVsCurrentText(): string | null {
+    if (!this.estimatedCompletionDate) return null;
+    const current = this.detail?.clearanceCompleteDate ?? this.estimatedCompletionDate;
+    if (current === this.estimatedCompletionDate) return null; // no actual completion recorded yet, nothing to compare
+    const plannedMs = new Date(this.estimatedCompletionDate).getTime();
+    const currentMs = new Date(current).getTime();
+    const diffDays = Math.round((currentMs - plannedMs) / 86400000);
+    if (diffDays === 0) return 'On plan';
+    return diffDays > 0 ? `Behind by ${diffDays} day(s)` : `Ahead by ${-diffDays} day(s)`;
   }
 }
