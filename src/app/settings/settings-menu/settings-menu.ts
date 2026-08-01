@@ -46,7 +46,8 @@ export class SettingsMenu {
         { label: 'Forwarders', path: '/settings/forwarders' },
         { label: 'Shipment Destinations', path: '/settings/shipment-destinations' },
         { label: 'Public Holidays', path: '/settings/public-holidays' },
-        { label: 'Clearance SLA', path: '/settings/clearance-sla' }
+        { label: 'Clearance SLA', path: '/settings/clearance-sla' },
+        { label: 'Clearance Charge Types', path: '/settings/clearance-charge-types' }
       ]
     },
     {
