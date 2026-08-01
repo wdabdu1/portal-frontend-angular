@@ -49,25 +49,6 @@ export interface ShipmentSupplierFullSet {
   fsReceivedDate: string | null;
 }
 
-export interface ShipmentSupplierPayment {
-  supplierInvoiceNo: string | null;
-  invoiceValue: number | null;
-  invoiceCurrencyId: number | null;
-  invoiceValueUsd: number | null;
-  totalPaidUsd: number | null;
-  balanceUsd: number | null;
-  remarks: string | null;
-}
-
-export interface PaymentRecord {
-  id: number;
-  paymentDate: string;
-  currencyId: number;
-  currencyCode: string;
-  value: number;
-  valueUsd: number;
-}
-
 export interface ShipmentBanking {
   senderBankId: number | null;
   osDocDispatchDate: string | null;
@@ -80,9 +61,6 @@ export interface ShipmentBanking {
   collectionValue: number | null;
   collectionCurrencyId: number | null;
   tenorId: number | null;
-  collectionDueDate: string | null;
-  collectionAmountSettled: number | null;
-  remainingDues: number | null;
   receiverBankCharges: number | null;
 }
 
@@ -138,19 +116,6 @@ export class UpdateShipmentService {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/supplier-full-set`, req);
   }
 
-  saveSupplierPayment(shipmentId: number, req: Partial<ShipmentSupplierPayment>) {
-    return this.http.put(`${API_URL}/shipments/${shipmentId}/supplier-payment`, req);
-  }
-
-  getPaymentRecords(shipmentId: number) {
-    return this.http.get<PaymentRecord[]>(`${API_URL}/shipments/${shipmentId}/supplier-payment/records`);
-  }
-  addPaymentRecord(shipmentId: number, req: { paymentDate: string; currencyId: number; value: number }) {
-    return this.http.post<PaymentRecord>(`${API_URL}/shipments/${shipmentId}/supplier-payment/records`, req);
-  }
-  deletePaymentRecord(shipmentId: number, recordId: number) {
-    return this.http.delete(`${API_URL}/shipments/${shipmentId}/supplier-payment/records/${recordId}`);
-  }
 
   saveBanking(shipmentId: number, req: Partial<ShipmentBanking>) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/banking`, req);
