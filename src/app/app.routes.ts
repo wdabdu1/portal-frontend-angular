@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { Login } from './auth/login/login';
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
+import { SupplierDuesList } from './supplier-dues/supplier-dues-list/supplier-dues-list';
 import { BusinessUnits } from './settings/business-units/business-units';
 import { SettingsMenu } from './settings/settings-menu/settings-menu';
 import { SimpleLookup } from './settings/simple-lookup/simple-lookup';
@@ -35,6 +36,7 @@ export const routes: Routes = [
   { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard] },
   { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard] },
+  { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
