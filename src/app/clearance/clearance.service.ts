@@ -86,6 +86,9 @@ export interface ClearanceDetail {
   clearanceCompleteDate: string | null;
   imFormNo: string | null;
   imFormDate: string | null;
+  consignee: string;
+  category: string;
+  fclCount: number;
 }
 
 export interface ScheduleItem {
