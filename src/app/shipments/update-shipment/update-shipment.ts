@@ -125,7 +125,8 @@ export class UpdateShipment implements OnInit {
 
   sectionStatus(key: SectionKey): 'Not Started' | 'Saved' {
     if (!this.detail) return 'Not Started';
-    return this.detail[key] ? 'Saved' : 'Not Started';
+    if (key === 'shipOnBoard') return this.detail.sobActualDate ? 'Saved' : 'Not Started';
+    return (this.detail as any)[key] ? 'Saved' : 'Not Started';
   }
 
   // MOT relates to whichever offshore entity hands off directly to Onshore —
