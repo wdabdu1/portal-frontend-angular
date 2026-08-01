@@ -48,10 +48,11 @@ export class UpdateShipment implements OnInit {
     advanceValue: null as number | null, advanceDueDate: '', advanceActualPaymentDate: '',
     remainingValue: null as number | null, remainingDueDate: '', remainingActualPaymentDate: '',
     remarks: ''
-  };  bankingForm = {
+  }; 
+  bankingForm = {
     senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
     receivingBankId: null as number | null, necessaryGoodType: false, collectionRefNo: '', collectionValue: null as number | null, collectionCurrencyId: null as number | null,
-    tenorId: null as number | null, collectionDueDate: '', collectionAmountSettled: null as number | null, imFormNo: '', imFormDate: ''
+    tenorId: null as number | null, collectionDueDate: '', collectionAmountSettled: null as number | null
   };
 
   constructor(private lookups: SettingsLookupService, private service: UpdateShipmentService) {}
@@ -101,8 +102,7 @@ export class UpdateShipment implements OnInit {
           senderBankId: detail.banking.senderBankId, osDocDispatchDate: detail.banking.osDocDispatchDate ?? '', osDocDispatchedViaId: detail.banking.osDocDispatchedViaId,
           osDocTrackingNumber: detail.banking.osDocTrackingNumber ?? '', receivingBankId: detail.banking.receivingBankId, necessaryGoodType: detail.banking.necessaryGoodType,
           collectionRefNo: detail.banking.collectionRefNo ?? '', collectionValue: detail.banking.collectionValue, collectionCurrencyId: detail.banking.collectionCurrencyId,
-          tenorId: detail.banking.tenorId, collectionDueDate: detail.banking.collectionDueDate ?? '', collectionAmountSettled: detail.banking.collectionAmountSettled,
-          imFormNo: detail.banking.imFormNo ?? '', imFormDate: detail.banking.imFormDate ?? ''
+          tenorId: detail.banking.tenorId, collectionDueDate: detail.banking.collectionDueDate ?? '', collectionAmountSettled: detail.banking.collectionAmountSettled
         };
 
         this.loading = false;
@@ -223,8 +223,7 @@ export class UpdateShipment implements OnInit {
       receivingBankId: this.bankingForm.receivingBankId, necessaryGoodType: this.bankingForm.necessaryGoodType,
       collectionRefNo: this.bankingForm.collectionRefNo || null, collectionValue: this.bankingForm.collectionValue,
       collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId,
-      collectionDueDate: this.bankingForm.collectionDueDate || null, collectionAmountSettled: this.bankingForm.collectionAmountSettled,
-      imFormNo: this.bankingForm.imFormNo || null, imFormDate: this.bankingForm.imFormDate || null
+      collectionDueDate: this.bankingForm.collectionDueDate || null, collectionAmountSettled: this.bankingForm.collectionAmountSettled
     }), andNext);
   }
 
