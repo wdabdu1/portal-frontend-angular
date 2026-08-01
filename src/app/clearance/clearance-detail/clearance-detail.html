@@ -8,29 +8,24 @@
     <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Clearance — {{ detail.blAwbNo }}</h1>
     <p style="color: #888; font-size: 13px;">PO {{ detail.poNumber }} — ETA: {{ detail.eta ? (detail.eta | date: 'MMM d, y') : '—' }}</p>
 
-    <!-- Route selector (moved to top) -->
-    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; overflow: hidden;">
+    <div *ngIf="estimatedCompletionDate" style="background:#f0f6fb; border-radius:6px; padding:10px 16px; margin-top:12px; font-size:13px;">
+      Planned Completion Date: <strong>{{ estimatedCompletionDate | date: 'MMM d, y' }}</strong>
+      <span *ngIf="detail.clearanceCompleteDate"> — Actual: <strong>{{ detail.clearanceCompleteDate | date: 'MMM d, y' }}</strong></span>
+      <span *ngIf="plannedVsCurrentText"> — {{ plannedVsCurrentText }}</span>
+    </div>
+
+    <!-- Route selector -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
       <div (click)="toggle('route')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
         <strong style="font-size: 14px;">Clearance Route</strong>
         <span style="font-size: 12px; color: #666;">{{ routeName(detail.route) }}</span>
       </div>
       <div *ngIf="expanded === 'route'" style="padding: 16px;">
         <div style="display:flex; flex-direction:column; gap:8px;">
-          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
-            <input type="radio" name="route" [value]="1" [(ngModel)]="selectedRoute" /> Route 1 — Clear at Port
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
-            <input type="radio" name="route" [value]="2" [(ngModel)]="selectedRoute" /> Route 2 — FZ Deposit
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
-            <input type="radio" name="route" [value]="3" [(ngModel)]="selectedRoute" /> Route 3 — Clear from FZ
-          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="radio" name="route" [value]="1" [(ngModel)]="selectedRoute" /> Route 1 — Clear at Port</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="radio" name="route" [value]="2" [(ngModel)]="selectedRoute" /> Route 2 — FZ Deposit</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="radio" name="route" [value]="3" [(ngModel)]="selectedRoute" /> Route 3 — Clear from FZ</label>
         </div>
-
-        <p *ngIf="estimatedCompletionDate" style="margin-top:12px; font-size:13px; background:#f0f6fb; padding:8px; border-radius:4px;">
-          Estimated Clearance Complete Date: <strong>{{ estimatedCompletionDate | date: 'MMM d, y' }}</strong>
-        </p>
-
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveRoute(false)" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
           <button (click)="saveRoute(true)" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRoute ? 'Saving...' : 'Save & Next' }}</button>
@@ -38,9 +33,60 @@
       </div>
     </div>
 
-    <!-- General sub-sections: skipped for Route 3 -->
-    <ng-container *ngIf="detail.route === 1 || detail.route === 2">
+    <!-- General Info -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('generalInfo')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">General Info</strong>
+      </div>
+      <div *ngIf="expanded === 'generalInfo'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Copy of BL Received Date</label><input type="date" [(ngModel)]="generalInfoForm.copyOfBlReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Original Shipment Set Received Date</label><input type="date" [(ngModel)]="generalInfoForm.originalShipmentSetReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Shipment Estimated Arrival Date</label><input type="date" [(ngModel)]="generalInfoForm.shipmentEta" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">L/C No.</label><input [(ngModel)]="generalInfoForm.lcNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">IM Form Ref. No.</label><input [(ngModel)]="generalInfoForm.imFormNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">IM Form Date</label><input type="date" [(ngModel)]="generalInfoForm.imFormDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveGeneralInfo(false)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveGeneralInfo(true)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingGeneralInfo ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="toggle('costEstimate')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+        </div>
+      </div>
+    </div>
 
+    <!-- Clearance Cost Estimate (before DO, per updated order) -->
+    <ng-container *ngIf="detail.route === 1 || detail.route === 2">
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+        <div (click)="toggle('costEstimate')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+          <strong style="font-size: 14px;">Clearance Cost Estimate</strong>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span [style.background]="lightColor(scheduleFor('ClearanceGeneral','Clearance Cost Estimate')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
+            <span style="font-size:11px; color:#666;">{{ scheduleFor('ClearanceGeneral','Clearance Cost Estimate')?.status }}</span>
+          </span>
+        </div>
+        <div *ngIf="expanded === 'costEstimate'" style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div><label style="display:block; font-size:12px; color:#555;">Estimate Date</label><input type="date" [(ngModel)]="costEstimateForm.estimateDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div>
+              <label style="display:block; font-size:12px; color:#555;">Estimate Value (SDG)</label>
+              <input type="text" [value]="estimateTotalSdg | number: '1.2-2'" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5;" />
+            </div>
+            <div style="grid-column: span 2;">
+              <a [routerLink]="['/clearance', shipmentId, 'estimate-items']" style="font-size:12px; color:#0a3d62;">Update Estimate Breakdown &rarr;</a>
+            </div>
+            <div><label style="display:block; font-size:12px; color:#555;">Notify BU Date</label><input type="date" [(ngModel)]="costEstimateForm.notifyBuDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Amount Settled Date</label><input type="date" [(ngModel)]="costEstimateForm.amountSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button (click)="saveCostEstimate(false)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveCostEstimate(true)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCostEstimate ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="toggle('deliveryOrder')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Order -->
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('deliveryOrder')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Delivery Order</strong>
@@ -54,41 +100,20 @@
             <div><label style="display:block; font-size:12px; color:#555;">Copy of DO Collected Date</label><input type="date" [(ngModel)]="deliveryOrderForm.copyOfDoCollectedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Receive DO Date</label><input type="date" [(ngModel)]="deliveryOrderForm.receiveDoDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Actual Arrival Date</label><input type="date" [(ngModel)]="deliveryOrderForm.actualArrivalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">DO Fees (SDG)</label><input type="text" appThousands [(ngModel)]="deliveryOrderForm.doFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="deliveryOrderForm.depositRequired" id="depreq" /><label for="depreq" style="font-size:13px;">Deposit Required?</label></div>
+            <div><label style="display:block; font-size:12px; color:#555;">DO Actual Fees (SDG)</label><input type="text" appThousands [(ngModel)]="deliveryOrderForm.doActualFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">DO Fees Settled Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doFeesSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">DO Received Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveDeliveryOrder(false)" [disabled]="savingDeliveryOrder" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
             <button (click)="saveDeliveryOrder(true)" [disabled]="savingDeliveryOrder" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingDeliveryOrder ? 'Saving...' : 'Save & Next' }}</button>
-            <button (click)="toggle('costEstimate')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
-          </div>
-        </div>
-      </div>
-
-      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
-        <div (click)="toggle('costEstimate')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
-          <strong style="font-size: 14px;">Clearance Cost Estimate</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('ClearanceGeneral','Clearance Cost Estimate')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('ClearanceGeneral','Clearance Cost Estimate')?.status }}</span>
-          </span>
-        </div>
-        <div *ngIf="expanded === 'costEstimate'" style="padding: 16px;">
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            <div><label style="display:block; font-size:12px; color:#555;">Estimate Date</label><input type="date" [(ngModel)]="costEstimateForm.estimateDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Estimate Value (SDG)</label><input type="text" appThousands [(ngModel)]="costEstimateForm.estimateValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Notify BU Date</label><input type="date" [(ngModel)]="costEstimateForm.notifyBuDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Amount Settled Date</label><input type="date" [(ngModel)]="costEstimateForm.amountSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-          </div>
-          <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveCostEstimate(false)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveCostEstimate(true)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCostEstimate ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('certificateEntry')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
       </div>
 
+      <!-- Customs Certificate Entry -->
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('certificateEntry')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Certificate Entry</strong>
@@ -113,14 +138,10 @@
 
     <!-- Route 1 Group Items -->
     <ng-container *ngIf="detail.route === 1">
-
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Containers Move Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Containers Move Process</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','Containers Move Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Containers Move Process')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Containers Move Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Containers Move Process')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Containers Move Process'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -139,10 +160,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SSMO File Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SSMO File Process</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO File Process')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO File Process')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'SSMO File Process'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -161,10 +179,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Examination (Form 48)')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Examination (Form 48)</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Examination (Form 48)')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Examination (Form 48)')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Examination (Form 48)'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -182,10 +197,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Lab')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Lab</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Lab')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Lab')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -205,10 +217,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SSMO Examination')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SSMO Examination</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO Examination')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO Examination')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'SSMO Examination'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -226,10 +235,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Evaluation')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Evaluation</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Evaluation')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Evaluation')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Evaluation'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -249,10 +255,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SPC Bill')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SPC Bill</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SPC Bill')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SPC Bill')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'SPC Bill'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -271,15 +274,14 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Truck & Containers</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route1','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Truck & Containers')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Truck & Containers')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route1Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route1Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Shipping Line Deposit Return Date</label><input type="date" [(ngModel)]="route1Form.shippingLineDepositReturnDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Deposit Value</label><input type="text" appThousands [(ngModel)]="route1Form.depositValue" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route1Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px;">
@@ -291,14 +293,10 @@
 
     <!-- Route 2 Group Items -->
     <ng-container *ngIf="detail.route === 2">
-
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('FZ Deposit Request')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">FZ Deposit Request</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route2','FZ Deposit Request')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','FZ Deposit Request')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','FZ Deposit Request')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','FZ Deposit Request')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'FZ Deposit Request'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -316,10 +314,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Inspection')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Inspection</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route2','Customs Inspection')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Customs Inspection')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','Customs Inspection')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Customs Inspection')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Inspection'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -336,10 +331,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SPC Bill')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SPC Bill</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route2','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','SPC Bill')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','SPC Bill')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'SPC Bill'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -359,16 +351,15 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Truck & Containers</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route2','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Truck & Containers')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Truck & Containers')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route2Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Containers Received at FZ Date</label><input type="date" [(ngModel)]="route2Form.containersReceivedAtFzDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route2Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Shipping Line Deposit Return Date</label><input type="date" [(ngModel)]="route2Form.shippingLineDepositReturnDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Deposit Value</label><input type="text" appThousands [(ngModel)]="route2Form.depositValue" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route2Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px;">
@@ -380,14 +371,10 @@
 
     <!-- Route 3 Group Items -->
     <ng-container *ngIf="detail.route === 3">
-
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Certificate Entry')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Certificate Entry</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route3','Customs Certificate Entry')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Certificate Entry')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Certificate Entry')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Certificate Entry')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Certificate Entry'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -405,10 +392,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SSMO File Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SSMO File Process</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route3','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO File Process')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO File Process')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'SSMO File Process'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -427,10 +411,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Examination (Form 48)')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Examination (Form 48)</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route3','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Examination (Form 48)')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Examination (Form 48)')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Examination (Form 48)'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -448,10 +429,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Lab')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Lab</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route3','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Lab')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Lab')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -471,10 +449,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SSMO Examination')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SSMO Examination</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route3','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO Examination')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO Examination')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'SSMO Examination'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -492,10 +467,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Evaluation')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Evaluation</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route3','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Evaluation')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Evaluation')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Customs Evaluation'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -515,10 +487,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Truck & Containers</strong>
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span [style.background]="lightColor(scheduleFor('Route3','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
-            <span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Truck & Containers')?.status }}</span>
-          </span>
+          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Truck & Containers')?.status }}</span></span>
         </div>
         <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
