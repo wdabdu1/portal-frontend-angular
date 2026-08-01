@@ -181,7 +181,7 @@ export const routes: Routes = [
     path: 'settings/tenors',
     component: SimpleLookup,
     canActivate: [authGuard],
-    data: { title: 'Tenors', resource: 'tenors', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
+    data: { title: 'Tenors', resource: 'tenors', fields: [{ key: 'days', label: 'No of Days', type: 'number' }] }
   },
   {
     path: 'settings/sender-banks',
