@@ -1,0 +1,53 @@
+<div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Supplier Dues</h1>
+  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding supplier balance.</p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">BU</th>
+        <th style="padding: 8px 6px;">Supplier</th>
+        <th style="padding: 8px 6px;">PO No.</th>
+        <th style="padding: 8px 6px;">Sup. Invoice No.</th>
+        <th style="padding: 8px 6px;">AWB/BL</th>
+        <th style="padding: 8px 6px;">SOB</th>
+        <th style="padding: 8px 6px;">Payment Term</th>
+        <th style="padding: 8px 6px;">Invoice Value</th>
+        <th style="padding: 8px 6px;">Currency</th>
+        <th style="padding: 8px 6px;">Unpaid Balance</th>
+        <th style="padding: 8px 6px;">Total Value $</th>
+        <th style="padding: 8px 6px;">Total Unpaid $</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee; cursor: pointer;" [routerLink]="['/shipments', r.shipmentId]">
+        <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
+        <td style="padding: 8px 6px;">{{ r.supplierName }}</td>
+        <td style="padding: 8px 6px; font-family: monospace;">{{ r.poNumber }}</td>
+        <td style="padding: 8px 6px;">{{ r.supplierInvoiceNo || '—' }}</td>
+        <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
+        <td style="padding: 8px 6px; color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.paymentTerm }}</td>
+        <td style="padding: 8px 6px;">{{ r.invoiceValue | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;">{{ r.invoiceCurrency || '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.unpaidBalance | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;">{{ r.totalValueUsd | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px; font-weight: 600; color: #c0392b;">{{ r.totalUnpaidUsd | number: '1.2-2' }}</td>
+      </tr>
+    </tbody>
+    <tfoot *ngIf="rows.length > 0">
+      <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+        <td colspan="10" style="padding: 8px 6px; text-align: right;">Totals:</td>
+        <td style="padding: 8px 6px;">{{ totalValueUsd | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px; color: #c0392b;">{{ totalUnpaidUsd | number: '1.2-2' }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No open supplier dues.
+  </p>
+</div>
