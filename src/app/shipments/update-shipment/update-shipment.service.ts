@@ -159,4 +159,8 @@ export class UpdateShipmentService {
   confirmShipment(shipmentId: number) {
     return this.http.post(`${API_URL}/shipments/${shipmentId}/confirm`, {});
   }
+
+  saveShipOnBoard(shipmentId: number, req: { sobActualDate: string | null }) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/ship-on-board`, req);
+  }
 }
