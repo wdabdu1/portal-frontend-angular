@@ -19,6 +19,12 @@ export const routes: Routes = [
   { path: '', redirectTo: 'orders', pathMatch: 'full' },
   { path: 'login', component: Login },
 
+  {
+    path: 'settings/clearance-charge-types',
+    component: SimpleLookup,
+    canActivate: [authGuard],
+    data: { title: 'Clearance Charge Types', resource: 'clearance-charge-types', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
+  },
   { path: 'settings', component: SettingsMenu, canActivate: [authGuard] },
   { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard] },
   { path: 'settings/divisions', component: Divisions, canActivate: [authGuard] },
