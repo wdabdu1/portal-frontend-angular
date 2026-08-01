@@ -11,11 +11,28 @@ export interface SupplierDueRow {
   blAwbNo: string;
   sob: string | null;
   paymentTerm: string;
-  invoiceValue: number | null;
-  invoiceCurrency: string | null;
-  unpaidBalance: number;
+  invoiceValue: number;
+  invoiceCurrency: string;
   totalValueUsd: number;
   totalUnpaidUsd: number;
+}
+
+export interface SupplierInvoiceSummary {
+  supplierInvoiceNo: string | null;
+  invoiceValue: number;
+  invoiceCurrency: string;
+  invoiceValueUsd: number;
+  totalPaidUsd: number;
+  balanceUsd: number;
+}
+
+export interface PaymentRecord {
+  id: number;
+  paymentDate: string;
+  currencyId: number;
+  currencyCode: string;
+  value: number;
+  valueUsd: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -24,5 +41,21 @@ export class SupplierDuesService {
 
   getOpen() {
     return this.http.get<SupplierDueRow[]>(`${API_URL}/supplier-dues`);
+  }
+
+  getInvoiceSummary(shipmentId: number) {
+    return this.http.get<SupplierInvoiceSummary>(`${API_URL}/shipments/${shipmentId}/supplier-invoice-summary`);
+  }
+
+  getPaymentRecords(shipmentId: number) {
+    return this.http.get<PaymentRecord[]>(`${API_URL}/shipments/${shipmentId}/supplier-payment/records`);
+  }
+
+  addPaymentRecord(shipmentId: number, req: { paymentDate: string; currencyId: number; value: number }) {
+    return this.http.post<PaymentRecord>(`${API_URL}/shipments/${shipmentId}/supplier-payment/records`, req);
+  }
+
+  deletePaymentRecord(shipmentId: number, recordId: number) {
+    return this.http.delete(`${API_URL}/shipments/${shipmentId}/supplier-payment/records/${recordId}`);
   }
 }
