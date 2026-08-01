@@ -10,14 +10,16 @@ export interface ClearanceRoute1Details {
   ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null;
   custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null;
   spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null;
-  truckPortEntryPermitDate: string | null; containersReturnedDate: string | null; clearanceActualCompletedDate: string | null;
+  truckPortEntryPermitDate: string | null; containersReturnedDate: string | null;
+  shippingLineDepositReturnDate: string | null; depositValue: number | null; clearanceActualCompletedDate: string | null;
 }
 
 export interface ClearanceRoute2Details {
   depositRequestDate: string | null; requestApprovalDate: string | null;
   inspectionDate: string | null;
   spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null; policeSecurityAppointedDate: string | null;
-  truckPortEntryPermitDate: string | null; containersReceivedAtFzDate: string | null; containersReturnedDate: string | null; clearanceActualCompletedDate: string | null;
+  truckPortEntryPermitDate: string | null; containersReceivedAtFzDate: string | null; containersReturnedDate: string | null;
+  shippingLineDepositReturnDate: string | null; depositValue: number | null; clearanceActualCompletedDate: string | null;
 }
 
 export interface ClearanceRoute3Details {
@@ -32,11 +34,24 @@ export interface ClearanceRoute3Details {
 
 export interface ClearanceDeliveryOrder {
   copyOfDoCollectedDate: string | null; receiveDoDate: string | null; actualArrivalDate: string | null;
-  doFeesSdg: number | null; doFeesSettledDate: string | null; doReceivedDate: string | null;
+  depositRequired: boolean; doActualFeesSdg: number | null; doFeesSettledDate: string | null; doReceivedDate: string | null;
 }
 
 export interface ClearanceCostEstimate {
-  estimateDate: string | null; estimateValueSdg: number | null; notifyBuDate: string | null; amountSettledDate: string | null;
+  estimateDate: string | null; notifyBuDate: string | null; amountSettledDate: string | null;
+}
+
+export interface CostEstimateResponse {
+  estimate: ClearanceCostEstimate | null;
+  totalSdg: number;
+}
+
+export interface ClearanceEstimateLineItem {
+  id: number;
+  chargeTypeId: number;
+  chargeTypeName: string;
+  valueSdg: number;
+  dueDate: string | null;
 }
 
 export interface ClearanceCertificateEntry {
@@ -69,6 +84,8 @@ export interface ClearanceDetail {
   notes: string | null;
   route: number;
   clearanceCompleteDate: string | null;
+  imFormNo: string | null;
+  imFormDate: string | null;
 }
 
 export interface ScheduleItem {
@@ -99,7 +116,7 @@ export class ClearanceService {
     return this.http.get<ClearanceDetail>(`${API_URL}/clearance/${shipmentId}/detail`);
   }
 
-  saveGeneralInfo(shipmentId: number, req: Partial<ClearanceDetail>) {
+  saveGeneralInfo(shipmentId: number, req: Partial<ClearanceDetail> & { shipmentEta?: string | null }) {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/general-info`, req);
   }
 
@@ -119,10 +136,20 @@ export class ClearanceService {
   }
 
   getCostEstimate(shipmentId: number) {
-    return this.http.get<ClearanceCostEstimate | null>(`${API_URL}/clearance/${shipmentId}/cost-estimate`);
+    return this.http.get<CostEstimateResponse>(`${API_URL}/clearance/${shipmentId}/cost-estimate`);
   }
   saveCostEstimate(shipmentId: number, req: Partial<ClearanceCostEstimate>) {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/cost-estimate`, req);
+  }
+
+  getEstimateLineItems(shipmentId: number) {
+    return this.http.get<ClearanceEstimateLineItem[]>(`${API_URL}/clearance/${shipmentId}/estimate-line-items`);
+  }
+  addEstimateLineItem(shipmentId: number, req: { chargeTypeId: number; valueSdg: number; dueDate: string | null }) {
+    return this.http.post<ClearanceEstimateLineItem>(`${API_URL}/clearance/${shipmentId}/estimate-line-items`, req);
+  }
+  deleteEstimateLineItem(shipmentId: number, lineItemId: number) {
+    return this.http.delete(`${API_URL}/clearance/${shipmentId}/estimate-line-items/${lineItemId}`);
   }
 
   getCertificateEntry(shipmentId: number) {
