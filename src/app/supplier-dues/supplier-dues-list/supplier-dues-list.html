@@ -1,6 +1,12 @@
 <div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
-  <h1 style="font-size: 20px; font-weight: 500;">Supplier Dues</h1>
-  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding supplier balance.</p>
+  <h1 style="font-size: 20px; font-weight: 500;">Supplier Payments & Dues</h1>
+  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding supplier balance. Click a row to view and record payments.</p>
+
+  <input
+    [(ngModel)]="searchText"
+    placeholder="Search by Supplier, PO No., or BL/AWB"
+    style="width: 100%; max-width: 400px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+  />
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
@@ -8,22 +14,26 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 8px 6px;">BU</th>
-        <th style="padding: 8px 6px;">Supplier</th>
-        <th style="padding: 8px 6px;">PO No.</th>
-        <th style="padding: 8px 6px;">Sup. Invoice No.</th>
-        <th style="padding: 8px 6px;">AWB/BL</th>
-        <th style="padding: 8px 6px;">SOB</th>
-        <th style="padding: 8px 6px;">Payment Term</th>
-        <th style="padding: 8px 6px;">Invoice Value</th>
-        <th style="padding: 8px 6px;">Currency</th>
-        <th style="padding: 8px 6px;">Unpaid Balance</th>
-        <th style="padding: 8px 6px;">Total Value $</th>
-        <th style="padding: 8px 6px;">Total Unpaid $</th>
+        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
+        <th (click)="sortBy('supplierName')" style="padding: 8px 6px; cursor: pointer;">Supplier</th>
+        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO No.</th>
+        <th (click)="sortBy('supplierInvoiceNo')" style="padding: 8px 6px; cursor: pointer;">Sup. Invoice No.</th>
+        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">AWB/BL</th>
+        <th (click)="sortBy('sob')" style="padding: 8px 6px; cursor: pointer;">SOB</th>
+        <th (click)="sortBy('paymentTerm')" style="padding: 8px 6px; cursor: pointer;">Payment Term</th>
+        <th (click)="sortBy('invoiceValue')" style="padding: 8px 6px; cursor: pointer;">Invoice Value</th>
+        <th (click)="sortBy('invoiceCurrency')" style="padding: 8px 6px; cursor: pointer;">Currency</th>
+        <th (click)="sortBy('totalValueUsd')" style="padding: 8px 6px; cursor: pointer;">Total Value $</th>
+        <th (click)="sortBy('totalUnpaidUsd')" style="padding: 8px 6px; cursor: pointer;">Total Unpaid $</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee; cursor: pointer;" [routerLink]="['/shipments', r.shipmentId]">
+      <tr
+        *ngFor="let r of rows"
+        (click)="select(r.shipmentId)"
+        [style.background]="selectedShipmentId === r.shipmentId ? '#f0f6fb' : 'transparent'"
+        style="border-bottom: 1px solid #eee; cursor: pointer;"
+      >
         <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
         <td style="padding: 8px 6px;">{{ r.supplierName }}</td>
         <td style="padding: 8px 6px; font-family: monospace;">{{ r.poNumber }}</td>
@@ -32,15 +42,14 @@
         <td style="padding: 8px 6px; color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</td>
         <td style="padding: 8px 6px;">{{ r.paymentTerm }}</td>
         <td style="padding: 8px 6px;">{{ r.invoiceValue | number: '1.2-2' }}</td>
-        <td style="padding: 8px 6px;">{{ r.invoiceCurrency || '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.unpaidBalance | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;">{{ r.invoiceCurrency }}</td>
         <td style="padding: 8px 6px;">{{ r.totalValueUsd | number: '1.2-2' }}</td>
         <td style="padding: 8px 6px; font-weight: 600; color: #c0392b;">{{ r.totalUnpaidUsd | number: '1.2-2' }}</td>
       </tr>
     </tbody>
     <tfoot *ngIf="rows.length > 0">
       <tr style="border-top: 2px solid #ccc; font-weight: 600;">
-        <td colspan="10" style="padding: 8px 6px; text-align: right;">Totals:</td>
+        <td colspan="9" style="padding: 8px 6px; text-align: right;">Totals:</td>
         <td style="padding: 8px 6px;">{{ totalValueUsd | number: '1.2-2' }}</td>
         <td style="padding: 8px 6px; color: #c0392b;">{{ totalUnpaidUsd | number: '1.2-2' }}</td>
       </tr>
@@ -50,4 +59,62 @@
   <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
     No open supplier dues.
   </p>
+
+  <!-- Inline detail panel -->
+  <div *ngIf="selectedShipmentId" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 16px;">
+    <p *ngIf="loadingDetail" style="color: #888; font-size: 13px;">Loading...</p>
+
+    <div *ngIf="!loadingDetail && summary">
+      <h3 style="font-size: 15px; margin: 0 0 8px;">Invoice {{ summary.supplierInvoiceNo || '—' }}</h3>
+      <p style="font-size: 13px; color: #666; background: #f7f7f7; padding: 8px; border-radius: 4px;">
+        Invoice Value: {{ summary.invoiceValue | number: '1.2-2' }} {{ summary.invoiceCurrency }}
+        ({{ summary.invoiceValueUsd | number: '1.2-2' }} USD)
+        — Paid: {{ summary.totalPaidUsd | number: '1.2-2' }} USD
+        — Balance: {{ summary.balanceUsd | number: '1.2-2' }} USD
+      </p>
+
+      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Payments Made</h4>
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="text-align:left; border-bottom:1px solid #ddd;">
+            <th style="padding:5px;">Date</th>
+            <th style="padding:5px;">Currency</th>
+            <th style="padding:5px;">Value</th>
+            <th style="padding:5px;">Value (USD)</th>
+            <th style="padding:5px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of paymentRecords" style="border-bottom:1px solid #eee;">
+            <td style="padding:5px;">{{ p.paymentDate | date: 'MMM d, y' }}</td>
+            <td style="padding:5px;">{{ p.currencyCode }}</td>
+            <td style="padding:5px;">{{ p.value | number: '1.2-2' }}</td>
+            <td style="padding:5px;">{{ p.valueUsd | number: '1.2-2' }}</td>
+            <td style="padding:5px;"><button (click)="removePayment(p.id)" style="color:#c0392b; background:none; border:none; cursor:pointer; font-size:12px;">Remove</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Date</label>
+          <input type="date" [(ngModel)]="newPaymentDate" style="padding:6px;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Currency</label>
+          <select [(ngModel)]="newPaymentCurrencyId" style="padding:6px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Value</label>
+          <input type="text" appThousands [(ngModel)]="newPaymentValue" style="padding:6px; width:120px; box-sizing:border-box;" />
+        </div>
+        <button (click)="addPayment()" [disabled]="addingPayment" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+          {{ addingPayment ? 'Adding...' : 'Add Payment' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
