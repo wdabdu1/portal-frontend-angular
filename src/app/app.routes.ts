@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { Login } from './auth/login/login';
 import { ShippingLines } from './settings/shipping-lines/shipping-lines';
+import { ShipmentDetails } from './shipments/shipment-details/shipment-details';
 import { OrderDetails } from './purchase-orders/order-details/order-details';
 import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
@@ -251,5 +252,6 @@ export const routes: Routes = [
   { path: 'orders/:id', component: OrderDetails, canActivate: [authGuard] },
   { path: 'shipments', component: ShipmentList, canActivate: [authGuard] },
   { path: 'shipments/new', component: NewShipment, canActivate: [authGuard] },
-  { path: 'shipments/:id', component: UpdateShipment, canActivate: [authGuard] }
+  { path: 'shipments/:id/update', component: UpdateShipment, canActivate: [authGuard] },
+  { path: 'shipments/:id', component: ShipmentDetails, canActivate: [authGuard] },
 ];
