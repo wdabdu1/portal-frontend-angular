@@ -51,8 +51,8 @@ export interface PurchaseOrderSummary {
   status: string;
   lineItemCount: number;
   createdAt: string;
+  orderValueUsd: number;
 }
-
 @Injectable({ providedIn: 'root' })
 export class PurchaseOrdersService {
   constructor(private http: HttpClient) {}
