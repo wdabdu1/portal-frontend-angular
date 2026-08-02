@@ -24,6 +24,12 @@ export const routes: Routes = [
   { path: 'login', component: Login },
 
   {
+    path: 'settings/tariff-groups',
+    component: SimpleLookup,
+    canActivate: [authGuard],
+    data: { title: 'Tariff Groups', resource: 'tariff-groups', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
+  },
+  {
     path: 'settings/clearance-charge-types',
     component: SimpleLookup,
     canActivate: [authGuard],
@@ -100,10 +106,18 @@ export const routes: Routes = [
     data: { title: 'Shipment Modes', resource: 'shipment-modes', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
+    {
     path: 'settings/product-categories',
     component: SimpleLookup,
     canActivate: [authGuard],
-    data: { title: 'Product Categories', resource: 'product-categories', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
+    data: {
+      title: 'Product Categories',
+      resource: 'product-categories',
+      fields: [
+        { key: 'name', label: 'Name', type: 'text' },
+        { key: 'tariffGroupId', label: 'Tariff Group', type: 'select', optionsResource: 'tariff-groups' }
+      ]
+    }
   },
   {
     path: 'settings/product-types',
