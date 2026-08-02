@@ -101,9 +101,20 @@ export interface ScheduleItem {
   light: 'Green' | 'Amber' | 'Red';
 }
 
-export interface ClearanceScheduleResponse {
-  estimatedCompletionDate: string | null;
-  items: ScheduleItem[];
+export interface DemurrageStorageResult {
+  applicable: boolean;
+  anchorDate: string | null;
+  storageEndDate: string | null;
+  storageEndIsActual: boolean;
+  demurrageEndDate: string | null;
+  demurrageEndIsActual: boolean;
+  storageDays: number;
+  demurrageDays: number;
+  storageCostEuro: number;
+  storageCostSdg: number;
+  demurrageCostSdg: number;
+  totalStorageDemurrageSdg: number;
+  warnings: string[];
 }
 
 export interface DemurrageStorageResult {
@@ -145,6 +156,10 @@ export class ClearanceService {
 
   getSchedule(shipmentId: number) {
     return this.http.get<ClearanceScheduleResponse>(`${API_URL}/clearance/${shipmentId}/sla-schedule`);
+  }
+
+  getDemurrageStorage(shipmentId: number) {
+    return this.http.get<DemurrageStorageResult>(`${API_URL}/clearance/${shipmentId}/demurrage-storage`);
   }
 
   getDemurrageStorage(shipmentId: number) {
