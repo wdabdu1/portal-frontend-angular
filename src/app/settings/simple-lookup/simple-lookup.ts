@@ -5,7 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { LookupEntity, SettingsLookupService } from '../settings-lookup.service';
 
-export type FieldType = 'text' | 'number' | 'checkbox' | 'date';
+export type FieldType = 'text' | 'number' | 'checkbox' | 'date' | 'select';
 export type FieldFormat = 'percent';
 
 export interface FieldConfig {
@@ -14,6 +14,7 @@ export interface FieldConfig {
   type: FieldType;
   readonly?: boolean;
   format?: FieldFormat;
+  optionsResource?: string; // for type: 'select' — which Settings resource to load as dropdown options
 }
 
 @Component({
@@ -34,6 +35,8 @@ export class SimpleLookup implements OnInit {
   loading = true;
   error = '';
 
+  selectOptions: Record<string, LookupEntity[]> = {};
+
   constructor(private lookups: SettingsLookupService, public auth: AuthService) {}
 
   get canEdit(): boolean {
@@ -51,6 +54,24 @@ export class SimpleLookup implements OnInit {
     this.fields = data['fields'];
     this.resetNewItem();
     this.load();
+
+    for (const f of this.fields) {
+      if (f.type === 'select' && f.optionsResource) {
+        this.lookups.getAll<LookupEntity>(f.optionsResource).subscribe({
+          next: (r) => { this.selectOptions[f.optionsResource!] = r; this.cdr.markForCheck(); }
+        });
+      }
+    }
+  }
+
+  optionLabel(item: LookupEntity): string {
+    return (item['name'] as string) ?? (item['label'] as string) ?? String(item['id']);
+  }
+
+  displaySelectValue(item: LookupEntity, field: FieldConfig): string {
+    const options = this.selectOptions[field.optionsResource ?? ''] ?? [];
+    const match = options.find((o) => o.id === item[field.key]);
+    return match ? this.optionLabel(match) : '—';
   }
 
   resetNewItem(): void {
