@@ -14,6 +14,24 @@
       <span *ngIf="plannedVsCurrentText"> — {{ plannedVsCurrentText }}</span>
     </div>
 
+    <div *ngIf="demurrageStorage?.applicable" style="background:#fff4e5; border: 1px solid #f0c674; border-radius:6px; padding:12px 16px; margin-top:10px; font-size:13px;">
+      <strong style="color:#a66a00;">Storage & Demurrage Exposure</strong>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
+        <div>
+          Storage: {{ demurrageStorage!.storageDays }} day(s)
+          <span style="color:#888;">({{ demurrageStorage!.storageEndIsActual ? 'actual' : 'projected' }} end {{ demurrageStorage!.storageEndDate | date: 'MMM d, y' }})</span>
+          <br /><strong>{{ demurrageStorage!.storageCostSdg | number: '1.2-2' }} SDG</strong>
+        </div>
+        <div>
+          Demurrage: {{ demurrageStorage!.demurrageDays }} day(s)
+          <span style="color:#888;">({{ demurrageStorage!.demurrageEndIsActual ? 'actual' : 'projected' }} end {{ demurrageStorage!.demurrageEndDate | date: 'MMM d, y' }})</span>
+          <br /><strong>{{ demurrageStorage!.demurrageCostSdg | number: '1.2-2' }} SDG</strong>
+        </div>
+      </div>
+      <p style="margin:10px 0 0; font-size:14px;">Total: <strong>{{ demurrageStorage!.totalStorageDemurrageSdg | number: '1.2-2' }} SDG</strong></p>
+      <p *ngFor="let w of demurrageStorage!.warnings" style="margin:6px 0 0; font-size:12px; color:#a66a00;">⚠ {{ w }}</p>
+    </div>
+
     <!-- Route selector -->
     <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
       <div (click)="toggle('route')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
