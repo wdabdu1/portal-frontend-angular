@@ -84,12 +84,12 @@
           </td>
           <td style="padding:6px;">
             <input
-              type="number"
+              type="text"
+              appThousands
               [(ngModel)]="li.qtyToShip"
               [name]="'qty'+li.id"
               [disabled]="!li.selected || li.qtyRemaining === 0"
-              [max]="li.qtyRemaining"
-              style="width:80px; padding:4px;"
+              style="width:90px; padding:4px;"
             />
           </td>
         </tr>
