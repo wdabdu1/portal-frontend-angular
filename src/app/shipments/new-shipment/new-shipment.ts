@@ -12,7 +12,7 @@ interface LineItemSelection extends LineItemRemaining {
 
 @Component({
   selector: 'app-new-shipment',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective],
   templateUrl: './new-shipment.html'
 })
 export class NewShipment implements OnInit {
