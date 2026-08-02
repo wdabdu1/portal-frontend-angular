@@ -63,6 +63,19 @@ export interface ShipmentBanking {
   tenorId: number | null;
   receiverBankCharges: number | null;
 }
+export interface ErpColumn {
+  purchaseOrderOffshorePartnerId: number;
+  companyName: string;
+  sequenceOrder: number;
+  prNo: string | null;
+  poNo: string | null;
+  sa: string | null;
+  billReg: string | null;
+  grn: string | null;
+  invoiceNo: string | null;
+  inspectionNo: string | null;
+  remarks: string | null;
+}
 
 export interface ShipmentDetail {
   id: number;
@@ -126,5 +139,13 @@ export class UpdateShipmentService {
 
   saveShipOnBoard(shipmentId: number, req: { sobActualDate: string | null }) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/ship-on-board`, req);
+  }
+
+  getErpColumns(shipmentId: number) {
+    return this.http.get<ErpColumn[]>(`${API_URL}/shipments/${shipmentId}/erp-info`);
+  }
+
+  saveErpColumn(shipmentId: number, offshorePartnerId: number, req: Partial<ErpColumn>) {
+    return this.http.put<ErpColumn>(`${API_URL}/shipments/${shipmentId}/erp-info/${offshorePartnerId}`, req);
   }
 }
