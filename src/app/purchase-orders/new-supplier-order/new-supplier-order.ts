@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { PurchaseOrdersService } from '../purchase-orders.service';
+import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 
 interface Division extends LookupEntity {
   businessUnitId: number;
@@ -27,7 +28,7 @@ interface OffshoreRow {
 
 @Component({
   selector: 'app-new-supplier-order',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective],
   templateUrl: './new-supplier-order.html'
 })
 export class NewSupplierOrder implements OnInit {
