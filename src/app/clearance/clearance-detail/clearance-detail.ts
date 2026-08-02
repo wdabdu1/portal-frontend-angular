@@ -220,6 +220,9 @@ export class ClearanceDetailComponent implements OnInit {
     } as any).subscribe({
       next: () => {
         this.savingGeneralInfo = false;
+        if (this.detail) {
+          this.detail = { ...this.detail, eta: this.generalInfoForm.shipmentEta || null };
+        }
         this.loadSchedule();
         if (andNext) this.expanded = 'costEstimate';
         this.cdr.markForCheck();
