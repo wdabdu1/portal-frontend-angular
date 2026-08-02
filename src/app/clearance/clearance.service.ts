@@ -68,6 +68,7 @@ export interface ClearanceShipmentSummary {
   declarationNo: string | null;
   product: string;
   qty: number;
+  unit: string;
   trafficLight: 'Green' | 'Amber' | 'Red' | 'Grey';
   routeStatus: string;
 }
