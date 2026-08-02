@@ -101,20 +101,9 @@ export interface ScheduleItem {
   light: 'Green' | 'Amber' | 'Red';
 }
 
-export interface DemurrageStorageResult {
-  applicable: boolean;
-  anchorDate: string | null;
-  storageEndDate: string | null;
-  storageEndIsActual: boolean;
-  demurrageEndDate: string | null;
-  demurrageEndIsActual: boolean;
-  storageDays: number;
-  demurrageDays: number;
-  storageCostEuro: number;
-  storageCostSdg: number;
-  demurrageCostSdg: number;
-  totalStorageDemurrageSdg: number;
-  warnings: string[];
+export interface ClearanceScheduleResponse {
+  estimatedCompletionDate: string | null;
+  items: ScheduleItem[];
 }
 
 export interface DemurrageStorageResult {
