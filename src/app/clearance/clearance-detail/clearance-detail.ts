@@ -6,7 +6,7 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import {
   ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
   ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details,
-  ClearanceService, ScheduleItem
+  ClearanceService, DemurrageStorageResult, ScheduleItem
 } from '../clearance.service';
 
 interface GroupItemDef {
@@ -31,6 +31,7 @@ export class ClearanceDetailComponent implements OnInit {
 
   schedule: ScheduleItem[] = [];
   estimatedCompletionDate: string | null = null;
+  demurrageStorage: DemurrageStorageResult | null = null;
 
   expanded: string | null = 'route';
   savingRoute = false;
@@ -157,6 +158,12 @@ export class ClearanceDetailComponent implements OnInit {
       next: (r) => {
         this.schedule = r.items;
         this.estimatedCompletionDate = r.estimatedCompletionDate;
+        this.cdr.markForCheck();
+      }
+    });
+    this.service.getDemurrageStorage(this.shipmentId).subscribe({
+      next: (r) => {
+        this.demurrageStorage = r;
         this.cdr.markForCheck();
       }
     });
