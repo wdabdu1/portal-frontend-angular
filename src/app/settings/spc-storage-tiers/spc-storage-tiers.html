@@ -1,0 +1,44 @@
+<div style="max-width: 700px; margin: 3rem auto; font-family: sans-serif;">
+  <a routerLink="/settings" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Settings</a>
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Settings — SPC Storage Tiers</h1>
+  <p style="color: #888; font-size: 13px;">Day-based storage tiers, in SPC Euro per FCL per day. Leave Duration blank on the last tier for "open-ended".</p>
+
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 6px;">Tier</th>
+        <th style="padding: 6px;">Duration (days)</th>
+        <th style="padding: 6px;">Rate 20' (€)</th>
+        <th style="padding: 6px;">Rate 40' (€)</th>
+        <th style="padding: 6px;" *ngIf="canEdit"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of tiers" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 6px;">{{ t.label }}</td>
+        <td style="padding: 6px;">
+          <input type="number" [(ngModel)]="t.durationDays" [disabled]="!canEdit" placeholder="open-ended" style="width: 90px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+        </td>
+        <td style="padding: 6px;">
+          <input type="text" appThousands [(ngModel)]="t.rate20" [disabled]="!canEdit" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+        </td>
+        <td style="padding: 6px;">
+          <input type="text" appThousands [(ngModel)]="t.rate40" [disabled]="!canEdit" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+        </td>
+        <td style="padding: 6px;" *ngIf="canEdit">
+          <button (click)="save(t)" [disabled]="savingId === t.id" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            {{ savingId === t.id ? 'Saving...' : 'Save' }}
+          </button>
+          <span *ngIf="savedId === t.id" style="color: #2a7d2a; font-size: 12px; margin-left: 6px;">✓</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!canEdit" style="margin-top: 1.5rem; color: #888; font-size: 13px;">
+    Your role doesn't have permission to edit these values (Manager or SuperUser required).
+  </p>
+</div>
