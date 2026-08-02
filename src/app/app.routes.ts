@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { Login } from './auth/login/login';
+import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
 import { BankDuesList } from './bank-dues/bank-dues-list/bank-dues-list';
 import { SupplierDuesList } from './supplier-dues/supplier-dues-list/supplier-dues-list';
@@ -227,17 +228,9 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'settings/spc-rates',
-    component: SimpleLookup,
-    canActivate: [authGuard],
-    data: {
-      title: 'SPC Rates',
-      resource: 'spc-rates',
-      fields: [
-        { key: 'euroToSdgRate', label: 'Euro to SDG Rate', type: 'number' },
-        { key: 'effectiveDate', label: 'Effective Date', type: 'date' }
-      ]
-    }
+    path: 'settings/spc-storage-tiers',
+    component: SpcStorageTiers,
+    canActivate: [authGuard]
   },
   {
     path: 'settings/acd-cost-settings',
