@@ -1,6 +1,6 @@
-<div style="max-width: 1000px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1050px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Clearance — Select Shipment</h1>
-  <p style="color: #888; font-size: 13px;">Sorted by ETA — shipments arriving soonest appear first.</p>
+  <p style="color: #888; font-size: 13px;">Click a column header to sort. Click a row to continue Clearance data entry.</p>
 
   <input
     [(ngModel)]="searchText"
@@ -16,21 +16,23 @@
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
         <th style="padding: 8px 6px;"></th>
-        <th style="padding: 8px 6px;">BL/AWB</th>
-        <th style="padding: 8px 6px;">BU</th>
-        <th style="padding: 8px 6px;">Category</th>
-        <th style="padding: 8px 6px;">ETA</th>
-        <th style="padding: 8px 6px;">FCL</th>
-        <th style="padding: 8px 6px;">Declaration No.</th>
-        <th style="padding: 8px 6px;">Product/Model</th>
-        <th style="padding: 8px 6px;">Qty</th>
-        <th style="padding: 8px 6px;">Route</th>
+        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB</th>
+        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
+        <th (click)="sortBy('category')" style="padding: 8px 6px; cursor: pointer;">Category</th>
+        <th (click)="sortBy('eta')" style="padding: 8px 6px; cursor: pointer;">ETA</th>
+        <th (click)="sortBy('fclCount')" style="padding: 8px 6px; cursor: pointer;">FCL</th>
+        <th (click)="sortBy('declarationNo')" style="padding: 8px 6px; cursor: pointer;">Declaration No.</th>
+        <th (click)="sortBy('product')" style="padding: 8px 6px; cursor: pointer;">Product/Model</th>
+        <th (click)="sortBy('qty')" style="padding: 8px 6px; cursor: pointer;">Qty</th>
+        <th style="padding: 8px 6px;">Units</th>
+        <th (click)="sortBy('routeStatus')" style="padding: 8px 6px; cursor: pointer;">Route</th>
+        <th style="padding: 8px 6px;"></th>
       </tr>
     </thead>
     <tbody>
       <tr
         *ngFor="let s of shipments"
-        (click)="select(s.shipmentId)"
+        (click)="goToClearance(s.shipmentId)"
         style="border-bottom: 1px solid #eee; cursor: pointer;"
       >
         <td style="padding: 8px 6px;">
@@ -44,7 +46,13 @@
         <td style="padding: 8px 6px;">{{ s.declarationNo || '—' }}</td>
         <td style="padding: 8px 6px;">{{ s.product }}</td>
         <td style="padding: 8px 6px;">{{ s.qty }}</td>
-        <td style="padding: 8px 6px; font-size: 12px; color: #666;">{{ s.routeStatus }}</td>
+        <td style="padding: 8px 6px;">{{ s.unit }}</td>
+        <td style="padding: 8px 6px; font-size: 12px; color: #666;">{{ routeLabel(s.routeStatus) }}</td>
+        <td style="padding: 8px 6px;">
+          <button (click)="viewDetails(s.shipmentId, $event)" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">
+            View Order
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>
