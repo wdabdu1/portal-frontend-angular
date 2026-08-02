@@ -395,5 +395,22 @@
         </div>
       </div>
     </div>
+
+    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #ddd;">
+      <p *ngIf="detail.status === 'Draft'" style="font-size: 12px; color: #888; margin-bottom: 8px;">
+        Once confirmed, this shipment becomes visible to all teams (Clearance, Dues, etc.) — double-check all sections above first.
+      </p>
+      <button
+        *ngIf="detail.status === 'Draft'"
+        (click)="confirmShipment()"
+        [disabled]="confirming"
+        style="padding:10px 20px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer; font-size:14px;"
+      >
+        {{ confirming ? 'Confirming...' : 'Confirm & Publish Shipment' }}
+      </button>
+      <span *ngIf="detail.status !== 'Draft'" style="font-size:13px; color:#1e7e34; font-weight:600;">
+        ✓ Confirmed — visible to all teams
+      </span>
+    </div>
   </div>
 </div>
