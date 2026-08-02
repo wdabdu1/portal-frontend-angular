@@ -102,6 +102,7 @@ export class UpdateShipment implements OnInit {
         };
 
         this.loading = false;
+        this.loadErpInfo();
         this.cdr.markForCheck();
       },
       error: () => {
@@ -175,9 +176,6 @@ export class UpdateShipment implements OnInit {
 
   toggleSection(key: SectionKey): void {
     this.expandedSection = this.expandedSection === key ? null : key;
-    if (key === 'erpInfo' && this.expandedSection === 'erpInfo' && this.erpColumns.length === 0 && !this.loadingErpInfo) {
-      this.loadErpInfo();
-    }
   }
 
   goToNext(current: SectionKey): void {
@@ -212,6 +210,7 @@ export class UpdateShipment implements OnInit {
     this.service.saveShipOnBoard(this.shipmentId, { sobActualDate: this.shipOnBoardForm.sobActualDate || null }).subscribe({
       next: () => {
         this.saving.shipOnBoard = false;
+        if (this.detail) this.detail = { ...this.detail, sobActualDate: this.shipOnBoardForm.sobActualDate || null };
         if (andNext) this.goToNext('shipOnBoard');
         this.cdr.markForCheck();
       },
