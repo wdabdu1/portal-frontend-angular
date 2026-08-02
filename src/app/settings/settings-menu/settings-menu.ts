@@ -57,7 +57,7 @@ export class SettingsMenu {
         { label: 'Tenors', path: '/settings/tenors' },
         { label: 'Sender Banks', path: '/settings/sender-banks' },
         { label: 'Receiver Banks', path: '/settings/receiver-banks' },
-        { label: 'SPC Rates', path: '/settings/spc-rates' },
+        { label: 'SPC Storage Tiers', path: '/settings/spc-storage-tiers' },
         { label: 'ACD Cost Settings', path: '/settings/acd-cost-settings' }
       ]
     }
