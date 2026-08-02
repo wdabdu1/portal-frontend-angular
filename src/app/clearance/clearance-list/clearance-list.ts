@@ -4,6 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ClearanceService, ClearanceShipmentSummary } from '../clearance.service';
 
+type SortColumn = keyof ClearanceShipmentSummary;
+
+const ROUTE_LABELS: Record<string, string> = {
+  NotSelected: 'Not Started',
+  Route1ClearAtPort: 'Clear at Port',
+  Route2FzDeposit: 'FZ Deposit',
+  Route3ClearFromFz: 'Clear from FZ'
+};
+
 @Component({
   selector: 'app-clearance-list',
   imports: [CommonModule, FormsModule],
@@ -12,10 +21,12 @@ import { ClearanceService, ClearanceShipmentSummary } from '../clearance.service
 export class ClearanceList implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  shipments: ClearanceShipmentSummary[] = [];
+  allShipments: ClearanceShipmentSummary[] = [];
   loading = true;
   error = '';
   searchText = '';
+  sortColumn: SortColumn = 'eta';
+  sortAsc = true;
 
   constructor(private service: ClearanceService, private router: Router) {}
 
@@ -26,7 +37,7 @@ export class ClearanceList implements OnInit {
   load(): void {
     this.loading = true;
     this.service.getShipmentsForClearance(this.searchText || undefined).subscribe({
-      next: (r) => { this.shipments = r; this.loading = false; this.cdr.markForCheck(); },
+      next: (r) => { this.allShipments = r; this.loading = false; this.cdr.markForCheck(); },
       error: () => { this.error = 'Could not load shipments.'; this.loading = false; this.cdr.markForCheck(); }
     });
   }
@@ -35,7 +46,38 @@ export class ClearanceList implements OnInit {
     this.load();
   }
 
-  select(shipmentId: number): void {
+  get shipments(): ClearanceShipmentSummary[] {
+    const dir = this.sortAsc ? 1 : -1;
+    return [...this.allShipments].sort((a, b) => {
+      const av = a[this.sortColumn];
+      const bv = b[this.sortColumn];
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+  }
+
+  sortBy(column: SortColumn): void {
+    if (this.sortColumn === column) {
+      this.sortAsc = !this.sortAsc;
+    } else {
+      this.sortColumn = column;
+      this.sortAsc = true;
+    }
+  }
+
+  routeLabel(status: string): string {
+    return ROUTE_LABELS[status] ?? status;
+  }
+
+  viewDetails(shipmentId: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.router.navigate(['/shipments', shipmentId]);
+  }
+
+  goToClearance(shipmentId: number): void {
     this.router.navigate(['/clearance', shipmentId]);
   }
 
