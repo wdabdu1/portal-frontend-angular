@@ -108,7 +108,6 @@ export const routes: Routes = [
     data: { title: 'Shipment Modes', resource: 'shipment-modes', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
-    {
     path: 'settings/product-categories',
     component: SimpleLookup,
     canActivate: [authGuard],
