@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { PurchaseOrderSummary, PurchaseOrdersService } from '../purchase-orders.service';
 
@@ -17,7 +17,11 @@ export class OrderList implements OnInit {
   error = '';
   confirmingId: number | null = null;
 
-  constructor(private ordersService: PurchaseOrdersService, public auth: AuthService) {}
+  constructor(private ordersService: PurchaseOrdersService, public auth: AuthService, private router: Router) {}
+
+  viewDetails(id: number): void {
+    this.router.navigate(['/orders', id]);
+  }
 
   ngOnInit(): void {
     this.load();
