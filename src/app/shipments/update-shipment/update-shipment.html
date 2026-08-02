@@ -323,5 +323,77 @@
         </div>
       </div>
     </div>
+
+    <!-- ERP Info -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('erpInfo')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">ERP Info</strong>
+        <span [style.background]="sectionStatus('erpInfo') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('erpInfo') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('erpInfo') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'erpInfo'" style="padding: 16px;">
+        <p *ngIf="loadingErpInfo" style="color:#888; font-size:13px;">Loading...</p>
+        <p *ngIf="!loadingErpInfo && erpColumns.length === 0" style="color:#888; font-size:13px;">No offshore partners on this order.</p>
+
+        <div *ngIf="!loadingErpInfo && erpColumns.length > 0" style="display:flex; gap:24px; overflow-x:auto;">
+          <div *ngFor="let col of erpColumns" style="min-width:220px; flex:1;">
+            <h4 style="font-size:13px; margin:0 0 10px; color:#333; border-bottom:1px solid #eee; padding-bottom:6px;">{{ col.companyName }}</h4>
+
+            <ng-container *ngIf="col.sequenceOrder === 1">
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} ERP PR No.</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].prNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} ERP PO No.</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].poNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} ERP SA</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].sa" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} ERP GRN</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].grn" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} Bill Reg</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].billReg" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} Invoice No.</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].invoiceNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="col.sequenceOrder > 1">
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} Inspection No.</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].inspectionNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} GRN No.</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].grn" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} Invoice No.</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].invoiceNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:12px; color:#555;">{{ col.companyName }} ERP Remarks</label>
+                <input [(ngModel)]="erpForms[col.purchaseOrderOffshorePartnerId].remarks" style="width:100%; padding:6px; box-sizing:border-box;" />
+              </div>
+            </ng-container>
+
+            <button (click)="saveErpColumn(col.purchaseOrderOffshorePartnerId, false)" [disabled]="savingErpColumn[col.purchaseOrderOffshorePartnerId]" style="margin-top:6px; padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer; width:100%;">
+              {{ savingErpColumn[col.purchaseOrderOffshorePartnerId] ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:8px;">
+          <button (click)="saveErpColumn(erpColumns[0]?.purchaseOrderOffshorePartnerId, true)" *ngIf="erpColumns.length > 0" [disabled]="saving.erpInfo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">Save & Next</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
