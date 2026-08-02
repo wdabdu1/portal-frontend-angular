@@ -41,7 +41,6 @@ export class BankDuesList implements OnInit {
     this.load();
   }
 
-  load(): void {
     load(): void {
     this.loading = true;
     this.service.getOpen().subscribe({
