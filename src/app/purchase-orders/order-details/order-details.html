@@ -1,0 +1,59 @@
+<div style="max-width: 750px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/orders" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Orders</a>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 12px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
+
+  <div *ngIf="!loading && order">
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Order {{ order.poNumber }}</h1>
+    <p style="color: #888; font-size: 13px;">{{ order.businessUnit }}<span *ngIf="order.division"> — {{ order.division }}</span> — Status: {{ order.status }} — Created {{ order.createdAt | date: 'MMM d, y' }}</p>
+
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">Order Info</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+        <div *ngIf="order.supplier"><span style="color:#888;">Supplier:</span> {{ order.supplier }}</div>
+        <div><span style="color:#888;">Brand/Manufacturer:</span> {{ order.brandManufacturer }}</div>
+        <div><span style="color:#888;">Consignee:</span> {{ order.consignee }}</div>
+        <div><span style="color:#888;">Incoterm:</span> {{ order.incoterm }}</div>
+        <div><span style="color:#888;">Payment Term:</span> {{ order.paymentTerm }}</div>
+        <div><span style="color:#888;">Approval Type:</span> {{ order.approvalType }}</div>
+      </div>
+      <p *ngIf="order.totalOrderValueUsd !== null" style="margin-top: 12px; font-size: 14px; background:#f7f7f7; padding:8px; border-radius:4px;">
+        Total Order Value: <strong>{{ order.totalOrderValueUsd | number: '1.2-2' }} USD</strong>
+      </p>
+    </div>
+
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">Line Items</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+            <th style="padding: 5px;">Category</th>
+            <th style="padding: 5px;">Type</th>
+            <th style="padding: 5px;">Model/Product</th>
+            <th style="padding: 5px;">Qty</th>
+            <th style="padding: 5px;" *ngIf="order.lineItems[0]?.unitPrice !== undefined && order.lineItems[0]?.unitPrice !== null">Unit Price</th>
+            <th style="padding: 5px;" *ngIf="order.lineItems[0]?.totalValue !== undefined && order.lineItems[0]?.totalValue !== null">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let li of order.lineItems" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 5px;">{{ li.productCategory }}</td>
+            <td style="padding: 5px;">{{ li.productType }}</td>
+            <td style="padding: 5px;">{{ li.modelProduct }}</td>
+            <td style="padding: 5px;">{{ li.qty | number: '1.0-2' }} {{ li.unitOfMeasure }}</td>
+            <td style="padding: 5px;" *ngIf="li.unitPrice !== null">{{ li.unitPrice | number: '1.2-2' }} {{ li.currency }}</td>
+            <td style="padding: 5px;" *ngIf="li.totalValue !== null">{{ li.totalValue | number: '1.2-2' }} {{ li.currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="order.offshorePartners.length > 0" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">Offshore Chain</h3>
+      <div *ngFor="let o of order.offshorePartners" style="font-size: 13px; padding: 4px 0;">
+        {{ o.sequenceOrder }}. {{ o.name }} <span *ngIf="o.isLast" style="color:#1e7e34; font-size:11px;">(last — hands off to Onshore)</span>
+      </div>
+    </div>
+  </div>
+</div>
