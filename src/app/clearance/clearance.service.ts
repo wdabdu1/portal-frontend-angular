@@ -151,10 +151,6 @@ export class ClearanceService {
     return this.http.get<DemurrageStorageResult>(`${API_URL}/clearance/${shipmentId}/demurrage-storage`);
   }
 
-  getDemurrageStorage(shipmentId: number) {
-    return this.http.get<DemurrageStorageResult>(`${API_URL}/clearance/${shipmentId}/demurrage-storage`);
-  }
-
   getDeliveryOrder(shipmentId: number) {
     return this.http.get<ClearanceDeliveryOrder | null>(`${API_URL}/clearance/${shipmentId}/delivery-order`);
   }
