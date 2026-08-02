@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { LineItemRemaining, ShipmentsService } from '../shipments.service';
+import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 
 interface LineItemSelection extends LineItemRemaining {
   selected: boolean;
