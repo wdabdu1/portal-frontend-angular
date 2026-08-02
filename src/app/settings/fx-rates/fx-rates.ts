@@ -28,6 +28,12 @@ export class FxRates implements OnInit {
   newRateToUsd: number | null = null;
   newEffectiveDate = '';
 
+  spcRates: { id: number; euroToSdgRate: number; effectiveDate: string }[] = [];
+  loadingSpc = true;
+  newSpcRate: number | null = null;
+  newSpcEffectiveDate = '';
+  savingSpc = false;
+
   constructor(private lookups: SettingsLookupService, public auth: AuthService) {}
 
   get canEdit(): boolean {
@@ -39,6 +45,29 @@ export class FxRates implements OnInit {
       next: (r) => { this.currencies = r; this.cdr.markForCheck(); }
     });
     this.load();
+    this.loadSpc();
+  }
+
+  loadSpc(): void {
+    this.loadingSpc = true;
+    this.lookups.getAll<{ id: number; euroToSdgRate: number; effectiveDate: string }>('spc-rates').subscribe({
+      next: (r) => { this.spcRates = r; this.loadingSpc = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingSpc = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  addSpcRate(): void {
+    if (!this.newSpcRate || !this.newSpcEffectiveDate) return;
+    this.savingSpc = true;
+    this.lookups.create('spc-rates', { euroToSdgRate: this.newSpcRate, effectiveDate: this.newSpcEffectiveDate }).subscribe({
+      next: () => {
+        this.savingSpc = false;
+        this.newSpcRate = null;
+        this.newSpcEffectiveDate = '';
+        this.loadSpc();
+      },
+      error: () => { this.savingSpc = false; this.error = 'Could not create SPC Euro Rate.'; this.cdr.markForCheck(); }
+    });
   }
 
   currencyCode(id: number): string {
