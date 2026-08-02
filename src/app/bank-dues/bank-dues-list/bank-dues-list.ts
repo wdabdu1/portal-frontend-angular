@@ -42,9 +42,19 @@ export class BankDuesList implements OnInit {
   }
 
   load(): void {
+    load(): void {
     this.loading = true;
     this.service.getOpen().subscribe({
-      next: (r) => { this.allRows = r; this.loading = false; this.cdr.markForCheck(); },
+      next: (r) => {
+        this.allRows = r;
+        this.loading = false;
+        // Keep the open detail panel in sync with the freshly reloaded row
+        // (fixes stale Paid/Balance in the summary line after add/remove).
+        if (this.selectedShipmentId !== null) {
+          this.selectedRow = r.find((row) => row.shipmentId === this.selectedShipmentId) ?? this.selectedRow;
+        }
+        this.cdr.markForCheck();
+      },
       error: () => { this.error = 'Could not load bank dues.'; this.loading = false; this.cdr.markForCheck(); }
     });
   }
