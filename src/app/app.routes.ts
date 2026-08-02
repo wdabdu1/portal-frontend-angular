@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { Login } from './auth/login/login';
+import { ShippingLines } from './settings/shipping-lines/shipping-lines';
 import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
 import { BankDuesList } from './bank-dues/bank-dues-list/bank-dues-list';
@@ -147,9 +148,8 @@ export const routes: Routes = [
   },
   {
     path: 'settings/shipping-lines',
-    component: SimpleLookup,
-    canActivate: [authGuard],
-    data: { title: 'Shipping Lines', resource: 'shipping-lines', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
+    component: ShippingLines,
+    canActivate: [authGuard]
   },
   {
     path: 'settings/couriers',
