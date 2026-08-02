@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
-import { ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
+import { ErpColumn, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
 
-type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'banking';
+type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'banking' | 'erpInfo';
 
 @Component({
   selector: 'app-update-shipment',
@@ -30,11 +30,16 @@ export class UpdateShipment implements OnInit {
   receiverBanks: LookupEntity[] = [];
   tenors: LookupEntity[] = [];
 
-  sectionOrder: SectionKey[] = ['shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'banking'];
+  sectionOrder: SectionKey[] = ['shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'banking', 'erpInfo'];
   expandedSection: SectionKey | null = 'shipOnBoard';
   saving: Record<SectionKey, boolean> = {
-    shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, banking: false
+    shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, banking: false, erpInfo: false
   };
+
+  erpColumns: ErpColumn[] = [];
+  erpForms: Record<number, { prNo: string; poNo: string; sa: string; billReg: string; grn: string; invoiceNo: string; inspectionNo: string; remarks: string }> = {};
+  savingErpColumn: Record<number, boolean> = {};
+  loadingErpInfo = false;
 
   shipOnBoardForm = { sobActualDate: '' };
   confirming = false;
@@ -110,7 +115,49 @@ export class UpdateShipment implements OnInit {
   sectionStatus(key: SectionKey): 'Not Started' | 'Saved' {
     if (!this.detail) return 'Not Started';
     if (key === 'shipOnBoard') return this.detail.sobActualDate ? 'Saved' : 'Not Started';
+    if (key === 'erpInfo') return this.erpColumns.some((c) => this.hasAnyValue(c)) ? 'Saved' : 'Not Started';
     return (this.detail as any)[key] ? 'Saved' : 'Not Started';
+  }
+
+  private hasAnyValue(c: ErpColumn): boolean {
+    return !!(c.prNo || c.poNo || c.sa || c.billReg || c.grn || c.invoiceNo || c.inspectionNo || c.remarks);
+  }
+
+  loadErpInfo(): void {
+    this.loadingErpInfo = true;
+    this.service.getErpColumns(this.shipmentId).subscribe({
+      next: (columns) => {
+        this.erpColumns = columns;
+        this.erpForms = {};
+        for (const c of columns) {
+          this.erpForms[c.purchaseOrderOffshorePartnerId] = {
+            prNo: c.prNo ?? '', poNo: c.poNo ?? '', sa: c.sa ?? '', billReg: c.billReg ?? '',
+            grn: c.grn ?? '', invoiceNo: c.invoiceNo ?? '', inspectionNo: c.inspectionNo ?? '', remarks: c.remarks ?? ''
+          };
+        }
+        this.loadingErpInfo = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.loadingErpInfo = false; this.error = 'Could not load ERP Info.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveErpColumn(offshorePartnerId: number, andNext: boolean): void {
+    const form = this.erpForms[offshorePartnerId];
+    this.savingErpColumn[offshorePartnerId] = true;
+    this.service.saveErpColumn(this.shipmentId, offshorePartnerId, {
+      prNo: form.prNo || null, poNo: form.poNo || null, sa: form.sa || null, billReg: form.billReg || null,
+      grn: form.grn || null, invoiceNo: form.invoiceNo || null, inspectionNo: form.inspectionNo || null, remarks: form.remarks || null
+    }).subscribe({
+      next: (updated) => {
+        this.savingErpColumn[offshorePartnerId] = false;
+        const idx = this.erpColumns.findIndex((c) => c.purchaseOrderOffshorePartnerId === offshorePartnerId);
+        if (idx >= 0) this.erpColumns[idx] = updated;
+        if (andNext) this.goToNext('erpInfo');
+        this.cdr.markForCheck();
+      },
+      error: () => { this.savingErpColumn[offshorePartnerId] = false; this.error = 'Could not save this ERP column.'; this.cdr.markForCheck(); }
+    });
   }
 
   // MOT relates to whichever offshore entity hands off directly to Onshore —
@@ -128,6 +175,9 @@ export class UpdateShipment implements OnInit {
 
   toggleSection(key: SectionKey): void {
     this.expandedSection = this.expandedSection === key ? null : key;
+    if (key === 'erpInfo' && this.expandedSection === 'erpInfo' && this.erpColumns.length === 0 && !this.loadingErpInfo) {
+      this.loadErpInfo();
+    }
   }
 
   goToNext(current: SectionKey): void {
