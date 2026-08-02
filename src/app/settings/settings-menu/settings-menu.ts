@@ -32,6 +32,7 @@ export class SettingsMenu {
         { label: 'Units of Measure', path: '/settings/units-of-measure' },
         { label: 'Shipment Modes', path: '/settings/shipment-modes' },
         { label: 'Product Categories', path: '/settings/product-categories' },
+        { label: 'Tariff Groups', path: '/settings/tariff-groups' },
         { label: 'Product Types', path: '/settings/product-types' },
         { label: 'Model/Product', path: '/settings/model-products' },
         { label: 'Currencies', path: '/settings/currencies' },
