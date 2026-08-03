@@ -22,11 +22,13 @@ export interface ShipmentFullDetail {
   poNumber: string;
   status: string;
   businessUnit: string;
+  division: string | null;
   supplier: string | null;
   consignee: string;
   category: string;
   fcl20Count: number;
   fcl40Count: number;
+  etd: string | null;
   eta: string | null;
   sobActualDate: string | null;
   lineItems: ShipmentLineItemDetail[];
@@ -38,6 +40,7 @@ export interface ShipmentFullDetail {
   supplierFullSet: Record<string, unknown> | null;
   banking: Record<string, unknown> | null;
   erpInfo: ErpColumnDetail[];
+  lastOffshoreInvoiceNo: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
