@@ -16,15 +16,30 @@
 
     <div *ngIf="demurrageStorage?.applicable" style="background:#fff4e5; border: 1px solid #f0c674; border-radius:6px; padding:12px 16px; margin-top:10px; font-size:13px;">
       <strong style="color:#a66a00;">Storage & Demurrage Exposure</strong>
+      <p style="margin:6px 0 0; color:#666;">
+        {{ demurrageStorage!.fcl20Count + demurrageStorage!.fcl40Count }} FCL
+        <span *ngIf="demurrageStorage!.fcl40Count > 0 || demurrageStorage!.fcl20Count > 0">
+          ({{ demurrageStorage!.fcl40Count }}× 40' and {{ demurrageStorage!.fcl20Count }}× 20')
+        </span>
+      </p>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
         <div>
           Storage: {{ demurrageStorage!.storageDays }} day(s)
-          <span style="color:#888;">({{ demurrageStorage!.storageEndIsActual ? 'actual' : 'projected' }} end {{ demurrageStorage!.storageEndDate | date: 'MMM d, y' }})</span>
+          <span style="color:#888;">({{ demurrageStorage!.storageFreeDays }} free + {{ demurrageStorage!.storageChargeableDays }} chargeable)</span>
+          <br /><span style="color:#888;">({{ demurrageStorage!.storageEndIsActual ? 'actual' : 'projected' }} end {{ demurrageStorage!.storageEndDate | date: 'MMM d, y' }})</span>
           <br /><strong>{{ demurrageStorage!.storageCostSdg | number: '1.2-2' }} SDG</strong>
         </div>
         <div>
           Demurrage: {{ demurrageStorage!.demurrageDays }} day(s)
-          <span style="color:#888;">({{ demurrageStorage!.demurrageEndIsActual ? 'actual' : 'projected' }} end {{ demurrageStorage!.demurrageEndDate | date: 'MMM d, y' }})</span>
+          <br *ngIf="demurrageStorage!.demurrageFreeDays20 !== null" />
+          <span *ngIf="demurrageStorage!.demurrageFreeDays20 !== null" style="color:#888;">
+            20': {{ demurrageStorage!.demurrageFreeDays20 }} free + {{ demurrageStorage!.demurrageChargeableDays20 }} chargeable
+          </span>
+          <br *ngIf="demurrageStorage!.demurrageFreeDays40 !== null" />
+          <span *ngIf="demurrageStorage!.demurrageFreeDays40 !== null" style="color:#888;">
+            40': {{ demurrageStorage!.demurrageFreeDays40 }} free + {{ demurrageStorage!.demurrageChargeableDays40 }} chargeable
+          </span>
+          <br /><span style="color:#888;">({{ demurrageStorage!.demurrageEndIsActual ? 'actual' : 'projected' }} end {{ demurrageStorage!.demurrageEndDate | date: 'MMM d, y' }})</span>
           <br /><strong>{{ demurrageStorage!.demurrageCostSdg | number: '1.2-2' }} SDG</strong>
         </div>
       </div>
