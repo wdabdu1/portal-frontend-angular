@@ -17,6 +17,9 @@
       <a routerLink="/bank-dues" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px;">
         Bank Dues
       </a>
+      <a *ngIf="auth.hasRole('SuperUser')" routerLink="/users" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px;">
+        Users
+      </a>
       <a routerLink="/orders/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
         + New Supplier Order
       </a>
