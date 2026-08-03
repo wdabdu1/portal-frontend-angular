@@ -22,6 +22,7 @@ import { FxRates } from './settings/fx-rates/fx-rates';
 import { ClearanceList } from './clearance/clearance-list/clearance-list';
 import { ClearanceDetailComponent } from './clearance/clearance-detail/clearance-detail';
 import { ClearanceSla } from './settings/clearance-sla/clearance-sla';
+import { Users } from './users/users';
 
 
 export const routes: Routes = [
