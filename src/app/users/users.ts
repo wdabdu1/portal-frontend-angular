@@ -36,7 +36,7 @@ export class Users implements OnInit {
   newEmail = '';
   newDisplayName = '';
   newPassword = '';
-  newRole = 'Standard';
+  newRole = 'IP_User';
   newBuRows: NewBuRow[] = [];
   creating = false;
 
@@ -63,7 +63,7 @@ export class Users implements OnInit {
       this.newEmail = '';
       this.newDisplayName = '';
       this.newPassword = '';
-      this.newRole = 'Standard';
+      this.newRole = 'IP_User';
       this.newBuRows = [];
     }
   }
