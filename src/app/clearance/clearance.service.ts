@@ -130,7 +130,6 @@ export interface DemurrageStorageResult {
   totalStorageDemurrageSdg: number;
   warnings: string[];
 }
-}
 
 @Injectable({ providedIn: 'root' })
 export class ClearanceService {
