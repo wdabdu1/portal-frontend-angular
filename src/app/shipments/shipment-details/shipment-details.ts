@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Location } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 import { ShipmentDetailsService, ShipmentFullDetail } from './shipment-details.service';
 
@@ -18,7 +19,11 @@ export class ShipmentDetails implements OnInit {
   loading = true;
   error = '';
 
-  constructor(private service: ShipmentDetailsService, public auth: AuthService) {}
+  constructor(private service: ShipmentDetailsService, public auth: AuthService, private location: Location) {}
+
+  goBack(): void {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
