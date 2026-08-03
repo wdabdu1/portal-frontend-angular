@@ -116,11 +116,20 @@ export interface DemurrageStorageResult {
   demurrageEndIsActual: boolean;
   storageDays: number;
   demurrageDays: number;
+  fcl20Count: number;
+  fcl40Count: number;
+  storageFreeDays: number;
+  storageChargeableDays: number;
+  demurrageFreeDays20: number | null;
+  demurrageChargeableDays20: number | null;
+  demurrageFreeDays40: number | null;
+  demurrageChargeableDays40: number | null;
   storageCostEuro: number;
   storageCostSdg: number;
   demurrageCostSdg: number;
   totalStorageDemurrageSdg: number;
   warnings: string[];
+}
 }
 
 @Injectable({ providedIn: 'root' })
