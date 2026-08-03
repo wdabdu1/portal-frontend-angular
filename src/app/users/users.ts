@@ -84,7 +84,7 @@ export class Users implements OnInit {
     this.creating = true;
     this.service.create({
       email: this.newEmail, displayName: this.newDisplayName, password: this.newPassword,
-      role: this.newRole, businessUnits
+      role: this.newRole, businessUnitAccess: businessUnits
     }).subscribe({
       next: () => {
         this.creating = false;
