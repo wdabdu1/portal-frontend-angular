@@ -1,0 +1,96 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/orders" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back</a>
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">User Management</h1>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">Email</th>
+        <th style="padding: 8px 6px;">Display Name</th>
+        <th style="padding: 8px 6px;">Role</th>
+        <th style="padding: 8px 6px;">Business Units</th>
+        <th style="padding: 8px 6px;">Status</th>
+        <th style="padding: 8px 6px;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of users" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px 6px;">{{ u.email }}</td>
+        <td style="padding: 8px 6px;">{{ u.displayName }}</td>
+        <td style="padding: 8px 6px;">{{ u.role }}</td>
+        <td style="padding: 8px 6px; font-size: 12px; color: #666;">
+          <span *ngIf="u.businessUnits.length === 0">All (role-based)</span>
+          <span *ngFor="let b of u.businessUnits; let last = last">{{ b.businessUnitName }} ({{ b.accessLevel }}){{ last ? '' : ', ' }}</span>
+        </td>
+        <td style="padding: 8px 6px;">
+          <span [style.color]="u.isActive ? '#1e7e34' : '#c0392b'">{{ u.isActive ? 'Active' : 'Deactivated' }}</span>
+        </td>
+        <td style="padding: 8px 6px;">
+          <button *ngIf="u.isActive" (click)="deactivate(u)" style="padding: 4px 10px; font-size: 12px; background: #fff4e5; color: #a66a00; border: none; border-radius: 4px; cursor: pointer;">
+            Deactivate
+          </button>
+          <button *ngIf="!u.isActive" (click)="reactivate(u)" style="padding: 4px 10px; font-size: 12px; background: #e6f4ea; color: #1e7e34; border: none; border-radius: 4px; cursor: pointer;">
+            Reactivate
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 1.5rem;">
+    <button (click)="toggleAddForm()" style="padding: 7px 14px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">
+      {{ showAddForm ? 'Cancel' : '+ Add User' }}
+    </button>
+
+    <div *ngIf="showAddForm" style="margin-top: 1rem; border: 1px solid #ddd; border-radius: 6px; padding: 16px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Email</label>
+          <input type="email" [(ngModel)]="newEmail" style="width:100%; padding:6px; box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Display Name</label>
+          <input [(ngModel)]="newDisplayName" style="width:100%; padding:6px; box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Password</label>
+          <input type="password" [(ngModel)]="newPassword" style="width:100%; padding:6px; box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Role</label>
+          <select [(ngModel)]="newRole" style="width:100%; padding:6px;">
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <label style="display:block; font-size:12px; color:#555; margin-bottom: 6px;">
+          Business Unit Access
+          <span style="color:#999;">(leave empty for Manager/SuperUser/Clearance — they see all BUs regardless)</span>
+        </label>
+        <div *ngFor="let row of newBuRows; let i = index" style="display: flex; gap: 8px; margin-bottom: 6px; align-items: center;">
+          <select [(ngModel)]="row.businessUnitId" style="padding: 6px;">
+            <option [ngValue]="null">-- select BU --</option>
+            <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
+          </select>
+          <select [(ngModel)]="row.accessLevel" style="padding: 6px;">
+            <option value="Read">Read</option>
+            <option value="ReadWrite">Read/Write</option>
+          </select>
+          <button (click)="removeBuRow(i)" style="color:#c0392b; background:none; border:none; cursor:pointer; font-size:12px;">Remove</button>
+        </div>
+        <button (click)="addBuRow()" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">
+          + Add BU
+        </button>
+      </div>
+
+      <button (click)="createUser()" [disabled]="creating || !newEmail || !newDisplayName || !newPassword" style="margin-top: 16px; padding: 8px 18px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        {{ creating ? 'Creating...' : 'Create User' }}
+      </button>
+    </div>
+  </div>
+</div>
