@@ -3,6 +3,7 @@ import { authGuard } from './auth/auth.guard';
 import { Login } from './auth/login/login';
 import { ShippingLines } from './settings/shipping-lines/shipping-lines';
 import { ShipmentDetails } from './shipments/shipment-details/shipment-details';
+import { Users } from './users/users';
 import { OrderDetails } from './purchase-orders/order-details/order-details';
 import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
