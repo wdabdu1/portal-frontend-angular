@@ -21,7 +21,7 @@
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Division *</label>
-        <select [()]="divisionId" name="divisionId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="divisionId" name="divisionId" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let d of filteredDivisions" [ngValue]="d.id">{{ d.name }}</option>
         </select>
