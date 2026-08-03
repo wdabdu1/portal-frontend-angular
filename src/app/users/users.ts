@@ -99,7 +99,10 @@ export class Users implements OnInit {
       },
       error: (err) => {
         this.creating = false;
-        this.error = err?.error?.message || 'Could not create user.';
+        const backendError = err?.error;
+        this.error = backendError?.message
+          || (Array.isArray(backendError) ? backendError.map((e: any) => e.description).join('; ') : null)
+          || 'Could not create user.';
         this.cdr.markForCheck();
       }
     });
