@@ -27,7 +27,7 @@ export interface CreateUserRequest {
   displayName: string;
   password: string;
   role: string;
-  businessUnits: BuAccessInput[];
+  businessUnitAccess: BuAccessInput[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -39,7 +39,7 @@ export class UsersService {
   }
 
   create(req: CreateUserRequest) {
-    return this.http.post<UserSummary>(`${API_URL}/users`, req);
+    return this.http.post(`${API_URL}/auth/users`, req);
   }
 
   updateRoles(id: string, role: string, businessUnits: BuAccessInput[]) {
