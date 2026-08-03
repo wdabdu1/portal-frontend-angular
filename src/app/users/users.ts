@@ -5,7 +5,8 @@ import { RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../settings/settings-lookup.service';
 import { BuAccessInput, UserSummary, UsersService } from './users.service';
 
-const ROLES = ['Standard', 'Manager', 'SuperUser', 'Clearance'];
+const ROLES = ['IP_User', 'IP_Supervisor', 'CLR_Usr', 'CLR_Supervisor', 'BU', 'Treasury', 'CorpFinance', 'Manager', 'SuperUser'];
+const BU_SCOPED_ROLES = ['IP_User', 'IP_Supervisor', 'BU'];
 
 interface NewBuRow {
   businessUnitId: number | null;
@@ -25,6 +26,11 @@ export class Users implements OnInit {
   loading = true;
   error = '';
   roles = ROLES;
+  buScopedRoles = BU_SCOPED_ROLES;
+
+  get newRoleIsBuScoped(): boolean {
+    return this.buScopedRoles.includes(this.newRole);
+  }
 
   showAddForm = false;
   newEmail = '';
