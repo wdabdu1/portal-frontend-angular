@@ -51,6 +51,7 @@ export const routes: Routes = [
   { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard] },
   { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard] },
+  { path: 'users', component: Users, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
