@@ -9,10 +9,11 @@
       <div>
         <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Shipment {{ detail.blAwbNo }}</h1>
         <p style="color: #888; font-size: 13px;">
-          {{ detail.businessUnit }} — PO {{ detail.poNumber }}<span *ngIf="detail.supplier"> — {{ detail.supplier }}</span> — {{ detail.consignee }} — {{ detail.category }} — Status: {{ detail.status }}
+          {{ detail.businessUnit }}<span *ngIf="detail.division"> — {{ detail.division }}</span> — PO {{ detail.poNumber }}<span *ngIf="detail.supplier"> — {{ detail.supplier }}</span> — {{ detail.consignee }} — {{ detail.category }} — Status: {{ detail.status }}
         </p>
         <p style="color: #888; font-size: 13px;">
           {{ detail.fcl20Count }}× 20' + {{ detail.fcl40Count }}× 40' —
+          ETD: {{ detail.etd ? (detail.etd | date: 'MMM d, y') : '—' }} —
           ETA: {{ detail.eta ? (detail.eta | date: 'MMM d, y') : '—' }} —
           SOB: {{ detail.sobActualDate ? (detail.sobActualDate | date: 'MMM d, y') : '—' }}
         </p>
@@ -104,6 +105,11 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div *ngIf="detail.lastOffshoreInvoiceNo !== null && detail.lastOffshoreInvoiceNo !== undefined" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">Last Offshore Invoice</h3>
+      <p style="font-size: 13px;">{{ formatValue(detail.lastOffshoreInvoiceNo) }}</p>
     </div>
   </div>
 </div>
