@@ -53,4 +53,34 @@ export class AuthService {
   hasRole(role: string): boolean {
     return this.getRoles().includes(role);
   }
+
+  hasAnyRole(roles: string[]): boolean {
+    return this.getRoles().some((r) => roles.includes(r));
+  }
+
+  // Nav visibility groups, matching the access matrix. Kept centralized
+  // here so every page (nav bar, home redirect, etc.) agrees on who sees what.
+  canSeeOrders(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'SuperUser', 'BU', 'Treasury', 'Manager']);
+  }
+
+  canCreateOrders(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'SuperUser']);
+  }
+
+  canSeeShipments(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'SuperUser', 'BU', 'Treasury', 'Manager', 'CLR_Usr', 'CLR_Supervisor']);
+  }
+
+  canSeeSupplierDues(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'SuperUser', 'BU', 'Treasury', 'CorpFinance', 'Manager']);
+  }
+
+  canSeeBankDues(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'SuperUser', 'Treasury', 'CorpFinance', 'Manager']);
+  }
+
+  canSeeSettings(): boolean {
+    return this.hasAnyRole(['Manager', 'SuperUser']);
+  }
 }
