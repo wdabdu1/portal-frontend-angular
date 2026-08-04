@@ -4,6 +4,7 @@ import { API_URL } from '../api-config';
 
 export interface BankDueRow {
   shipmentId: number;
+  businessUnit: string;
   consignee: string;
   receiverBank: string | null;
   blAwbNo: string;
