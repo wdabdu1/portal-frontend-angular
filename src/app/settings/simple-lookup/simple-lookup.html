@@ -10,16 +10,43 @@
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
         <th *ngFor="let f of fields" style="padding: 6px;">{{ f.label }}</th>
         <th style="padding: 6px;">Active</th>
+        <th style="padding: 6px;" *ngIf="canEdit"></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let item of items" style="border-bottom: 1px solid #eee;">
-        <td *ngFor="let f of fields" style="padding: 6px;">
-          <span *ngIf="f.type === 'checkbox'">{{ item[f.key] ? 'Yes' : 'No' }}</span>
-          <span *ngIf="f.type === 'select'">{{ displaySelectValue(item, f) }}</span>
-          <span *ngIf="f.type !== 'checkbox' && f.type !== 'select'">{{ displayValue(item, f) }}</span>
-        </td>
-        <td style="padding: 6px;">{{ item['isActive'] ? 'Yes' : 'No' }}</td>
+        <ng-container *ngIf="editingId !== item.id">
+          <td *ngFor="let f of fields" style="padding: 6px;">
+            <span *ngIf="f.type === 'checkbox'">{{ item[f.key] ? 'Yes' : 'No' }}</span>
+            <span *ngIf="f.type === 'select'">{{ displaySelectValue(item, f) }}</span>
+            <span *ngIf="f.type !== 'checkbox' && f.type !== 'select'">{{ displayValue(item, f) }}</span>
+          </td>
+          <td style="padding: 6px;">{{ item['isActive'] ? 'Yes' : 'No' }}</td>
+          <td style="padding: 6px; white-space: nowrap;" *ngIf="canEdit">
+            <button (click)="startEdit(item)" style="padding: 3px 8px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+            <button (click)="confirmDelete(item)" [disabled]="deletingId === item.id" style="padding: 3px 8px; font-size: 12px; background: #fdecea; color: #c0392b; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">
+              {{ deletingId === item.id ? '...' : 'Delete' }}
+            </button>
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="editingId === item.id">
+          <td *ngFor="let f of editableFields" style="padding: 6px;">
+            <input *ngIf="f.type !== 'checkbox' && f.type !== 'select'" [type]="f.type" [(ngModel)]="editValues[f.key]" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+            <input *ngIf="f.type === 'checkbox'" type="checkbox" [(ngModel)]="editValues[f.key]" />
+            <select *ngIf="f.type === 'select'" [(ngModel)]="editValues[f.key]" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let o of selectOptions[f.optionsResource ?? '']" [ngValue]="o.id">{{ optionLabel(o) }}</option>
+            </select>
+          </td>
+          <td style="padding: 6px;">{{ item['isActive'] ? 'Yes' : 'No' }}</td>
+          <td style="padding: 6px; white-space: nowrap;">
+            <button (click)="saveEdit(item)" [disabled]="saving" style="padding: 3px 8px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              {{ saving ? '...' : 'Save' }}
+            </button>
+            <button (click)="cancelEdit()" style="padding: 3px 8px; font-size: 12px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px;">Cancel</button>
+          </td>
+        </ng-container>
       </tr>
     </tbody>
   </table>
