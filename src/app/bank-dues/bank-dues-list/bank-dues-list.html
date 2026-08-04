@@ -15,6 +15,7 @@
   <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
         <th (click)="sortBy('consignee')" style="padding: 8px 6px; cursor: pointer;">Consignee</th>
         <th (click)="sortBy('receiverBank')" style="padding: 8px 6px; cursor: pointer;">Receiver Bank</th>
         <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB</th>
@@ -38,6 +39,7 @@
         [style.background]="selectedShipmentId === r.shipmentId ? '#f0f6fb' : 'transparent'"
         style="border-bottom: 1px solid #eee; cursor: pointer;"
       >
+        <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
         <td style="padding: 8px 6px;">{{ r.consignee }}</td>
         <td style="padding: 8px 6px;">{{ r.receiverBank || '—' }}</td>
         <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
