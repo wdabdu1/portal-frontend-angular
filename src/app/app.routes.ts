@@ -22,10 +22,11 @@ import { FxRates } from './settings/fx-rates/fx-rates';
 import { ClearanceList } from './clearance/clearance-list/clearance-list';
 import { ClearanceDetailComponent } from './clearance/clearance-detail/clearance-detail';
 import { ClearanceSla } from './settings/clearance-sla/clearance-sla';
+import { HomeRedirect } from './home-redirect';
 
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'orders', pathMatch: 'full' },
+  { path: '', component: HomeRedirect, canActivate: [authGuard], pathMatch: 'full' },
   { path: 'login', component: Login },
 
   {
