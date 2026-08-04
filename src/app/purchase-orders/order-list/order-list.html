@@ -7,13 +7,13 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 8px 6px;">PO Number</th>
-        <th style="padding: 8px 6px;">Business Unit</th>
-        <th style="padding: 8px 6px;">Supplier</th>
-        <th style="padding: 8px 6px;">Line Items</th>
-        <th style="padding: 8px 6px;">Order Value</th>
-        <th style="padding: 8px 6px;">Status</th>
-        <th style="padding: 8px 6px;">Created</th>
+        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO Number</th>
+        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">Business Unit</th>
+        <th (click)="sortBy('supplier')" style="padding: 8px 6px; cursor: pointer;">Supplier</th>
+        <th (click)="sortBy('lineItemCount')" style="padding: 8px 6px; cursor: pointer;">Line Items</th>
+        <th (click)="sortBy('orderValueUsd')" style="padding: 8px 6px; cursor: pointer;">Order Value</th>
+        <th (click)="sortBy('status')" style="padding: 8px 6px; cursor: pointer;">Status</th>
+        <th (click)="sortBy('createdAt')" style="padding: 8px 6px; cursor: pointer;">Created</th>
         <th style="padding: 8px 6px;"></th>
       </tr>
     </thead>
