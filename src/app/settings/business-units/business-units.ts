@@ -24,6 +24,12 @@ export class BusinessUnits implements OnInit {
   loading = true;
   error = '';
 
+  editingId: number | null = null;
+  editCode = '';
+  editName = '';
+  saving = false;
+  deletingId: number | null = null;
+
   constructor(private lookups: SettingsLookupService, public auth: AuthService) {}
 
   get canEdit(): boolean {
@@ -43,12 +49,57 @@ export class BusinessUnits implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => {
-        this.error = 'Could not load business units.';
-        this.loading = false;
+        this.error = 'Could not create business unit.';
         this.cdr.markForCheck();
       }
     });
   }
+
+  startEdit(unit: BusinessUnit): void {
+    this.editingId = unit.id;
+    this.editCode = unit.code;
+    this.editName = unit.name;
+  }
+
+  cancelEdit(): void {
+    this.editingId = null;
+  }
+
+  saveEdit(unit: BusinessUnit): void {
+    this.saving = true;
+    this.lookups.update<BusinessUnit>('business-units', unit.id, { code: this.editCode, name: this.editName }).subscribe({
+      next: () => {
+        this.saving = false;
+        this.editingId = null;
+        this.load();
+      },
+      error: () => {
+        this.saving = false;
+        this.error = 'Could not update this business unit.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  confirmDelete(unit: BusinessUnit): void {
+    if (!window.confirm(`Delete "${unit.name}"? This can't be undone.`)) return;
+
+    this.deletingId = unit.id;
+    this.lookups.delete('business-units', unit.id).subscribe({
+      next: () => {
+        this.deletingId = null;
+        this.load();
+      },
+      error: (err) => {
+        this.deletingId = null;
+        this.error = err?.status === 409
+          ? `"${unit.name}" is in use and can't be deleted.`
+          : `Could not delete this business unit.`;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
 
   add(): void {
     if (!this.newCode || !this.newName) return;
