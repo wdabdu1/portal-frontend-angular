@@ -11,6 +11,15 @@ import { ClearanceEstimateLineItem, ClearanceService } from '../clearance.servic
   imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
   templateUrl: './estimate-line-items.html'
 })
+type SortColumn = keyof ClearanceEstimateLineItem;
+
+@Component({
+  selector: 'app-estimate-line-items',
+  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
+  templateUrl: './estimate-line-items.html'
+})
+type SortColumn = keyof ClearanceEstimateLineItem;
+
 export class EstimateLineItems implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
@@ -21,6 +30,12 @@ export class EstimateLineItems implements OnInit {
   loading = true;
   error = '';
   adding = false;
+
+  sortColumn: SortColumn = 'dueDate';
+  sortAsc = true;
+
+  sortColumn: SortColumn = 'dueDate';
+  sortAsc = true;
 
   newChargeTypeId: number | null = null;
   newValueSdg: number | null = null;
@@ -44,8 +59,31 @@ export class EstimateLineItems implements OnInit {
     });
   }
 
+  get sortedItems(): ClearanceEstimateLineItem[] {
+    const dir = this.sortAsc ? 1 : -1;
+    return [...this.items].sort((a, b) => {
+      const av = a[this.sortColumn];
+      const bv = b[this.sortColumn];
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+  }
+
+  sortBy(column: SortColumn): void {
+    if (this.sortColumn === column) {
+      this.sortAsc = !this.sortAsc;
+    } else {
+      this.sortColumn = column;
+      this.sortAsc = true;
+    }
+  }
+
   get total(): number {
     return this.items.reduce((sum, i) => sum + i.valueSdg, 0);
+  }
   }
 
   add(): void {
