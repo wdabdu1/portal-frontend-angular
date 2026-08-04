@@ -162,7 +162,6 @@ export class NewSupplierOrder implements OnInit {
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
-  }
 
   submit(): void {
     this.error = '';
