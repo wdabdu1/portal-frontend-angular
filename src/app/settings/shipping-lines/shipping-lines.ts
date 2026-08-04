@@ -7,6 +7,12 @@ import { LookupEntity, SettingsLookupService } from '../settings-lookup.service'
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { ShippingLine, ShippingLinesService, TariffRow } from './shipping-lines.service';
 
+interface RatesBySize {
+  firstPeriodDays: number;
+  firstPeriodRateSdg: number;
+  afterwardRateSdg: number;
+}
+
 @Component({
   selector: 'app-shipping-lines',
   imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
@@ -20,12 +26,16 @@ export class ShippingLines implements OnInit {
   loading = true;
   error = '';
 
+  sizes: ('20' | '40')[] = ['20', '40'];
+
   expandedLineId: number | null = null;
-  editTariffs: Record<number, TariffRow[]> = {};
+  editRates: Record<number, Record<string, RatesBySize>> = {};
+  editFreeDays: Record<number, Record<string, Record<number, number>>> = {};
   savingTariffs: Record<number, boolean> = {};
 
   newLineName = '';
-  newLineTariffs: TariffRow[] = [];
+  newRates: Record<string, RatesBySize> = {};
+  newFreeDays: Record<string, Record<number, number>> = {};
   addingLine = false;
   showAddForm = false;
 
@@ -50,13 +60,21 @@ export class ShippingLines implements OnInit {
     });
   }
 
-  emptyTariffGrid(): TariffRow[] {
-    const rows: TariffRow[] = [];
-    for (const g of this.tariffGroups) {
-      rows.push({ tariffGroupId: g.id, containerSize: '20', freeDays: 0, firstPeriodDays: 0, firstPeriodRateSdg: 0, afterwardRateSdg: 0 });
-      rows.push({ tariffGroupId: g.id, containerSize: '40', freeDays: 0, firstPeriodDays: 0, firstPeriodRateSdg: 0, afterwardRateSdg: 0 });
+  private emptyRates(): Record<string, RatesBySize> {
+    const rates: Record<string, RatesBySize> = {};
+    for (const size of this.sizes) {
+      rates[size] = { firstPeriodDays: 0, firstPeriodRateSdg: 0, afterwardRateSdg: 0 };
     }
-    return rows;
+    return rates;
+  }
+
+  private emptyFreeDays(): Record<string, Record<number, number>> {
+    const freeDays: Record<string, Record<number, number>> = {};
+    for (const size of this.sizes) {
+      freeDays[size] = {};
+      for (const g of this.tariffGroups) freeDays[size][g.id] = 0;
+    }
+    return freeDays;
   }
 
   tariffGroupName(id: number): string {
@@ -65,19 +83,36 @@ export class ShippingLines implements OnInit {
 
   toggleAddForm(): void {
     this.showAddForm = !this.showAddForm;
-    if (this.showAddForm && this.newLineTariffs.length === 0) {
-      this.newLineTariffs = this.emptyTariffGrid();
+    if (this.showAddForm) {
+      this.newRates = this.emptyRates();
+      this.newFreeDays = this.emptyFreeDays();
     }
+  }
+
+  private buildTariffRows(rates: Record<string, RatesBySize>, freeDays: Record<string, Record<number, number>>): TariffRow[] {
+    const rows: TariffRow[] = [];
+    for (const size of this.sizes) {
+      for (const g of this.tariffGroups) {
+        rows.push({
+          tariffGroupId: g.id,
+          containerSize: size,
+          freeDays: freeDays[size]?.[g.id] ?? 0,
+          firstPeriodDays: rates[size].firstPeriodDays,
+          firstPeriodRateSdg: rates[size].firstPeriodRateSdg,
+          afterwardRateSdg: rates[size].afterwardRateSdg
+        });
+      }
+    }
+    return rows;
   }
 
   addLine(): void {
     if (!this.newLineName) return;
     this.addingLine = true;
-    this.service.create(this.newLineName, this.newLineTariffs).subscribe({
+    this.service.create(this.newLineName, this.buildTariffRows(this.newRates, this.newFreeDays)).subscribe({
       next: () => {
         this.addingLine = false;
         this.newLineName = '';
-        this.newLineTariffs = [];
         this.showAddForm = false;
         this.load();
       },
@@ -91,21 +126,36 @@ export class ShippingLines implements OnInit {
       return;
     }
     this.expandedLineId = line.id;
-    if (!this.editTariffs[line.id]) {
-      // Merge existing tariffs into a full grid (every Tariff Group x size combination),
-      // so missing combinations still show as editable zero-rows.
-      const grid = this.emptyTariffGrid();
-      for (const row of grid) {
-        const existing = line.tariffs.find((t) => t.tariffGroupId === row.tariffGroupId && t.containerSize === row.containerSize);
-        if (existing) Object.assign(row, existing);
+    if (!this.editRates[line.id]) {
+      const rates = this.emptyRates();
+      const freeDays = this.emptyFreeDays();
+
+      for (const size of this.sizes) {
+        // Rates are shared across Tariff Groups for a given size — take
+        // whichever existing row of this size we find first.
+        const anyRowForSize = line.tariffs.find((t) => t.containerSize === size);
+        if (anyRowForSize) {
+          rates[size] = {
+            firstPeriodDays: anyRowForSize.firstPeriodDays,
+            firstPeriodRateSdg: anyRowForSize.firstPeriodRateSdg,
+            afterwardRateSdg: anyRowForSize.afterwardRateSdg
+          };
+        }
+        for (const g of this.tariffGroups) {
+          const row = line.tariffs.find((t) => t.containerSize === size && t.tariffGroupId === g.id);
+          if (row) freeDays[size][g.id] = row.freeDays;
+        }
       }
-      this.editTariffs[line.id] = grid;
+
+      this.editRates[line.id] = rates;
+      this.editFreeDays[line.id] = freeDays;
     }
   }
 
   saveTariffs(line: ShippingLine): void {
     this.savingTariffs[line.id] = true;
-    this.service.replaceTariffs(line.id, this.editTariffs[line.id]).subscribe({
+    const rows = this.buildTariffRows(this.editRates[line.id], this.editFreeDays[line.id]);
+    this.service.replaceTariffs(line.id, rows).subscribe({
       next: () => { this.savingTariffs[line.id] = false; this.load(); },
       error: () => { this.savingTariffs[line.id] = false; this.error = 'Could not save tariffs.'; this.cdr.markForCheck(); }
     });
