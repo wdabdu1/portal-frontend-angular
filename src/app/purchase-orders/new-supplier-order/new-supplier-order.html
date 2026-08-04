@@ -10,46 +10,46 @@
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
       <div>
         <label style="display:block; font-size:12px; color:#555;">PO Number *</label>
-        <input [(ngModel)]="poNumber" name="poNumber" style="width:100%; padding:6px;" />
+        <input [(ngModel)]="poNumber" name="poNumber" [style.border]="fieldBorder('poNumber')" style="width:100%; padding:6px;" />
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Business Unit *</label>
-        <select [(ngModel)]="businessUnitId" name="businessUnitId" (change)="onBusinessUnitChange()" style="width:100%; padding:6px;">
+        <select [(ngModel)]="businessUnitId" name="businessUnitId" (change)="onBusinessUnitChange()" [style.border]="fieldBorder('businessUnitId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Division *</label>
-        <select [(ngModel)]="divisionId" name="divisionId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="divisionId" name="divisionId" [style.border]="fieldBorder('divisionId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let d of filteredDivisions" [ngValue]="d.id">{{ d.name }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Supplier *</label>
-        <select [(ngModel)]="supplierId" name="supplierId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="supplierId" name="supplierId" [style.border]="fieldBorder('supplierId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s['name'] }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Brand/Manufacturer</label>
-        <select [(ngModel)]="brandManufacturerId" name="brandManufacturerId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="brandManufacturerId" name="brandManufacturerId" [style.border]="fieldBorder('brandManufacturerId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let b of brands" [ngValue]="b.id">{{ b['name'] }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Approval Type</label>
-        <select [(ngModel)]="approvalTypeId" name="approvalTypeId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="approvalTypeId" name="approvalTypeId" [style.border]="fieldBorder('approvalTypeId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let a of approvalTypes" [ngValue]="a.id">{{ a['name'] }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Consignee</label>
-        <select [(ngModel)]="consigneeId" name="consigneeId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="consigneeId" name="consigneeId" [style.border]="fieldBorder('consigneeId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let c of consignees" [ngValue]="c.id">{{ c['name'] }}</option>
         </select>
@@ -68,28 +68,28 @@
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Payment Term</label>
-        <select [(ngModel)]="supplierPaymentTermId" name="supplierPaymentTermId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="supplierPaymentTermId" name="supplierPaymentTermId" [style.border]="fieldBorder('supplierPaymentTermId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let p of paymentTerms" [ngValue]="p.id">{{ p['name'] }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Incoterm</label>
-        <select [(ngModel)]="incotermId" name="incotermId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="incotermId" name="incotermId" [style.border]="fieldBorder('incotermId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let i of incoterms" [ngValue]="i.id">{{ i['name'] }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Origin Country</label>
-        <select [(ngModel)]="originCountryId" name="originCountryId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="originCountryId" name="originCountryId" [style.border]="fieldBorder('originCountryId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let o of originCountries" [ngValue]="o.id">{{ o['name'] }}</option>
         </select>
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Shipment Mode</label>
-        <select [(ngModel)]="shipmentModeId" name="shipmentModeId" style="width:100%; padding:6px;">
+       <select [(ngModel)]="shipmentModeId" name="shipmentModeId" [style.border]="fieldBorder('shipmentModeId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let m of shipmentModes" [ngValue]="m.id">{{ m['name'] }}</option>
         </select>
