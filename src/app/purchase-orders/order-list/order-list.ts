@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { PurchaseOrderSummary, PurchaseOrdersService } from '../purchase-orders.service';
 
 @Component({
   selector: 'app-order-list',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './order-list.html'
 })
 export class OrderList implements OnInit {
