@@ -6,11 +6,6 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { ClearanceEstimateLineItem, ClearanceService } from '../clearance.service';
 
-@Component({
-  selector: 'app-estimate-line-items',
-  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
-  templateUrl: './estimate-line-items.html'
-})
 type SortColumn = keyof ClearanceEstimateLineItem;
 
 @Component({
@@ -18,8 +13,6 @@ type SortColumn = keyof ClearanceEstimateLineItem;
   imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
   templateUrl: './estimate-line-items.html'
 })
-type SortColumn = keyof ClearanceEstimateLineItem;
-
 export class EstimateLineItems implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
@@ -30,9 +23,6 @@ export class EstimateLineItems implements OnInit {
   loading = true;
   error = '';
   adding = false;
-
-  sortColumn: SortColumn = 'dueDate';
-  sortAsc = true;
 
   sortColumn: SortColumn = 'dueDate';
   sortAsc = true;
@@ -83,7 +73,6 @@ export class EstimateLineItems implements OnInit {
 
   get total(): number {
     return this.items.reduce((sum, i) => sum + i.valueSdg, 0);
-  }
   }
 
   add(): void {
