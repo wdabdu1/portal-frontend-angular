@@ -16,7 +16,7 @@ export class SettingsLookupService {
     return this.http.get<T[]>(`${API_URL}/settings/${resource}`);
   }
 
-  create<T extends >(resource: string, entity: Partial<T>) {
+  create<T extends LookupEntity>(resource: string, entity: Partial<T>) {
     return this.http.post<T>(`${API_URL}/settings/${resource}`, entity);
   }
 
