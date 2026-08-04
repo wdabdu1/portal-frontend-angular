@@ -37,6 +37,11 @@ export class SimpleLookup implements OnInit {
 
   selectOptions: Record<string, LookupEntity[]> = {};
 
+  editingId: number | null = null;
+  editValues: Record<string, unknown> = {};
+  saving = false;
+  deletingId: number | null = null;
+
   constructor(private lookups: SettingsLookupService, public auth: AuthService) {}
 
   get canEdit(): boolean {
@@ -118,5 +123,54 @@ export class SimpleLookup implements OnInit {
       return `${(num * 100).toFixed(2)}%`;
     }
     return String(raw ?? '');
+  }
+
+  startEdit(item: LookupEntity): void {
+    this.editingId = item.id;
+    this.editValues = {};
+    for (const f of this.editableFields) {
+      this.editValues[f.key] = item[f.key];
+    }
+  }
+
+  cancelEdit(): void {
+    this.editingId = null;
+    this.editValues = {};
+  }
+
+  saveEdit(item: LookupEntity): void {
+    this.saving = true;
+    this.lookups.update(this.resource, item.id, this.editValues).subscribe({
+      next: () => {
+        this.saving = false;
+        this.editingId = null;
+        this.load();
+      },
+      error: () => {
+        this.saving = false;
+        this.error = `Could not update this entry.`;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  confirmDelete(item: LookupEntity): void {
+    const label = this.optionLabel(item);
+    if (!window.confirm(`Delete "${label}"? This can't be undone.`)) return;
+
+    this.deletingId = item.id;
+    this.lookups.delete(this.resource, item.id).subscribe({
+      next: () => {
+        this.deletingId = null;
+        this.load();
+      },
+      error: (err) => {
+        this.deletingId = null;
+        this.error = err?.status === 409
+          ? `"${label}" is in use and can't be deleted.`
+          : `Could not delete this entry.`;
+        this.cdr.markForCheck();
+      }
+    });
   }
 }
