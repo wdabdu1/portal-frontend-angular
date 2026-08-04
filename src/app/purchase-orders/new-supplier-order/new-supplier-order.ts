@@ -38,6 +38,7 @@ export class NewSupplierOrder implements OnInit {
   saving = false;
   error = '';
   success = '';
+  invalidFields = new Set<string>();
 
   businessUnits: LookupEntity[] = [];
   divisions: Division[] = [];
@@ -150,12 +151,37 @@ export class NewSupplierOrder implements OnInit {
     this.offshoreRows.splice(index, 1);
   }
 
+  fieldBorder(key: string): string {
+    return this.invalidFields.has(key) ? '1px solid #c0392b' : '1px solid #ccc';
+  }
+
+  private scrollToFirstError(): void {
+    setTimeout(() => {
+      const firstKey = Array.from(this.invalidFields)[0];
+      const el = document.querySelector(`[name="${firstKey}"]`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+  }
+
   submit(): void {
     this.error = '';
     this.success = '';
+    this.invalidFields = new Set<string>();
 
-    if (!this.poNumber || !this.businessUnitId || !this.divisionId || !this.supplierId) {
-      this.error = 'Please fill in the required identity fields.';
+    const requiredFields: [string, unknown][] = [
+      ['poNumber', this.poNumber], ['businessUnitId', this.businessUnitId], ['divisionId', this.divisionId],
+      ['supplierId', this.supplierId], ['brandManufacturerId', this.brandManufacturerId], ['approvalTypeId', this.approvalTypeId],
+      ['consigneeId', this.consigneeId], ['supplierPaymentTermId', this.supplierPaymentTermId], ['incotermId', this.incotermId],
+      ['originCountryId', this.originCountryId], ['shipmentModeId', this.shipmentModeId]
+    ];
+    for (const [key, value] of requiredFields) {
+      if (!value) this.invalidFields.add(key);
+    }
+
+    if (this.invalidFields.size > 0) {
+      this.error = 'Please complete the highlighted required fields.';
+      this.scrollToFirstError();
       return;
     }
 
