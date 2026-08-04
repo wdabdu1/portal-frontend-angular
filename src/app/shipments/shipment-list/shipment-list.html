@@ -12,12 +12,13 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 8px 6px;">BL/AWB No.</th>
-        <th style="padding: 8px 6px;">PO Number</th>
-        <th style="padding: 8px 6px;">Shipping Line</th>
-        <th style="padding: 8px 6px;">Line Items</th>
-        <th style="padding: 8px 6px;">ETA</th>
-        <th style="padding: 8px 6px;">Status</th>
+        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB No.</th>
+        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO Number</th>
+        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
+        <th (click)="sortBy('shippingLine')" style="padding: 8px 6px; cursor: pointer;">Shipping Line</th>
+        <th (click)="sortBy('lineItemCount')" style="padding: 8px 6px; cursor: pointer;">Line Items</th>
+        <th (click)="sortBy('eta')" style="padding: 8px 6px; cursor: pointer;">ETA</th>
+        <th (click)="sortBy('status')" style="padding: 8px 6px; cursor: pointer;">Status</th>
         <th style="padding: 8px 6px;"></th>
       </tr>
     </thead>
@@ -25,6 +26,7 @@
       <tr *ngFor="let s of shipments" (click)="viewDetails(s.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
         <td style="padding: 8px 6px; font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</td>
         <td style="padding: 8px 6px;">{{ s.poNumber }}</td>
+        <td style="padding: 8px 6px;">{{ s.businessUnit }}</td>
         <td style="padding: 8px 6px;">{{ s.shippingLine }}</td>
         <td style="padding: 8px 6px;">{{ s.lineItemCount }}</td>
         <td style="padding: 8px 6px; color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</td>
