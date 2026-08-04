@@ -1,16 +1,44 @@
-<div
-  *ngIf="auth.isLoggedIn()"
-  style="padding: 10px 20px; background: #0a3d62; color: white; font-family: sans-serif; display: flex; justify-content: space-between; align-items: center;"
->
-  <strong>CTC Group Supply Chain Portal</strong>
-  <div style="display: flex; align-items: center; gap: 12px; font-size: 13px;">
-    <span>{{ auth.getDisplayName() }}</span>
-    <button
-      (click)="logout()"
-      style="background: transparent; border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer;"
-    >
-      Log out
-    </button>
+<div *ngIf="auth.isLoggedIn()">
+  <div
+    style="padding: 10px 20px; background: #0a3d62; color: white; font-family: sans-serif; display: flex; justify-content: space-between; align-items: center;"
+  >
+    <strong>CTC Group Supply Chain Portal</strong>
+    <div style="display: flex; align-items: center; gap: 12px; font-size: 13px;">
+      <span>{{ auth.getDisplayName() }}</span>
+      <button
+        (click)="logout()"
+        style="background: transparent; border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer;"
+      >
+        Log out
+      </button>
+    </div>
+  </div>
+
+  <div style="padding: 8px 20px; background: #f7f7f7; border-bottom: 1px solid #ddd; font-family: sans-serif; display: flex; gap: 8px; flex-wrap: wrap;">
+    <a *ngIf="auth.canSeeOrders()" routerLink="/orders" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
+      Orders
+    </a>
+    <a *ngIf="auth.canSeeShipments()" routerLink="/shipments" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
+      Shipments
+    </a>
+    <a routerLink="/clearance" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
+      Clearance
+    </a>
+    <a *ngIf="auth.canSeeSupplierDues()" routerLink="/supplier-dues" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
+      Supplier Dues
+    </a>
+    <a *ngIf="auth.canSeeBankDues()" routerLink="/bank-dues" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
+      Bank Dues
+    </a>
+    <a *ngIf="auth.canSeeSettings()" routerLink="/settings" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
+      Settings
+    </a>
+    <a *ngIf="auth.hasRole('SuperUser')" routerLink="/users" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
+      Users
+    </a>
+    <a *ngIf="auth.canCreateOrders()" routerLink="/orders/new" style="padding: 6px 12px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px; margin-left: auto;">
+      + New Supplier Order
+    </a>
   </div>
 </div>
 
