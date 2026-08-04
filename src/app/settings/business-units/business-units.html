@@ -11,13 +11,33 @@
         <th style="padding: 6px;">Code</th>
         <th style="padding: 6px;">Name</th>
         <th style="padding: 6px;">Active</th>
+        <th style="padding: 6px;" *ngIf="canEdit"></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let u of units" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 6px;">{{ u.code }}</td>
-        <td style="padding: 6px;">{{ u.name }}</td>
-        <td style="padding: 6px;">{{ u.isActive ? 'Yes' : 'No' }}</td>
+        <ng-container *ngIf="editingId !== u.id">
+          <td style="padding: 6px;">{{ u.code }}</td>
+          <td style="padding: 6px;">{{ u.name }}</td>
+          <td style="padding: 6px;">{{ u.isActive ? 'Yes' : 'No' }}</td>
+          <td style="padding: 6px; white-space: nowrap;" *ngIf="canEdit">
+            <button (click)="startEdit(u)" style="padding: 3px 8px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+            <button (click)="confirmDelete(u)" [disabled]="deletingId === u.id" style="padding: 3px 8px; font-size: 12px; background: #fdecea; color: #c0392b; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">
+              {{ deletingId === u.id ? '...' : 'Delete' }}
+            </button>
+          </td>
+        </ng-container>
+        <ng-container *ngIf="editingId === u.id">
+          <td style="padding: 6px;"><input [(ngModel)]="editCode" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" /></td>
+          <td style="padding: 6px;"><input [(ngModel)]="editName" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" /></td>
+          <td style="padding: 6px;">{{ u.isActive ? 'Yes' : 'No' }}</td>
+          <td style="padding: 6px; white-space: nowrap;">
+            <button (click)="saveEdit(u)" [disabled]="saving" style="padding: 3px 8px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              {{ saving ? '...' : 'Save' }}
+            </button>
+            <button (click)="cancelEdit()" style="padding: 3px 8px; font-size: 12px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px;">Cancel</button>
+          </td>
+        </ng-container>
       </tr>
     </tbody>
   </table>
