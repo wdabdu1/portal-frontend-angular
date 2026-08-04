@@ -1,7 +1,7 @@
-<div style="max-width: 900px; margin: 3rem auto; font-family: sans-serif;">
+<div style="max-width: 800px; margin: 3rem auto; font-family: sans-serif;">
   <a routerLink="/settings" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Settings</a>
   <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Settings — Shipping Lines</h1>
-  <p style="color: #888; font-size: 13px;">Each line's demurrage tariff varies by Tariff Group (goods type) and container size, rates in SDG.</p>
+  <p style="color: #888; font-size: 13px;">Rates are shared across Tariff Groups for a given container size — only Free Days vary by goods type.</p>
 
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
@@ -14,25 +14,40 @@
       </div>
 
       <div *ngIf="expandedLineId === line.id" style="padding: 16px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <h4 style="font-size: 13px; margin: 0 0 8px; color: #333;">Rates (by container size)</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px;">
           <thead>
             <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-              <th style="padding: 5px;">Tariff Group</th>
               <th style="padding: 5px;">Size</th>
-              <th style="padding: 5px;">Free Days</th>
               <th style="padding: 5px;">1st Period Days</th>
               <th style="padding: 5px;">1st Period Rate (SDG)</th>
               <th style="padding: 5px;">Afterward Rate (SDG)</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of editTariffs[line.id]" style="border-bottom: 1px solid #eee;">
-              <td style="padding: 5px;">{{ tariffGroupName(row.tariffGroupId) }}</td>
-              <td style="padding: 5px;">{{ row.containerSize }}'</td>
-              <td style="padding: 5px;"><input type="number" [(ngModel)]="row.freeDays" [disabled]="!canEdit" style="width: 60px; padding: 4px;" /></td>
-              <td style="padding: 5px;"><input type="number" [(ngModel)]="row.firstPeriodDays" [disabled]="!canEdit" style="width: 60px; padding: 4px;" /></td>
-              <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="row.firstPeriodRateSdg" [disabled]="!canEdit" style="width: 90px; padding: 4px;" /></td>
-              <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="row.afterwardRateSdg" [disabled]="!canEdit" style="width: 90px; padding: 4px;" /></td>
+            <tr *ngFor="let size of sizes" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 5px;">{{ size }}'</td>
+              <td style="padding: 5px;"><input type="number" [(ngModel)]="editRates[line.id][size].firstPeriodDays" [disabled]="!canEdit" style="width: 70px; padding: 4px;" /></td>
+              <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="editRates[line.id][size].firstPeriodRateSdg" [disabled]="!canEdit" style="width: 100px; padding: 4px;" /></td>
+              <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="editRates[line.id][size].afterwardRateSdg" [disabled]="!canEdit" style="width: 100px; padding: 4px;" /></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4 style="font-size: 13px; margin: 0 0 8px; color: #333;">Free Days (by size × Tariff Group)</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 5px;">Tariff Group</th>
+              <th *ngFor="let size of sizes" style="padding: 5px;">{{ size }}' Free Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let g of tariffGroups" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 5px;">{{ g['name'] }}</td>
+              <td *ngFor="let size of sizes" style="padding: 5px;">
+                <input type="number" [(ngModel)]="editFreeDays[line.id][size][g.id]" [disabled]="!canEdit" style="width: 70px; padding: 4px;" />
+              </td>
             </tr>
           </tbody>
         </table>
@@ -57,25 +72,40 @@
         <input [(ngModel)]="newLineName" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 250px;" />
       </div>
 
-      <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Rates (by container size)</h4>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
         <thead>
           <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-            <th style="padding: 5px;">Tariff Group</th>
             <th style="padding: 5px;">Size</th>
-            <th style="padding: 5px;">Free Days</th>
             <th style="padding: 5px;">1st Period Days</th>
             <th style="padding: 5px;">1st Period Rate (SDG)</th>
             <th style="padding: 5px;">Afterward Rate (SDG)</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of newLineTariffs" style="border-bottom: 1px solid #eee;">
-            <td style="padding: 5px;">{{ tariffGroupName(row.tariffGroupId) }}</td>
-            <td style="padding: 5px;">{{ row.containerSize }}'</td>
-            <td style="padding: 5px;"><input type="number" [(ngModel)]="row.freeDays" style="width: 60px; padding: 4px;" /></td>
-            <td style="padding: 5px;"><input type="number" [(ngModel)]="row.firstPeriodDays" style="width: 60px; padding: 4px;" /></td>
-            <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="row.firstPeriodRateSdg" style="width: 90px; padding: 4px;" /></td>
-            <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="row.afterwardRateSdg" style="width: 90px; padding: 4px;" /></td>
+          <tr *ngFor="let size of sizes" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 5px;">{{ size }}'</td>
+            <td style="padding: 5px;"><input type="number" [(ngModel)]="newRates[size].firstPeriodDays" style="width: 70px; padding: 4px;" /></td>
+            <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="newRates[size].firstPeriodRateSdg" style="width: 100px; padding: 4px;" /></td>
+            <td style="padding: 5px;"><input type="text" appThousands [(ngModel)]="newRates[size].afterwardRateSdg" style="width: 100px; padding: 4px;" /></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Free Days (by size × Tariff Group)</h4>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+            <th style="padding: 5px;">Tariff Group</th>
+            <th *ngFor="let size of sizes" style="padding: 5px;">{{ size }}' Free Days</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let g of tariffGroups" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 5px;">{{ g['name'] }}</td>
+            <td *ngFor="let size of sizes" style="padding: 5px;">
+              <input type="number" [(ngModel)]="newFreeDays[size][g.id]" style="width: 70px; padding: 4px;" />
+            </td>
           </tr>
         </tbody>
       </table>
