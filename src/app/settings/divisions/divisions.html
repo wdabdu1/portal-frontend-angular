@@ -6,20 +6,45 @@
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
 
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
-    <thead>
-      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+    <tr style="text-align: left; border-bottom: 1px solid #ddd;">
         <th style="padding: 6px;">Business Unit</th>
         <th style="padding: 6px;">Code</th>
         <th style="padding: 6px;">Name</th>
         <th style="padding: 6px;">Active</th>
+        <th style="padding: 6px;" *ngIf="canEdit"></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let d of divisions" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 6px;">{{ businessUnitName(d.businessUnitId) }}</td>
-        <td style="padding: 6px;">{{ d.code }}</td>
-        <td style="padding: 6px;">{{ d.name }}</td>
-        <td style="padding: 6px;">{{ d.isActive ? 'Yes' : 'No' }}</td>
+        <ng-container *ngIf="editingId !== d.id">
+          <td style="padding: 6px;">{{ businessUnitName(d.businessUnitId) }}</td>
+          <td style="padding: 6px;">{{ d.code }}</td>
+          <td style="padding: 6px;">{{ d.name }}</td>
+          <td style="padding: 6px;">{{ d.isActive ? 'Yes' : 'No' }}</td>
+          <td style="padding: 6px; white-space: nowrap;" *ngIf="canEdit">
+            <button (click)="startEdit(d)" style="padding: 3px 8px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+            <button (click)="confirmDelete(d)" [disabled]="deletingId === d.id" style="padding: 3px 8px; font-size: 12px; background: #fdecea; color: #c0392b; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">
+              {{ deletingId === d.id ? '...' : 'Delete' }}
+            </button>
+          </td>
+        </ng-container>
+        <ng-container *ngIf="editingId === d.id">
+          <td style="padding: 6px;">
+            <select [(ngModel)]="editBusinessUnitId" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let b of businessUnits" [ngValue]="b.id">{{ b['name'] }}</option>
+            </select>
+          </td>
+          <td style="padding: 6px;"><input [(ngModel)]="editCode" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" /></td>
+          <td style="padding: 6px;"><input [(ngModel)]="editName" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" /></td>
+          <td style="padding: 6px;">{{ d.isActive ? 'Yes' : 'No' }}</td>
+          <td style="padding: 6px; white-space: nowrap;">
+            <button (click)="saveEdit(d)" [disabled]="saving" style="padding: 3px 8px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              {{ saving ? '...' : 'Save' }}
+            </button>
+            <button (click)="cancelEdit()" style="padding: 3px 8px; font-size: 12px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px;">Cancel</button>
+          </td>
+        </ng-container>
       </tr>
     </tbody>
   </table>
