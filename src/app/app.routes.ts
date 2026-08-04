@@ -243,7 +243,8 @@ export const routes: Routes = [
       title: 'ACD Cost Settings',
       resource: 'acd-cost-settings',
       fields: [
-        { key: 'costPerFclUsd', label: 'Cost per FCL (USD)', type: 'number' },
+        { key: 'rate20Usd', label: '20\' Rate (USD)', type: 'number' },
+        { key: 'rate40Usd', label: '40\' Rate (USD)', type: 'number' },
         { key: 'effectiveDate', label: 'Effective Date', type: 'date' }
       ]
     }
