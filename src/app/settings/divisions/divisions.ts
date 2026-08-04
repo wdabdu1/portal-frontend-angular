@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { LookupEntity, SettingsLookupService } from '../settings-lookup.service';
 
@@ -13,7 +14,7 @@ interface Division extends LookupEntity {
 
 @Component({
   selector: 'app-divisions',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './divisions.html'
 })
 export class Divisions implements OnInit {
