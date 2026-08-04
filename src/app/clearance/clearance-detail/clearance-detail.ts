@@ -87,6 +87,8 @@ export class ClearanceDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
+    const section = this.route.snapshot.queryParamMap.get('section');
+    if (section) this.expanded = section;
     this.load();
   }
 
