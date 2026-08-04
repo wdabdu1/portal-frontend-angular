@@ -9,7 +9,7 @@
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 1rem;">
       <div>
         <label style="display:block; font-size:12px; color:#555;">Purchase Order (Confirmed only) *</label>
-        <select [(ngModel)]="purchaseOrderId" name="purchaseOrderId" (change)="onOrderChange()" style="width:100%; padding:6px;">
+        <select [(ngModel)]="purchaseOrderId" name="purchaseOrderId" (change)="onOrderChange()" [style.border]="fieldBorder('purchaseOrderId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let po of confirmedOrders" [ngValue]="po.id">{{ po.poNumber }} — {{ po.supplier }}</option>
         </select>
@@ -19,7 +19,7 @@
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">BL/AWB Number *</label>
-        <input [(ngModel)]="blAwbNo" name="blAwbNo" style="width:100%; padding:6px;" />
+        <input [(ngModel)]="blAwbNo" name="blAwbNo" [style.border]="fieldBorder('blAwbNo')" style="width:100%; padding:6px;" />
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">BL/AWB Date</label>
@@ -27,7 +27,7 @@
       </div>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Shipping Line *</label>
-        <select [(ngModel)]="shippingLineId" name="shippingLineId" style="width:100%; padding:6px;">
+        <select [(ngModel)]="shippingLineId" name="shippingLineId" [style.border]="fieldBorder('shippingLineId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let l of shippingLines" [ngValue]="l.id">{{ l['name'] }}</option>
         </select>
