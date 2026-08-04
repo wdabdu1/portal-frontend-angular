@@ -1,5 +1,5 @@
 <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
-  <a [routerLink]="['/clearance', shipmentId]" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Clearance</a>
+  <a [routerLink]="['/clearance', shipmentId]" [queryParams]="{ section: 'costEstimate' }" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Clearance</a>
   <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Clearance Cost Estimate — Breakdown</h1>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
@@ -8,13 +8,14 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 6px;">Charge Type</th>
-        <th style="padding: 6px;">Value (SDG)</th>
-        <th style="padding: 6px;">Due Date</th>
+        <th (click)="sortBy('chargeTypeName')" style="padding: 6px; cursor: pointer;">Charge Type</th>
+        <th (click)="sortBy('valueSdg')" style="padding: 6px; cursor: pointer;">Value (SDG)</th>
+        <th (click)="sortBy('dueDate')" style="padding: 6px; cursor: pointer;">Due Date</th>
         <th style="padding: 6px;"></th>
       </tr>
     </thead>
     <tbody>
+      <tr *ngFor="let item of sortedItems" style="border-bottom: 1px solid #eee;">
       <tr *ngFor="let item of items" style="border-bottom: 1px solid #eee;">
         <td style="padding: 6px;">{{ item.chargeTypeName }}</td>
         <td style="padding: 6px;">{{ item.valueSdg | number: '1.2-2' }}</td>
