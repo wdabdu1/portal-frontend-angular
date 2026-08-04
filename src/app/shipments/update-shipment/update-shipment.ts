@@ -45,7 +45,7 @@ export class UpdateShipment implements OnInit {
   confirming = false;
 
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
-  acdForm = { processDate: '', costUsd: null as number | null, costSettledDate: '', refNumber: '' };
+  acdForm = { processDate: '', costSettledDate: '', refNumber: '' };
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
   ssmoForm = { applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '' };
   motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', offshoreApprovedPiNumber: '', offshoreApprovedPiDate: '' };
@@ -77,7 +77,7 @@ export class UpdateShipment implements OnInit {
         this.detail = detail;
 
         if (detail.forwarder) this.forwarderForm = { ...detail.forwarder };
-        if (detail.acd) this.acdForm = { processDate: detail.acd.processDate ?? '', costUsd: detail.acd.costUsd, costSettledDate: detail.acd.costSettledDate ?? '', refNumber: detail.acd.refNumber ?? '' };
+        if (detail.acd) this.acdForm = { processDate: detail.acd.processDate ?? '', costSettledDate: detail.acd.costSettledDate ?? '', refNumber: detail.acd.refNumber ?? '' };
         if (detail.draftDocuments) this.draftDocumentsForm = {
           initialDraftReceivedDate: detail.draftDocuments.initialDraftReceivedDate ?? '',
           finalDraftReceivedDate: detail.draftDocuments.finalDraftReceivedDate ?? '',
@@ -224,7 +224,7 @@ export class UpdateShipment implements OnInit {
 
   saveAcd(andNext: boolean): void {
     this.genericSave('acd', () => this.service.saveAcd(this.shipmentId, {
-      processDate: this.acdForm.processDate || null, costUsd: this.acdForm.costUsd,
+      processDate: this.acdForm.processDate || null,
       costSettledDate: this.acdForm.costSettledDate || null, refNumber: this.acdForm.refNumber || null
     }), andNext);
   }
