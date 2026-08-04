@@ -16,11 +16,15 @@ export class SettingsLookupService {
     return this.http.get<T[]>(`${API_URL}/settings/${resource}`);
   }
 
-  create<T extends LookupEntity>(resource: string, entity: Partial<T>) {
+  create<T extends >(resource: string, entity: Partial<T>) {
     return this.http.post<T>(`${API_URL}/settings/${resource}`, entity);
   }
 
   update<T extends LookupEntity>(resource: string, id: number, entity: Partial<T>) {
     return this.http.put(`${API_URL}/settings/${resource}/${id}`, entity);
+  }
+
+  delete(resource: string, id: number) {
+    return this.http.delete(`${API_URL}/settings/${resource}/${id}`);
   }
 }
