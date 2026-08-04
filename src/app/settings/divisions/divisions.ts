@@ -29,6 +29,13 @@ export class Divisions implements OnInit {
   newCode = '';
   newName = '';
 
+  editingId: number | null = null;
+  editBusinessUnitId: number | null = null;
+  editCode = '';
+  editName = '';
+  saving = false;
+  deletingId: number | null = null;
+
   constructor(private lookups: SettingsLookupService, public auth: AuthService) {}
 
   get canEdit(): boolean {
@@ -50,7 +57,56 @@ export class Divisions implements OnInit {
     this.loading = true;
     this.lookups.getAll<Division>('divisions').subscribe({
       next: (r) => { this.divisions = r; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.error = 'Could not load divisions.'; this.loading = false; this.cdr.markForCheck(); }
+      error: () => { this.error = 'Could not create division.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  startEdit(division: Division): void {
+    this.editingId = division.id;
+    this.editBusinessUnitId = division.businessUnitId;
+    this.editCode = division.code;
+    this.editName = division.name;
+  }
+
+  cancelEdit(): void {
+    this.editingId = null;
+  }
+
+  saveEdit(division: Division): void {
+    if (!this.editBusinessUnitId) return;
+    this.saving = true;
+    this.lookups.update<Division>('divisions', division.id, {
+      businessUnitId: this.editBusinessUnitId, code: this.editCode, name: this.editName
+    }).subscribe({
+      next: () => {
+        this.saving = false;
+        this.editingId = null;
+        this.load();
+      },
+      error: () => {
+        this.saving = false;
+        this.error = 'Could not update this division.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  confirmDelete(division: Division): void {
+    if (!window.confirm(`Delete "${division.name}"? This can't be undone.`)) return;
+
+    this.deletingId = division.id;
+    this.lookups.delete('divisions', division.id).subscribe({
+      next: () => {
+        this.deletingId = null;
+        this.load();
+      },
+      error: (err) => {
+        this.deletingId = null;
+        this.error = err?.status === 409
+          ? `"${division.name}" is in use and can't be deleted.`
+          : `Could not delete this division.`;
+        this.cdr.markForCheck();
+      }
     });
   }
 
