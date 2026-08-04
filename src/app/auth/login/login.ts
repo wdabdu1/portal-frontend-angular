@@ -25,7 +25,7 @@ export class Login {
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigate(['/settings/business-units']);
+        this.router.navigate(['/orders']);
       },
       error: () => {
         this.loading = false;
