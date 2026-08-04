@@ -25,6 +25,7 @@ export interface ShipmentSummary {
   id: number;
   blAwbNo: string;
   poNumber: string;
+  businessUnit: string;
   shippingLine: string;
   status: string;
   eta: string | null;
