@@ -23,6 +23,7 @@ export class NewShipment implements OnInit {
   loadingLineItems = false;
   saving = false;
   error = '';
+  invalidFields = new Set<string>();
   success = '';
 
   confirmedOrders: { id: number; poNumber: string; businessUnit: string; supplier: string }[] = [];
@@ -86,9 +87,18 @@ export class NewShipment implements OnInit {
   submit(): void {
     this.error = '';
     this.success = '';
+    this.invalidFields = new Set<string>();
 
-    if (!this.blAwbNo || !this.purchaseOrderId || !this.shippingLineId) {
-      this.error = 'Please fill in BL/AWB number, purchase order, and shipping line.';
+    const requiredFields: [string, unknown][] = [
+      ['blAwbNo', this.blAwbNo], ['purchaseOrderId', this.purchaseOrderId], ['shippingLineId', this.shippingLineId]
+    ];
+    for (const [key, value] of requiredFields) {
+      if (!value) this.invalidFields.add(key);
+    }
+
+    if (this.invalidFields.size > 0) {
+      this.error = 'Please complete the highlighted required fields.';
+      this.scrollToFirstError();
       return;
     }
 
@@ -134,5 +144,17 @@ export class NewShipment implements OnInit {
           this.cdr.markForCheck();
         }
       });
+  }
+
+  fieldBorder(key: string): string {
+    return this.invalidFields.has(key) ? '1px solid #c0392b' : '1px solid #ccc';
+  }
+
+  private scrollToFirstError(): void {
+    setTimeout(() => {
+      const firstKey = Array.from(this.invalidFields)[0];
+      const el = document.querySelector(`[name="${firstKey}"]`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
   }
 }
