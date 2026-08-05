@@ -3,6 +3,8 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
+import { SectionLockBadge } from '../../section-lock/section-lock-badge';
+import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import {
   ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
   ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details,
@@ -16,7 +18,7 @@ interface GroupItemDef {
 
 @Component({
   selector: 'app-clearance-detail',
-  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective],
+  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective, SectionLockBadge],
   templateUrl: './clearance-detail.html'
 })
 export class ClearanceDetailComponent implements OnInit {
@@ -83,13 +85,30 @@ export class ClearanceDetailComponent implements OnInit {
     { key: 'Truck & Containers', label: 'Truck & Containers' }
   ];
 
-  constructor(private service: ClearanceService) {}
+  locks: Record<string, SectionLockInfo | null> = {};
+
+  loadLocks(): void {
+    this.lockService.getLocks('Clearance', this.shipmentId).subscribe({
+      next: (list) => {
+        this.locks = {};
+        for (const l of list) this.locks[l.sectionKey] = l;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  isLocked(key: string): boolean {
+    return !!this.locks[key];
+  }
+
+  constructor(private service: ClearanceService, private lockService: SectionLockService) {}
 
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
     const section = this.route.snapshot.queryParamMap.get('section');
     if (section) this.expanded = section;
     this.load();
+    this.loadLocks();
   }
 
   emptyRoute1(): ClearanceRoute1Details {
