@@ -18,8 +18,8 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO Number</th>
         <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">Business Unit</th>
+        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO Number</th>
         <th (click)="sortBy('supplier')" style="padding: 8px 6px; cursor: pointer;">Supplier</th>
         <th (click)="sortBy('lineItemCount')" style="padding: 8px 6px; cursor: pointer;">Line Items</th>
         <th (click)="sortBy('orderValueUsd')" style="padding: 8px 6px; cursor: pointer;">Order Value</th>
@@ -31,8 +31,8 @@
     </thead>
     <tbody>
       <tr *ngFor="let o of orders" (click)="viewDetails(o.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
-        <td style="padding: 8px 6px; font-family: monospace;">{{ o.poNumber }}</td>
         <td style="padding: 8px 6px;">{{ o.businessUnit }}</td>
+        <td style="padding: 8px 6px; font-family: monospace;">{{ o.poNumber }}</td>
         <td style="padding: 8px 6px;">{{ o.supplier }}</td>
         <td style="padding: 8px 6px;">{{ o.lineItemCount }}</td>
         <td style="padding: 8px 6px;">{{ o.orderValueUsd | number: '1.2-2' }} USD</td>
