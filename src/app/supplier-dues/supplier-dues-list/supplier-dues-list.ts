@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
+import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import {
   PaymentRecord, SupplierDueRow, SupplierDuesService, SupplierInvoiceSummary
 } from '../supplier-dues.service';
@@ -26,6 +27,9 @@ export class SupplierDuesList implements OnInit {
 
   currencies: LookupEntity[] = [];
 
+  filterBusinessUnit = '';
+  filterPaymentTerm = '';
+
   selectedShipmentId: number | null = null;
   summary: SupplierInvoiceSummary | null = null;
   paymentRecords: PaymentRecord[] = [];
@@ -36,19 +40,35 @@ export class SupplierDuesList implements OnInit {
   newPaymentValue: number | null = null;
   addingPayment = false;
 
-  constructor(private service: SupplierDuesService, private lookups: SettingsLookupService) {}
+  constructor(private service: SupplierDuesService, private lookups: SettingsLookupService, private tablePrefs: TablePreferencesService) {}
 
   ngOnInit(): void {
     this.lookups.getAll<LookupEntity>('currencies').subscribe({ next: (r) => { this.currencies = r; this.cdr.markForCheck(); } });
-    this.load();
+    this.tablePrefs.get('supplierDues').subscribe({
+      next: (pref) => {
+        if (pref) {
+          this.sortColumn = pref.sortColumn as SortColumn;
+          this.sortAsc = pref.sortAsc;
+        }
+        this.load();
+      },
+      error: () => this.load()
+    });
   }
-
   load(): void {
     this.loading = true;
     this.service.getOpen().subscribe({
       next: (r) => { this.allRows = r; this.loading = false; this.cdr.markForCheck(); },
       error: () => { this.error = 'Could not load supplier dues.'; this.loading = false; this.cdr.markForCheck(); }
     });
+  }
+
+  get businessUnitOptions(): string[] {
+    return [...new Set(this.allRows.map((r) => r.businessUnit))].sort();
+  }
+
+  get paymentTermOptions(): string[] {
+    return [...new Set(this.allRows.map((r) => r.paymentTerm))].sort();
   }
 
   get rows(): SupplierDueRow[] {
@@ -61,6 +81,8 @@ export class SupplierDuesList implements OnInit {
         r.blAwbNo.toLowerCase().includes(q)
       );
     }
+    if (this.filterBusinessUnit) filtered = filtered.filter((r) => r.businessUnit === this.filterBusinessUnit);
+    if (this.filterPaymentTerm) filtered = filtered.filter((r) => r.paymentTerm === this.filterPaymentTerm);
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
       const av = a[this.sortColumn];
@@ -80,6 +102,7 @@ export class SupplierDuesList implements OnInit {
       this.sortColumn = column;
       this.sortAsc = true;
     }
+    this.tablePrefs.save('supplierDues', this.sortColumn, this.sortAsc).subscribe();
   }
 
   get totalValueUsd(): number {
