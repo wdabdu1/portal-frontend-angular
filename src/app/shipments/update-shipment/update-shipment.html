@@ -36,7 +36,7 @@
         <strong style="font-size: 14px;">Forwarder</strong>
         <span [style.background]="sectionStatus('forwarder') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('forwarder') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('forwarder') }}</span>
       </div>
-      <div *ngIf=" === 'forwarder'" style="padding: 16px;">
+      <div *ngIf="expandedSection === 'forwarder'" style="padding: 16px;">
         <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
           <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="forwarder" [lockInfo]="locks['forwarder']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
         </div>
@@ -83,7 +83,7 @@
         <strong style="font-size: 14px;">ACD</strong>
         <span [style.background]="sectionStatus('acd') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('acd') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('acd') }}</span>
       </div>
-      <div *ngIf=" === 'acd'" style="padding: 16px;">
+      <div *ngIf="expandedSection === 'acd'" style="padding: 16px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">Process Date</label>
@@ -116,7 +116,7 @@
         <strong style="font-size: 14px;">Draft Documents</strong>
         <span [style.background]="sectionStatus('draftDocuments') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('draftDocuments') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('draftDocuments') }}</span>
       </div>
-      <div *ngIf=" === 'draftDocuments'" style="padding: 16px;">
+      <div *ngIf="expandedSection === 'draftDocuments'" style="padding: 16px;">
         <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
           <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="draftDocuments" [lockInfo]="locks['draftDocuments']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
         </div>
