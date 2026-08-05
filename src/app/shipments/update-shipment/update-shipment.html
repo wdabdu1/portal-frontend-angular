@@ -117,6 +117,9 @@
         <span [style.background]="sectionStatus('draftDocuments') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('draftDocuments') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('draftDocuments') }}</span>
       </div>
       <div *ngIf="expandedSection === 'draftDocuments'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="draftDocuments" [lockInfo]="locks['draftDocuments']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">Initial Draft Received</label>
@@ -132,8 +135,8 @@
           </div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveDraftDocuments(false)" [disabled]="saving.draftDocuments" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveDraftDocuments(true)" [disabled]="saving.draftDocuments" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.draftDocuments ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveDraftDocuments(false)" [disabled]="saving.draftDocuments || isLocked('draftDocuments')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveDraftDocuments(true)" [disabled]="saving.draftDocuments || isLocked('draftDocuments')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.draftDocuments ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('draftDocuments')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
