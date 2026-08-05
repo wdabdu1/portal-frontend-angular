@@ -131,6 +131,7 @@ export class ClearanceDetailComponent implements OnInit {
   emptyRoute2(): ClearanceRoute2Details {
     return {
       depositRequestDate: null, requestApprovalDate: null,
+      depositRefNo: null, fzInvoiceNo: null, destinationId: null,
       inspectionDate: null,
       spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, policeSecurityAppointedDate: null,
       truckPortEntryPermitDate: null, containersReceivedAtFzDate: null, containersReturnedDate: null,
@@ -140,6 +141,7 @@ export class ClearanceDetailComponent implements OnInit {
 
   emptyRoute3(): ClearanceRoute3Details {
     return {
+      depositShipmentId: null, withdrawals: null,
       certificateEntryDate: null, scudaDeclarationNo: null,
       ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null,
       custExamStartDate: null, custExamCompletedDate: null,
