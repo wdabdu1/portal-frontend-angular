@@ -26,8 +26,8 @@
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
         <th style="padding: 8px 6px;"></th>
-        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB</th>
         <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
+        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB</th>
         <th (click)="sortBy('category')" style="padding: 8px 6px; cursor: pointer;">Category</th>
         <th (click)="sortBy('eta')" style="padding: 8px 6px; cursor: pointer;">ETA</th>
         <th (click)="sortBy('fclCount')" style="padding: 8px 6px; cursor: pointer;">FCL</th>
@@ -48,8 +48,8 @@
         <td style="padding: 8px 6px;">
           <span [style.background]="trafficColor(s.trafficLight)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
         </td>
-        <td style="padding: 8px 6px; font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</td>
         <td style="padding: 8px 6px;">{{ s.businessUnit }}</td>
+        <td style="padding: 8px 6px; font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</td>
         <td style="padding: 8px 6px;">{{ s.category }}</td>
         <td style="padding: 8px 6px; color: #888;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</td>
         <td style="padding: 8px 6px;">{{ s.fclCount }}</td>
