@@ -246,4 +246,14 @@ export class ClearanceService {
   saveRoute3(shipmentId: number, req: Partial<ClearanceRoute3Details>) {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/route3`, req);
   }
+
+  getFzDepositOptions() {
+    return this.http.get<FzDepositOption[]>(`${API_URL}/fz-inventory/options`);
+  }
+  getFzBalance(depositShipmentId: number) {
+    return this.http.get<FzBalanceLine[]>(`${API_URL}/fz-inventory/${depositShipmentId}/balance`);
+  }
+  getFzInventory() {
+    return this.http.get<FzInventoryRow[]>(`${API_URL}/fz-inventory`);
+  }
 }
