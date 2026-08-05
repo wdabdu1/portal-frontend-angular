@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { ClearanceService, FzInventoryRow } from '../../clearance/clearance.service';
 
 type SortColumn = keyof FzInventoryRow;
 
 @Component({
   selector: 'app-fz-inventory-list',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './fz-inventory-list.html'
 })
 export class FzInventoryList implements OnInit {
@@ -19,10 +21,21 @@ export class FzInventoryList implements OnInit {
   sortColumn: SortColumn = 'dateOfDeposit';
   sortAsc = true;
 
-  constructor(private service: ClearanceService) {}
+  filterBusinessUnit = '';
+
+  constructor(private service: ClearanceService, private tablePrefs: TablePreferencesService) {}
 
   ngOnInit(): void {
-    this.load();
+    this.tablePrefs.get('fzInventory').subscribe({
+      next: (pref) => {
+        if (pref) {
+          this.sortColumn = pref.sortColumn as SortColumn;
+          this.sortAsc = pref.sortAsc;
+        }
+        this.load();
+      },
+      error: () => this.load()
+    });
   }
 
   load(): void {
@@ -33,9 +46,16 @@ export class FzInventoryList implements OnInit {
     });
   }
 
+  get businessUnitOptions(): string[] {
+    return [...new Set(this.rows.map((r) => r.businessUnit))].sort();
+  }
+
   get sortedRows(): FzInventoryRow[] {
+    let filtered = this.rows;
+    if (this.filterBusinessUnit) filtered = filtered.filter((r) => r.businessUnit === this.filterBusinessUnit);
+
     const dir = this.sortAsc ? 1 : -1;
-    return [...this.rows].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const av = a[this.sortColumn];
       const bv = b[this.sortColumn];
       if (av === null || av === undefined) return 1;
@@ -53,15 +73,16 @@ export class FzInventoryList implements OnInit {
       this.sortColumn = column;
       this.sortAsc = true;
     }
+    this.tablePrefs.save('fzInventory', this.sortColumn, this.sortAsc).subscribe();
   }
 
   get totalQty(): number {
-    return this.rows.reduce((sum, r) => sum + r.totalQty, 0);
+    return this.sortedRows.reduce((sum, r) => sum + r.totalQty, 0);
   }
   get totalWithdrawn(): number {
-    return this.rows.reduce((sum, r) => sum + r.totalWithdrawn, 0);
+    return this.sortedRows.reduce((sum, r) => sum + r.totalWithdrawn, 0);
   }
   get totalBalance(): number {
-    return this.rows.reduce((sum, r) => sum + r.balance, 0);
+    return this.sortedRows.reduce((sum, r) => sum + r.balance, 0);
   }
 }
