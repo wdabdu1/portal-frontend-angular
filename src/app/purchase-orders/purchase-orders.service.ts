@@ -52,6 +52,7 @@ export interface PurchaseOrderSummary {
   lineItemCount: number;
   createdAt: string;
   orderValueUsd: number;
+  percentShipped: number;
 }
 @Injectable({ providedIn: 'root' })
 export class PurchaseOrdersService {
