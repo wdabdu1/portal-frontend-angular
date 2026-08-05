@@ -78,6 +78,12 @@ export interface ErpColumn {
   remarks: string | null;
 }
 
+export interface ShipmentLineItemHsCode {
+  lineItemId: number;
+  modelProduct: string;
+  hsCode: string | null;
+}
+
 export interface ShipmentDetail {
   id: number;
   blAwbNo: string;
@@ -95,6 +101,7 @@ export interface ShipmentDetail {
   supplier: string;
   category: string;
   sobActualDate: string | null;
+  lineItemHsCodes: ShipmentLineItemHsCode[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -111,6 +118,10 @@ export class UpdateShipmentService {
 
   saveAcd(shipmentId: number, req: Partial<ShipmentAcd>) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/acd`, req);
+  }
+
+  saveHsCodes(shipmentId: number, lineItemHsCodes: ShipmentLineItemHsCode[]) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/hs-codes`, { lineItemHsCodes });
   }
 
   saveDraftDocuments(shipmentId: number, req: Partial<ShipmentDraftDocuments>) {
