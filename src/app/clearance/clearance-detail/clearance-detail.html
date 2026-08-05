@@ -54,14 +54,17 @@
         <span style="font-size: 12px; color: #666;">{{ routeName(detail.route) }}</span>
       </div>
       <div *ngIf="expanded === 'route'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route" [lockInfo]="locks['route']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="radio" name="route" [value]="1" [(ngModel)]="selectedRoute" /> Route 1 — Clear at Port</label>
           <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="radio" name="route" [value]="2" [(ngModel)]="selectedRoute" /> Route 2 — FZ Deposit</label>
           <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="radio" name="route" [value]="3" [(ngModel)]="selectedRoute" /> Route 3 — Clear from FZ</label>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveRoute(false)" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveRoute(true)" [disabled]="savingRoute || !selectedRoute" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRoute ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveRoute(false)" [disabled]="savingRoute || !selectedRoute || isLocked('route')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveRoute(true)" [disabled]="savingRoute || !selectedRoute || isLocked('route')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRoute ? 'Saving...' : 'Save & Next' }}</button>
         </div>
       </div>
     </div>
@@ -72,17 +75,19 @@
         <strong style="font-size: 14px;">General Info</strong>
       </div>
       <div *ngIf="expanded === 'generalInfo'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="generalInfo" [lockInfo]="locks['generalInfo']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-          <div><label style="display:block; font-size:12px; color:#555;">Copy of BL Received Date</label><input type="date" [(ngModel)]="generalInfoForm.copyOfBlReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-          <div><label style="display:block; font-size:12px; color:#555;">Original Shipment Set Received Date</label><input type="date" [(ngModel)]="generalInfoForm.originalShipmentSetReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Copy of BL Received Date</label><input type="date" [(ngModel)]="generalInfoForm.originalShipmentSetReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           <div><label style="display:block; font-size:12px; color:#555;">Shipment Estimated Arrival Date</label><input type="date" [(ngModel)]="generalInfoForm.shipmentEta" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           <div><label style="display:block; font-size:12px; color:#555;">L/C No.</label><input [(ngModel)]="generalInfoForm.lcNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           <div><label style="display:block; font-size:12px; color:#555;">IM Form Ref. No.</label><input [(ngModel)]="generalInfoForm.imFormNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           <div><label style="display:block; font-size:12px; color:#555;">IM Form Date</label><input type="date" [(ngModel)]="generalInfoForm.imFormDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveGeneralInfo(false)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveGeneralInfo(true)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingGeneralInfo ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveGeneralInfo(false)" [disabled]="savingGeneralInfo || isLocked('generalInfo')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveGeneralInfo(true)" [disabled]="savingGeneralInfo || isLocked('generalInfo')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingGeneralInfo ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="toggle('costEstimate')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
