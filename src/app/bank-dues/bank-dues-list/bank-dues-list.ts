@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
+import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { BankDueRow, BankDuesService, CollectionRecord } from '../bank-dues.service';
 
 type SortColumn = keyof BankDueRow;
@@ -24,6 +25,8 @@ export class BankDuesList implements OnInit {
 
   currencies: LookupEntity[] = [];
 
+  filterBusinessUnit = '';
+
   selectedShipmentId: number | null = null;
   selectedRow: BankDueRow | null = null;
   records: CollectionRecord[] = [];
@@ -34,11 +37,20 @@ export class BankDuesList implements OnInit {
   newPaymentValue: number | null = null;
   addingPayment = false;
 
-  constructor(private service: BankDuesService, private lookups: SettingsLookupService) {}
+  constructor(private service: BankDuesService, private lookups: SettingsLookupService, private tablePrefs: TablePreferencesService) {}
 
   ngOnInit(): void {
     this.lookups.getAll<LookupEntity>('currencies').subscribe({ next: (r) => { this.currencies = r; this.cdr.markForCheck(); } });
-    this.load();
+    this.tablePrefs.get('bankDues').subscribe({
+      next: (pref) => {
+        if (pref) {
+          this.sortColumn = pref.sortColumn as SortColumn;
+          this.sortAsc = pref.sortAsc;
+        }
+        this.load();
+      },
+      error: () => this.load()
+    });
   }
 
     load(): void {
@@ -58,6 +70,10 @@ export class BankDuesList implements OnInit {
     });
   }
 
+  get businessUnitOptions(): string[] {
+    return [...new Set(this.allRows.map((r) => r.businessUnit))].sort();
+  }
+
   get rows(): BankDueRow[] {
     let filtered = this.allRows;
     const q = this.searchText.trim().toLowerCase();
@@ -69,6 +85,7 @@ export class BankDuesList implements OnInit {
         (r.imFormNo ?? '').toLowerCase().includes(q)
       );
     }
+    if (this.filterBusinessUnit) filtered = filtered.filter((r) => r.businessUnit === this.filterBusinessUnit);
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
       const av = a[this.sortColumn];
@@ -88,6 +105,7 @@ export class BankDuesList implements OnInit {
       this.sortColumn = column;
       this.sortAsc = true;
     }
+    this.tablePrefs.save('bankDues', this.sortColumn, this.sortAsc).subscribe();
   }
 
   get totalValueAed(): number {
