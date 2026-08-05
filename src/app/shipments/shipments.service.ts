@@ -14,6 +14,7 @@ export interface CreateShipmentRequest {
   etd?: string;
   eta?: string;
   shippingLineId: number;
+  vesselName?: string | null;
   fcl20Count: number;
   fcl40Count: number;
   soc: boolean;
