@@ -64,6 +64,8 @@ export class UpdateShipment implements OnInit {
 
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
   acdForm = { processDate: '', costSettledDate: '', refNumber: '' };
+  hsCodeLines: { lineItemId: number; modelProduct: string; hsCode: string }[] = [];
+  savingHsCodes = false;
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
   ssmoForm = { applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '' };
   motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '', offshoreApprovedPiNumber: '' };
@@ -97,6 +99,7 @@ export class UpdateShipment implements OnInit {
 
         if (detail.forwarder) this.forwarderForm = { ...detail.forwarder };
         if (detail.acd) this.acdForm = { processDate: detail.acd.processDate ?? '', costSettledDate: detail.acd.costSettledDate ?? '', refNumber: detail.acd.refNumber ?? '' };
+        this.hsCodeLines = detail.lineItemHsCodes.map((l) => ({ lineItemId: l.lineItemId, modelProduct: l.modelProduct, hsCode: l.hsCode ?? '' }));
         if (detail.draftDocuments) this.draftDocumentsForm = {
           initialDraftReceivedDate: detail.draftDocuments.initialDraftReceivedDate ?? '',
           finalDraftReceivedDate: detail.draftDocuments.finalDraftReceivedDate ?? '',
@@ -246,6 +249,16 @@ export class UpdateShipment implements OnInit {
       processDate: this.acdForm.processDate || null,
       costSettledDate: this.acdForm.costSettledDate || null, refNumber: this.acdForm.refNumber || null
     }), andNext);
+  }
+
+  saveHsCodes(): void {
+    this.savingHsCodes = true;
+    this.service.saveHsCodes(this.shipmentId, this.hsCodeLines.map((l) => ({
+      lineItemId: l.lineItemId, modelProduct: l.modelProduct, hsCode: l.hsCode || null
+    }))).subscribe({
+      next: () => { this.savingHsCodes = false; this.cdr.markForCheck(); },
+      error: () => { this.savingHsCodes = false; this.error = 'Could not save HS Codes.'; this.cdr.markForCheck(); }
+    });
   }
 
   saveDraftDocuments(andNext: boolean): void {
