@@ -1,13 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { ClearanceService, FzInventoryRow } from '../../clearance/clearance.service';
 
 type SortColumn = keyof FzInventoryRow;
 
 @Component({
   selector: 'app-fz-inventory-list',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './fz-inventory-list.html'
 })
 export class FzInventoryList implements OnInit {
