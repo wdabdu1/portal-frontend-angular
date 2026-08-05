@@ -1,0 +1,48 @@
+<div style="max-width: 1100px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">FZ Inventory</h1>
+  <p style="color: #888; font-size: 13px;">Open Free Zone deposits with remaining balance. Click a column header to sort.</p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
+        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL</th>
+        <th (click)="sortBy('depositRefNo')" style="padding: 8px 6px; cursor: pointer;">Deposit Ref.</th>
+        <th (click)="sortBy('dateOfDeposit')" style="padding: 8px 6px; cursor: pointer;">Date of Deposit</th>
+        <th (click)="sortBy('division')" style="padding: 8px 6px; cursor: pointer;">Div</th>
+        <th style="padding: 8px 6px;">Cat</th>
+        <th (click)="sortBy('totalQty')" style="padding: 8px 6px; cursor: pointer;">Total Qty</th>
+        <th (click)="sortBy('totalWithdrawn')" style="padding: 8px 6px; cursor: pointer;">Total Withdrawn</th>
+        <th (click)="sortBy('balance')" style="padding: 8px 6px; cursor: pointer;">Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of sortedRows" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
+        <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
+        <td style="padding: 8px 6px;">{{ r.depositRefNo || '—' }}</td>
+        <td style="padding: 8px 6px; color: #888;">{{ r.dateOfDeposit ? (r.dateOfDeposit | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.division || '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.categories.join(', ') || '—' }}</td>
+        <td style="padding: 8px 6px;">{{ r.totalQty | number: '1.0-2' }}</td>
+        <td style="padding: 8px 6px;">{{ r.totalWithdrawn | number: '1.0-2' }}</td>
+        <td style="padding: 8px 6px; font-weight: 600; color: #0a3d62;">{{ r.balance | number: '1.0-2' }}</td>
+      </tr>
+    </tbody>
+    <tfoot *ngIf="rows.length > 0">
+      <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+        <td colspan="6" style="padding: 8px 6px; text-align: right;">Totals:</td>
+        <td style="padding: 8px 6px;">{{ totalQty | number: '1.0-2' }}</td>
+        <td style="padding: 8px 6px;">{{ totalWithdrawn | number: '1.0-2' }}</td>
+        <td style="padding: 8px 6px; color: #0a3d62;">{{ totalBalance | number: '1.0-2' }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No open FZ deposits.
+  </p>
+</div>
