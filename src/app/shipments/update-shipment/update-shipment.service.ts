@@ -29,6 +29,7 @@ export interface ShipmentSsmo {
   cost: number | null;
   costSettledDate: string | null;
   refNumber: string | null;
+  approvalDate: string | null;
 }
 
 export interface ShipmentMot {
@@ -36,8 +37,8 @@ export interface ShipmentMot {
   cost: number | null;
   costSettledDate: string | null;
   refNumber: string | null;
+  approvalDate: string | null;
   offshoreApprovedPiNumber: string | null;
-  offshoreApprovedPiDate: string | null;
 }
 
 export interface ShipmentSupplierFullSet {
