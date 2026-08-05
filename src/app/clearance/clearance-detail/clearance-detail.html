@@ -355,6 +355,15 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Deposit Request Date</label><input type="date" [(ngModel)]="route2Form.depositRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Request Approval Date</label><input type="date" [(ngModel)]="route2Form.requestApprovalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Deposit Ref. No.</label><input [(ngModel)]="route2Form.depositRefNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">FZ Invoice No.</label><input [(ngModel)]="route2Form.fzInvoiceNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div>
+              <label style="display:block; font-size:12px; color:#555;">Free Zone Destination</label>
+              <select [(ngModel)]="route2Form.destinationId" style="width:100%; padding:6px;">
+                <option [ngValue]="null">-- select --</option>
+                <option *ngFor="let d of freeZoneDestinations" [ngValue]="d.id">{{ d['name'] }}</option>
+              </select>
+            </div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -427,6 +436,39 @@
       <div style="margin-top:1rem;">
         <app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route3" [lockInfo]="locks['route3']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
       </div>
+
+      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 0.5rem; overflow: hidden; padding: 16px;">
+        <h4 style="font-size: 13px; margin: 0 0 10px; color: #333;">Withdrawing From (FZ Deposit)</h4>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">BL / AWB No.</label>
+          <select [(ngModel)]="route3Form.depositShipmentId" (change)="onDepositSelected()" style="width:100%; max-width:400px; padding:6px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let o of fzDepositOptions" [ngValue]="o.shipmentId">{{ o.blAwbNo }} — Deposit Ref. {{ o.depositRefNo || '—' }}</option>
+          </select>
+        </div>
+
+        <p *ngIf="loadingFzBalance" style="color:#888; font-size:12px; margin-top:10px;">Loading balance...</p>
+
+        <table *ngIf="!loadingFzBalance && fzBalanceLines.length > 0" style="width:100%; border-collapse:collapse; font-size:13px; margin-top:12px;">
+          <thead>
+            <tr style="text-align:left; border-bottom:1px solid #ddd;">
+              <th style="padding:5px;">Item</th>
+              <th style="padding:5px;">Balance Remaining</th>
+              <th style="padding:5px;">Qty to Withdraw Now</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of fzBalanceLines" style="border-bottom:1px solid #eee;">
+              <td style="padding:5px;">{{ l.modelProduct }}</td>
+              <td style="padding:5px;">{{ l.balance | number: '1.0-2' }}</td>
+              <td style="padding:5px;">
+                <input type="text" appThousands [(ngModel)]="withdrawQtyByLineItem[l.shipmentLineItemId]" style="width:100px; padding:4px;" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 0.5rem; overflow: hidden;">
         <div (click)="toggle('Customs Certificate Entry')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Certificate Entry</strong>
