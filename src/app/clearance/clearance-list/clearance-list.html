@@ -2,12 +2,22 @@
   <h1 style="font-size: 20px; font-weight: 500;">Clearance — Select Shipment</h1>
   <p style="color: #888; font-size: 13px;">Click a column header to sort. Click a row to continue Clearance data entry.</p>
 
-  <input
-    [(ngModel)]="searchText"
-    (ngModelChange)="onSearchChange()"
-    placeholder="Search by BL/AWB or Declaration No."
-    style="width: 100%; max-width: 400px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
-  />
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
+    <input
+      [(ngModel)]="searchText"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Search by BL/AWB or Declaration No."
+      style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+    />
+    <select [(ngModel)]="filterBusinessUnit" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All Business Units</option>
+      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
+    </select>
+    <select [(ngModel)]="filterCategory" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All Categories</option>
+      <option *ngFor="let c of categoryOptions" [value]="c">{{ c }}</option>
+    </select>
+  </div>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
