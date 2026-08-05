@@ -12,6 +12,7 @@
         <th (click)="sortBy('supplier')" style="padding: 8px 6px; cursor: pointer;">Supplier</th>
         <th (click)="sortBy('lineItemCount')" style="padding: 8px 6px; cursor: pointer;">Line Items</th>
         <th (click)="sortBy('orderValueUsd')" style="padding: 8px 6px; cursor: pointer;">Order Value</th>
+        <th (click)="sortBy('percentShipped')" style="padding: 8px 6px; cursor: pointer;">% Shipped</th>
         <th (click)="sortBy('status')" style="padding: 8px 6px; cursor: pointer;">Status</th>
         <th (click)="sortBy('createdAt')" style="padding: 8px 6px; cursor: pointer;">Created</th>
         <th style="padding: 8px 6px;"></th>
@@ -24,6 +25,14 @@
         <td style="padding: 8px 6px;">{{ o.supplier }}</td>
         <td style="padding: 8px 6px;">{{ o.lineItemCount }}</td>
         <td style="padding: 8px 6px;">{{ o.orderValueUsd | number: '1.2-2' }} USD</td>
+        <td style="padding: 8px 6px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
+              <div [style.width.%]="o.percentShipped" [style.background]="o.percentShipped >= 100 ? '#1e7e34' : '#0a3d62'" style="height:100%;"></div>
+            </div>
+            <span style="font-size:12px; color:#666;">{{ o.percentShipped | number: '1.0-0' }}%</span>
+          </div>
+        </td>
         <td style="padding: 8px 6px;">
           <span
             [style.background]="o.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
