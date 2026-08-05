@@ -6,7 +6,18 @@
     </a>
   </div>
 
-  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
+    <select [(ngModel)]="filterBusinessUnit" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All Business Units</option>
+      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
+    </select>
+    <select [(ngModel)]="filterStatus" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All Statuses</option>
+      <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
 
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
