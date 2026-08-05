@@ -111,7 +111,38 @@ export class ClearanceDetailComponent implements OnInit {
   get activeRouteLockKey(): string {
     return `route${this.detail?.route ?? this.selectedRoute}`;
   }
-  constructor(private service: ClearanceService, private lockService: SectionLockService) {}
+  constructor(private service: ClearanceService, private lockService: SectionLockService, private lookups: SettingsLookupService) {}
+
+  loadFreeZoneDestinations(): void {
+    this.lookups.getAll<LookupEntity>('shipment-destinations').subscribe({
+      next: (r) => {
+        this.freeZoneDestinations = r.filter((d) => d['isFreeZone']);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  loadFzDepositOptions(): void {
+    this.service.getFzDepositOptions().subscribe({
+      next: (r) => { this.fzDepositOptions = r; this.cdr.markForCheck(); }
+    });
+  }
+
+  onDepositSelected(): void {
+    this.fzBalanceLines = [];
+    this.withdrawQtyByLineItem = {};
+    if (!this.route3Form.depositShipmentId) return;
+
+    this.loadingFzBalance = true;
+    this.service.getFzBalance(this.route3Form.depositShipmentId).subscribe({
+      next: (lines) => {
+        this.fzBalanceLines = lines;
+        this.loadingFzBalance = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.loadingFzBalance = false; this.cdr.markForCheck(); }
+    });
+  }
 
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
@@ -119,6 +150,8 @@ export class ClearanceDetailComponent implements OnInit {
     if (section) this.expanded = section;
     this.load();
     this.loadLocks();
+    this.loadFreeZoneDestinations();
+    this.loadFzDepositOptions();
   }
 
   emptyRoute1(): ClearanceRoute1Details {
@@ -220,7 +253,7 @@ export class ClearanceDetailComponent implements OnInit {
     } else if (this.selectedRoute === 2) {
       this.service.getRoute2(this.shipmentId).subscribe({ next: (r) => { if (r) this.route2Form = r; this.cdr.markForCheck(); } });
     } else if (this.selectedRoute === 3) {
-      this.service.getRoute3(this.shipmentId).subscribe({ next: (r) => { if (r) this.route3Form = r; this.cdr.markForCheck(); } });
+      this.service.getRoute3(this.shipmentId).subscribe({ next: (r) => { if (r) { this.route3Form = r; this.onDepositSelected(); } this.cdr.markForCheck(); } });
     }
   }
 
@@ -332,6 +365,13 @@ export class ClearanceDetailComponent implements OnInit {
 
   saveRouteDetail(andNext: boolean, nextGroupKey: string | null): void {
     this.savingRouteDetail = true;
+
+    if (this.selectedRoute === 3) {
+      this.route3Form.withdrawals = this.fzBalanceLines
+        .map((l) => ({ shipmentLineItemId: l.shipmentLineItemId, qty: this.withdrawQtyByLineItem[l.shipmentLineItemId] || 0 }))
+        .filter((w) => w.qty > 0);
+    }
+
     const save$ = this.selectedRoute === 1
       ? this.service.saveRoute1(this.shipmentId, this.route1Form)
       : this.selectedRoute === 2
