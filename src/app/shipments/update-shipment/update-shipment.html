@@ -36,7 +36,7 @@
         <strong style="font-size: 14px;">Forwarder</strong>
         <span [style.background]="sectionStatus('forwarder') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('forwarder') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('forwarder') }}</span>
       </div>
-      <div *ngIf="expandedSection === 'forwarder'" style="padding: 16px;">
+      <div *ngIf=" === 'forwarder'" style="padding: 16px;">
         <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
           <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="forwarder" [lockInfo]="locks['forwarder']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
         </div>
@@ -83,7 +83,7 @@
         <strong style="font-size: 14px;">ACD</strong>
         <span [style.background]="sectionStatus('acd') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('acd') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('acd') }}</span>
       </div>
-      <div *ngIf="expandedSection === 'acd'" style="padding: 16px;">
+      <div *ngIf=" === 'acd'" style="padding: 16px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">Process Date</label>
@@ -116,7 +116,7 @@
         <strong style="font-size: 14px;">Draft Documents</strong>
         <span [style.background]="sectionStatus('draftDocuments') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('draftDocuments') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('draftDocuments') }}</span>
       </div>
-      <div *ngIf="expandedSection === 'draftDocuments'" style="padding: 16px;">
+      <div *ngIf=" === 'draftDocuments'" style="padding: 16px;">
         <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
           <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="draftDocuments" [lockInfo]="locks['draftDocuments']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
         </div>
@@ -149,6 +149,9 @@
         <span [style.background]="sectionStatus('ssmo') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('ssmo') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('ssmo') }}</span>
       </div>
       <div *ngIf="expandedSection === 'ssmo'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="ssmo" [lockInfo]="locks['ssmo']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">Application Date</label>
@@ -168,8 +171,8 @@
           </div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveSsmo(false)" [disabled]="saving.ssmo" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveSsmo(true)" [disabled]="saving.ssmo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.ssmo ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveSsmo(false)" [disabled]="saving.ssmo || isLocked('ssmo')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveSsmo(true)" [disabled]="saving.ssmo || isLocked('ssmo')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.ssmo ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('ssmo')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
@@ -182,6 +185,9 @@
         <span [style.background]="sectionStatus('mot') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('mot') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('mot') }}</span>
       </div>
       <div *ngIf="expandedSection === 'mot'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="mot" [lockInfo]="locks['mot']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">Process Date</label>
@@ -209,8 +215,8 @@
           </div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveMot(false)" [disabled]="saving.mot" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveMot(true)" [disabled]="saving.mot" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.mot ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveMot(false)" [disabled]="saving.mot || isLocked('mot')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveMot(true)" [disabled]="saving.mot || isLocked('mot')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.mot ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('mot')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
@@ -223,6 +229,9 @@
         <span [style.background]="sectionStatus('supplierFullSet') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('supplierFullSet') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('supplierFullSet') }}</span>
       </div>
       <div *ngIf="expandedSection === 'supplierFullSet'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="supplierFullSet" [lockInfo]="locks['supplierFullSet']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">Supplier Invoice No.</label>
@@ -253,8 +262,8 @@
           </div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveSupplierFullSet(false)" [disabled]="saving.supplierFullSet" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveSupplierFullSet(true)" [disabled]="saving.supplierFullSet" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.supplierFullSet ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveSupplierFullSet(false)" [disabled]="saving.supplierFullSet || isLocked('supplierFullSet')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveSupplierFullSet(true)" [disabled]="saving.supplierFullSet || isLocked('supplierFullSet')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.supplierFullSet ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('supplierFullSet')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
@@ -267,6 +276,9 @@
         <span [style.background]="sectionStatus('banking') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('banking') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('banking') }}</span>
       </div>
       <div *ngIf="expandedSection === 'banking'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="banking" [lockInfo]="locks['banking']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">Sender Bank</label>
@@ -326,8 +338,8 @@
         </div>
         <p *ngIf="detail.banking?.senderBankCharges !== null && detail.banking?.senderBankCharges !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG</p>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveBanking(false)" [disabled]="saving.banking" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveBanking(true)" [disabled]="saving.banking" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.banking ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveBanking(false)" [disabled]="saving.banking || isLocked('banking')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveBanking(true)" [disabled]="saving.banking || isLocked('banking')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.banking ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('banking')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
