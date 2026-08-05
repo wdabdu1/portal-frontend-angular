@@ -16,13 +16,21 @@ export interface ClearanceRoute1Details {
 
 export interface ClearanceRoute2Details {
   depositRequestDate: string | null; requestApprovalDate: string | null;
+  depositRefNo: string | null; fzInvoiceNo: string | null; destinationId: number | null;
   inspectionDate: string | null;
   spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null; policeSecurityAppointedDate: string | null;
   truckPortEntryPermitDate: string | null; containersReceivedAtFzDate: string | null; containersReturnedDate: string | null;
   shippingLineDepositReturnDate: string | null; depositValue: number | null; clearanceActualCompletedDate: string | null;
 }
 
+export interface WithdrawalLineInput {
+  shipmentLineItemId: number;
+  qty: number;
+}
+
 export interface ClearanceRoute3Details {
+  depositShipmentId: number | null;
+  withdrawals: WithdrawalLineInput[] | null;
   certificateEntryDate: string | null; scudaDeclarationNo: string | null;
   ssmoFileRequestDate: string | null; ssmoInspectionAmountSdg: number | null; ssmoFeesSettlementDate: string | null;
   custExamStartDate: string | null; custExamCompletedDate: string | null;
@@ -30,6 +38,33 @@ export interface ClearanceRoute3Details {
   ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null;
   custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null;
   truckPortEntryPermitDate: string | null; clearanceActualCompletedDate: string | null;
+}
+
+export interface FzDepositOption {
+  shipmentId: number;
+  blAwbNo: string;
+  depositRefNo: string | null;
+}
+
+export interface FzBalanceLine {
+  shipmentLineItemId: number;
+  modelProduct: string;
+  deposited: number;
+  withdrawn: number;
+  balance: number;
+}
+
+export interface FzInventoryRow {
+  shipmentId: number;
+  businessUnit: string;
+  blAwbNo: string;
+  depositRefNo: string | null;
+  dateOfDeposit: string | null;
+  division: string | null;
+  categories: string[];
+  totalQty: number;
+  totalWithdrawn: number;
+  balance: number;
 }
 
 export interface ClearanceDeliveryOrder {
