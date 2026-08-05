@@ -4,13 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
+import { SectionLockBadge } from '../../section-lock/section-lock-badge';
+import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { ErpColumn, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
 
 type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'banking' | 'erpInfo';
 
 @Component({
   selector: 'app-update-shipment',
-  imports: [CommonModule, FormsModule, ThousandsInputDirective, RouterLink],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective, RouterLink, SectionLockBadge],
   templateUrl: './update-shipment.html'
 })
 export class UpdateShipment implements OnInit {
@@ -41,6 +43,22 @@ export class UpdateShipment implements OnInit {
   savingErpColumn: Record<number, boolean> = {};
   loadingErpInfo = false;
 
+  locks: Record<string, SectionLockInfo | null> = {};
+
+  loadLocks(): void {
+    this.lockService.getLocks('Shipment', this.shipmentId).subscribe({
+      next: (list) => {
+        this.locks = {};
+        for (const l of list) this.locks[l.sectionKey] = l;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  isLocked(key: string): boolean {
+    return !!this.locks[key];
+  }
+
   shipOnBoardForm = { sobActualDate: '' };
   confirming = false;
 
@@ -56,7 +74,7 @@ export class UpdateShipment implements OnInit {
     tenorId: null as number | null
   };
 
-  constructor(private lookups: SettingsLookupService, private service: UpdateShipmentService) {}
+  constructor(private lookups: , private service: UpdateShipmentService) {}
 
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
