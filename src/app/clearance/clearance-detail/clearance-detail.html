@@ -104,6 +104,9 @@
           </span>
         </div>
         <div *ngIf="expanded === 'costEstimate'" style="padding: 16px;">
+          <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+            <app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="costEstimate" [lockInfo]="locks['costEstimate']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+          </div>
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Estimate Date</label><input type="date" [(ngModel)]="costEstimateForm.estimateDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div>
@@ -117,8 +120,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Amount Settled Date</label><input type="date" [(ngModel)]="costEstimateForm.amountSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveCostEstimate(false)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveCostEstimate(true)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCostEstimate ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveCostEstimate(false)" [disabled]="savingCostEstimate || isLocked('costEstimate')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveCostEstimate(true)" [disabled]="savingCostEstimate || isLocked('costEstimate')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCostEstimate ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('deliveryOrder')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -134,6 +137,9 @@
           </span>
         </div>
         <div *ngIf="expanded === 'deliveryOrder'" style="padding: 16px;">
+          <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+            <app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="deliveryOrder" [lockInfo]="locks['deliveryOrder']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+          </div>
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Copy of DO Collected Date</label><input type="date" [(ngModel)]="deliveryOrderForm.copyOfDoCollectedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Receive DO Date</label><input type="date" [(ngModel)]="deliveryOrderForm.receiveDoDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
@@ -144,8 +150,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">DO Received Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveDeliveryOrder(false)" [disabled]="savingDeliveryOrder" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveDeliveryOrder(true)" [disabled]="savingDeliveryOrder" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingDeliveryOrder ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveDeliveryOrder(false)" [disabled]="savingDeliveryOrder || isLocked('deliveryOrder')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveDeliveryOrder(true)" [disabled]="savingDeliveryOrder || isLocked('deliveryOrder')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingDeliveryOrder ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('certificateEntry')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -161,13 +167,16 @@
           </span>
         </div>
         <div *ngIf="expanded === 'certificateEntry'" style="padding: 16px;">
+          <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+            <app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="certificateEntry" [lockInfo]="locks['certificateEntry']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+          </div>
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Certificate Entry Date</label><input type="date" [(ngModel)]="certificateEntryForm.certificateEntryDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SCUDA Declaration No.</label><input [(ngModel)]="certificateEntryForm.scudaDeclarationNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveCertificateEntry(false)" [disabled]="savingCertificateEntry" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveCertificateEntry(true)" [disabled]="savingCertificateEntry" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCertificateEntry ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveCertificateEntry(false)" [disabled]="savingCertificateEntry || isLocked('certificateEntry')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveCertificateEntry(true)" [disabled]="savingCertificateEntry || isLocked('certificateEntry')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCertificateEntry ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle(activeRouteGroups[0]?.key ?? '')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
