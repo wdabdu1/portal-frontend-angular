@@ -9,7 +9,7 @@
       <div>
         <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Shipment {{ detail.blAwbNo }}</h1>
         <p style="color: #888; font-size: 13px;">
-          {{ detail.businessUnit }}<span *ngIf="detail.division"> — {{ detail.division }}</span> — PO {{ detail.poNumber }}<span *ngIf="detail.supplier"> — {{ detail.supplier }}</span> — {{ detail.consignee }} — {{ detail.category }} — Status: {{ detail.status }}
+          {{ detail.businessUnit }}<span *ngIf="detail.division"> — {{ detail.division }}</span> — PO {{ detail.poNumber }}<span *ngIf="detail.supplier"> — {{ detail.supplier }}</span> — {{ detail.consignee }} — {{ detail.category }}<span *ngIf="detail.vesselName"> — Vessel: {{ detail.vesselName }}</span> — Status: {{ detail.status }}
         </p>
         <p style="color: #888; font-size: 13px;">
           {{ detail.fcl20Count }}× 20' + {{ detail.fcl40Count }}× 40' —
