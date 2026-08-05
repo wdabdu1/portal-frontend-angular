@@ -101,6 +101,9 @@ export class ClearanceDetailComponent implements OnInit {
     return !!this.locks[key];
   }
 
+  get activeRouteLockKey(): string {
+    return `route${this.detail?.route ?? this.selectedRoute}`;
+  }
   constructor(private service: ClearanceService, private lockService: SectionLockService) {}
 
   ngOnInit(): void {
