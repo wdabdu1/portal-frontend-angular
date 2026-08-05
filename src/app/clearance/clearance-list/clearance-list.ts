@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { ClearanceService, ClearanceShipmentSummary } from '../clearance.service';
 
 type SortColumn = keyof ClearanceShipmentSummary;
@@ -28,10 +29,22 @@ export class ClearanceList implements OnInit {
   sortColumn: SortColumn = 'eta';
   sortAsc = true;
 
-  constructor(private service: ClearanceService, private router: Router) {}
+  filterBusinessUnit = '';
+  filterCategory = '';
+
+  constructor(private service: ClearanceService, private router: Router, private tablePrefs: TablePreferencesService) {}
 
   ngOnInit(): void {
-    this.load();
+    this.tablePrefs.get('clearance').subscribe({
+      next: (pref) => {
+        if (pref) {
+          this.sortColumn = pref.sortColumn as SortColumn;
+          this.sortAsc = pref.sortAsc;
+        }
+        this.load();
+      },
+      error: () => this.load()
+    });
   }
 
   load(): void {
@@ -46,9 +59,21 @@ export class ClearanceList implements OnInit {
     this.load();
   }
 
+  get businessUnitOptions(): string[] {
+    return [...new Set(this.allShipments.map((s) => s.businessUnit))].sort();
+  }
+
+  get categoryOptions(): string[] {
+    return [...new Set(this.allShipments.map((s) => s.category))].sort();
+  }
+
   get shipments(): ClearanceShipmentSummary[] {
+    let filtered = this.allShipments;
+    if (this.filterBusinessUnit) filtered = filtered.filter((s) => s.businessUnit === this.filterBusinessUnit);
+    if (this.filterCategory) filtered = filtered.filter((s) => s.category === this.filterCategory);
+
     const dir = this.sortAsc ? 1 : -1;
-    return [...this.allShipments].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const av = a[this.sortColumn];
       const bv = b[this.sortColumn];
       if (av === null || av === undefined) return 1;
@@ -66,6 +91,7 @@ export class ClearanceList implements OnInit {
       this.sortColumn = column;
       this.sortAsc = true;
     }
+    this.tablePrefs.save('clearance', this.sortColumn, this.sortAsc).subscribe();
   }
 
   routeLabel(status: string): string {
