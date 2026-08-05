@@ -65,8 +65,8 @@ export class UpdateShipment implements OnInit {
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
   acdForm = { processDate: '', costSettledDate: '', refNumber: '' };
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
-  ssmoForm = { applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '' };
-  motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', offshoreApprovedPiNumber: '', offshoreApprovedPiDate: '' };
+  ssmoForm = { applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '' };
+  motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '', offshoreApprovedPiNumber: '' };
   supplierFullSetForm = { supplierInvoiceNo: '', supplierInvoiceDate: '', fsDispatchDate: '', fsDispatchedViaId: null as number | null, fsTrackingNumber: '', fsReceivedDate: '' };
   bankingForm = {
     senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
@@ -102,10 +102,10 @@ export class UpdateShipment implements OnInit {
           finalDraftReceivedDate: detail.draftDocuments.finalDraftReceivedDate ?? '',
           finalDraftConfirmedDate: detail.draftDocuments.finalDraftConfirmedDate ?? ''
         };
-        if (detail.ssmo) this.ssmoForm = { applicationDate: detail.ssmo.applicationDate ?? '', cost: detail.ssmo.cost, costSettledDate: detail.ssmo.costSettledDate ?? '', refNumber: detail.ssmo.refNumber ?? '' };
+        if (detail.ssmo) this.ssmoForm = { applicationDate: detail.ssmo.applicationDate ?? '', cost: detail.ssmo.cost, costSettledDate: detail.ssmo.costSettledDate ?? '', refNumber: detail.ssmo.refNumber ?? '', approvalDate: detail.ssmo.approvalDate ?? '' };
         if (detail.mot) this.motForm = {
           processDate: detail.mot.processDate ?? '', cost: detail.mot.cost, costSettledDate: detail.mot.costSettledDate ?? '', refNumber: detail.mot.refNumber ?? '',
-          offshoreApprovedPiNumber: detail.mot.offshoreApprovedPiNumber ?? '', offshoreApprovedPiDate: detail.mot.offshoreApprovedPiDate ?? ''
+          approvalDate: detail.mot.approvalDate ?? '', offshoreApprovedPiNumber: detail.mot.offshoreApprovedPiNumber ?? ''
         };
         if (detail.supplierFullSet) this.supplierFullSetForm = {
           supplierInvoiceNo: detail.supplierFullSet.supplierInvoiceNo ?? '', supplierInvoiceDate: detail.supplierFullSet.supplierInvoiceDate ?? '',
@@ -259,15 +259,16 @@ export class UpdateShipment implements OnInit {
   saveSsmo(andNext: boolean): void {
     this.genericSave('ssmo', () => this.service.saveSsmo(this.shipmentId, {
       applicationDate: this.ssmoForm.applicationDate || null, cost: this.ssmoForm.cost,
-      costSettledDate: this.ssmoForm.costSettledDate || null, refNumber: this.ssmoForm.refNumber || null
+      costSettledDate: this.ssmoForm.costSettledDate || null, refNumber: this.ssmoForm.refNumber || null,
+      approvalDate: this.ssmoForm.approvalDate || null
     }), andNext);
   }
 
   saveMot(andNext: boolean): void {
     this.genericSave('mot', () => this.service.saveMot(this.shipmentId, {
       processDate: this.motForm.processDate || null, cost: this.motForm.cost, costSettledDate: this.motForm.costSettledDate || null,
-      refNumber: this.motForm.refNumber || null, offshoreApprovedPiNumber: this.motForm.offshoreApprovedPiNumber || null,
-      offshoreApprovedPiDate: this.motForm.offshoreApprovedPiDate || null
+      refNumber: this.motForm.refNumber || null, approvalDate: this.motForm.approvalDate || null,
+      offshoreApprovedPiNumber: this.motForm.offshoreApprovedPiNumber || null
     }), andNext);
   }
 
