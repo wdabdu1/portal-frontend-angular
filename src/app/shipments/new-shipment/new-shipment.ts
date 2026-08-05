@@ -36,6 +36,7 @@ export class NewShipment implements OnInit {
   etd = '';
   eta = '';
   shippingLineId: number | null = null;
+  vesselName = '';
   fcl20Count = 0;
   fcl40Count = 0;
   soc = false;
@@ -125,6 +126,7 @@ export class NewShipment implements OnInit {
         etd: this.etd || undefined,
         eta: this.eta || undefined,
         shippingLineId: this.shippingLineId!,
+        vesselName: this.vesselName || null,
         fcl20Count: this.fcl20Count,
         fcl40Count: this.fcl40Count,
         soc: this.soc,
