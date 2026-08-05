@@ -19,7 +19,7 @@ export interface ErpColumnDetail {
 export interface ShipmentFullDetail {
   id: number;
   blAwbNo: string;
-  poNumber: string;
+  poNumber: string | null;
   status: string;
   businessUnit: string;
   division: string | null;
