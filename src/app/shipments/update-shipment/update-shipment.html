@@ -14,6 +14,9 @@
         <span [style.background]="sectionStatus('shipOnBoard') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('shipOnBoard') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('shipOnBoard') }}</span>
       </div>
       <div *ngIf="expandedSection === 'shipOnBoard'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="shipOnBoard" [lockInfo]="locks['shipOnBoard']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
             <label style="display:block; font-size:12px; color:#555;">SOB Actual Date</label>
@@ -21,8 +24,8 @@
           </div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
-          <button (click)="saveShipOnBoard(false)" [disabled]="saving.shipOnBoard" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-          <button (click)="saveShipOnBoard(true)" [disabled]="saving.shipOnBoard" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.shipOnBoard ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="saveShipOnBoard(false)" [disabled]="saving.shipOnBoard || isLocked('shipOnBoard')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveShipOnBoard(true)" [disabled]="saving.shipOnBoard || isLocked('shipOnBoard')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.shipOnBoard ? 'Saving...' : 'Save & Next' }}</button>
           <button (click)="goToNext('shipOnBoard')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
