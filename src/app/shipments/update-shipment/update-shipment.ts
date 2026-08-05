@@ -74,7 +74,7 @@ export class UpdateShipment implements OnInit {
     tenorId: null as number | null
   };
 
-  constructor(private lookups: , private service: UpdateShipmentService) {}
+  constructor(private lookups: SettingsLookupService, private service: UpdateShipmentService, private lockService: SectionLockService) {}
 
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('id'));
@@ -87,6 +87,7 @@ export class UpdateShipment implements OnInit {
     this.lookups.getAll<LookupEntity>('tenors').subscribe({ next: (r) => { this.tenors = r; this.cdr.markForCheck(); } });
 
     this.loadDetail();
+    this.loadLocks();
   }
 
   loadDetail(): void {
