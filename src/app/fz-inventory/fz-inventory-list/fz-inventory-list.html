@@ -2,6 +2,13 @@
   <h1 style="font-size: 20px; font-weight: 500;">FZ Inventory</h1>
   <p style="color: #888; font-size: 13px;">Open Free Zone deposits with remaining balance. Click a column header to sort.</p>
 
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
+    <select [(ngModel)]="filterBusinessUnit" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All Business Units</option>
+      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
+    </select>
+  </div>
+
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
 
