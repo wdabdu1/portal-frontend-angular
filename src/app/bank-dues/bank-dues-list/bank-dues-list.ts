@@ -2,15 +2,40 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
+import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
+import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { BankDueRow, BankDuesService, CollectionRecord } from '../bank-dues.service';
 
 type SortColumn = keyof BankDueRow;
 
+interface ColumnDef {
+  key: SortColumn;
+  label: string;
+}
+
+const DEFAULT_COLUMNS: ColumnDef[] = [
+  { key: 'businessUnit', label: 'BU' },
+  { key: 'consignee', label: 'Consignee' },
+  { key: 'receiverBank', label: 'Receiver Bank' },
+  { key: 'blAwbNo', label: 'BL/AWB' },
+  { key: 'sob', label: 'Actual SOB' },
+  { key: 'lastOffshoreInvoiceNo', label: 'Last Offshore Invoice No.' },
+  { key: 'tenorDays', label: 'Tenor' },
+  { key: 'dueDate', label: 'Due Date' },
+  { key: 'imFormNo', label: 'IM Form No.' },
+  { key: 'imFormDate', label: 'IM Form Date' },
+  { key: 'value', label: 'Value' },
+  { key: 'currency', label: 'Currency' },
+  { key: 'valueAed', label: 'Value (AED)' },
+  { key: 'paidAed', label: 'Paid (AED)' },
+  { key: 'balanceAed', label: 'Balance (AED)' }
+];
+
 @Component({
   selector: 'app-bank-dues-list',
-  imports: [CommonModule, FormsModule, ThousandsInputDirective],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective, ExcelHeaderFilter],
   templateUrl: './bank-dues-list.html'
 })
 export class BankDuesList implements OnInit {
@@ -25,7 +50,10 @@ export class BankDuesList implements OnInit {
 
   currencies: LookupEntity[] = [];
 
-  filterBusinessUnit = '';
+  columns: ColumnDef[] = [...DEFAULT_COLUMNS];
+  private dragFromIndex: number | null = null;
+
+  filters: Record<string, Set<string>> = {};
 
   selectedShipmentId: number | null = null;
   selectedRow: BankDueRow | null = null;
@@ -51,6 +79,40 @@ export class BankDuesList implements OnInit {
       },
       error: () => this.load()
     });
+
+    this.tablePrefs.getColumnOrder('bankDues').subscribe({
+      next: (order) => { if (order && order.length > 0) this.applyColumnOrder(order); }
+    });
+  }
+
+  private applyColumnOrder(savedOrder: string[]): void {
+    const byKey = new Map(DEFAULT_COLUMNS.map((c) => [c.key, c]));
+    const ordered: ColumnDef[] = [];
+    for (const key of savedOrder) {
+      const col = byKey.get(key as SortColumn);
+      if (col) { ordered.push(col); byKey.delete(key as SortColumn); }
+    }
+    ordered.push(...byKey.values());
+    this.columns = ordered;
+    this.cdr.markForCheck();
+  }
+
+  onDragStart(index: number): void {
+    this.dragFromIndex = index;
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  onDrop(index: number): void {
+    if (this.dragFromIndex === null || this.dragFromIndex === index) return;
+    const cols = [...this.columns];
+    const [moved] = cols.splice(this.dragFromIndex, 1);
+    cols.splice(index, 0, moved);
+    this.columns = cols;
+    this.dragFromIndex = null;
+    this.tablePrefs.saveColumnOrder('bankDues', cols.map((c) => c.key)).subscribe();
   }
 
     load(): void {
@@ -70,8 +132,28 @@ export class BankDuesList implements OnInit {
     });
   }
 
-  get businessUnitOptions(): string[] {
-    return [...new Set(this.allRows.map((r) => r.businessUnit))].sort();
+  private ensureFilterKey(key: string): void {
+    if (!this.filters[key]) this.filters[key] = new Set();
+  }
+
+  private getValue(row: BankDueRow, col: string): string {
+    return String((row as any)[col] ?? '');
+  }
+
+  optionsFor(col: string): string[] {
+    this.ensureFilterKey(col);
+    return columnOptions(this.allRows, this.filters, col, (r, c) => this.getValue(r, c));
+  }
+
+  onFilterChange(col: string, values: Set<string>): void {
+    this.filters[col] = values;
+    this.cdr.markForCheck();
+  }
+
+  isColumnFiltered(col: string): boolean {
+    const selected = this.filters[col];
+    if (!selected || selected.size === 0) return false;
+    return selected.size < this.optionsFor(col).length;
   }
 
   get rows(): BankDueRow[] {
@@ -85,7 +167,7 @@ export class BankDuesList implements OnInit {
         (r.imFormNo ?? '').toLowerCase().includes(q)
       );
     }
-    if (this.filterBusinessUnit) filtered = filtered.filter((r) => r.businessUnit === this.filterBusinessUnit);
+    filtered = applyFilters(filtered, this.filters, (r, col) => this.getValue(r, col));
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
       const av = a[this.sortColumn];
