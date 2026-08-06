@@ -72,7 +72,7 @@ export class FzInventoryList implements OnInit {
   loadWithdrawals(): void {
     this.loadingWithdrawals = true;
     this.withdrawalService.getAll().subscribe({
-      next: (r) => { this.withdrawals = r; this.loadingWithdrawals = false; this.cdr.markForCheck(); },
+      next: (r) => { this.withdrawals = r.filter((w) => !w.isCompleted); this.loadingWithdrawals = false; this.cdr.markForCheck(); },
       error: () => { this.loadingWithdrawals = false; this.cdr.markForCheck(); }
     });
   }
