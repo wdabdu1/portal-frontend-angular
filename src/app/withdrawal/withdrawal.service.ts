@@ -8,6 +8,7 @@ export interface WithdrawalSummary {
   depositBlAwbNo: string;
   withdrawalRequestDate: string | null;
   withdrawalRequestRefNo: string | null;
+  isCompleted: boolean;
 }
 
 export interface WithdrawalDetail {
