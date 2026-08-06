@@ -134,11 +134,16 @@ export class WithdrawalDetailComponent implements OnInit {
     this.service.saveLineItems(this.withdrawalId, lines).subscribe({
       next: () => {
         this.savingLineItems = false;
+        this.error = '';
         this.loadBalance();
         if (andNext) this.expanded = 'generalInfo';
         this.cdr.markForCheck();
       },
-      error: () => { this.savingLineItems = false; this.error = 'Could not save withdrawal quantities.'; this.cdr.markForCheck(); }
+      error: (err) => {
+        this.savingLineItems = false;
+        this.error = err?.error?.message || 'Could not save withdrawal quantities.';
+        this.cdr.markForCheck();
+      }
     });
   }
 
