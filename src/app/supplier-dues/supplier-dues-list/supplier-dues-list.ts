@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
+import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
+import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import {
@@ -10,9 +12,28 @@ import {
 
 type SortColumn = keyof SupplierDueRow;
 
+interface ColumnDef {
+  key: SortColumn;
+  label: string;
+}
+
+const DEFAULT_COLUMNS: ColumnDef[] = [
+  { key: 'businessUnit', label: 'BU' },
+  { key: 'supplierName', label: 'Supplier' },
+  { key: 'poNumber', label: 'PO No.' },
+  { key: 'supplierInvoiceNo', label: 'Sup. Invoice No.' },
+  { key: 'blAwbNo', label: 'AWB/BL' },
+  { key: 'sob', label: 'SOB' },
+  { key: 'paymentTerm', label: 'Payment Term' },
+  { key: 'invoiceValue', label: 'Invoice Value' },
+  { key: 'invoiceCurrency', label: 'Currency' },
+  { key: 'totalValueUsd', label: 'Total Value $' },
+  { key: 'totalUnpaidUsd', label: 'Total Unpaid $' }
+];
+
 @Component({
   selector: 'app-supplier-dues-list',
-  imports: [CommonModule, FormsModule, ThousandsInputDirective],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective, ExcelHeaderFilter],
   templateUrl: './supplier-dues-list.html'
 })
 export class SupplierDuesList implements OnInit {
@@ -27,8 +48,10 @@ export class SupplierDuesList implements OnInit {
 
   currencies: LookupEntity[] = [];
 
-  filterBusinessUnit = '';
-  filterPaymentTerm = '';
+  columns: ColumnDef[] = [...DEFAULT_COLUMNS];
+  private dragFromIndex: number | null = null;
+
+  filters: Record<string, Set<string>> = {};
 
   selectedShipmentId: number | null = null;
   summary: SupplierInvoiceSummary | null = null;
