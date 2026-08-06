@@ -77,7 +77,42 @@ export class SupplierDuesList implements OnInit {
       },
       error: () => this.load()
     });
+
+    this.tablePrefs.getColumnOrder('supplierDues').subscribe({
+      next: (order) => { if (order && order.length > 0) this.applyColumnOrder(order); }
+    });
   }
+
+  private applyColumnOrder(savedOrder: string[]): void {
+    const byKey = new Map(DEFAULT_COLUMNS.map((c) => [c.key, c]));
+    const ordered: ColumnDef[] = [];
+    for (const key of savedOrder) {
+      const col = byKey.get(key as SortColumn);
+      if (col) { ordered.push(col); byKey.delete(key as SortColumn); }
+    }
+    ordered.push(...byKey.values());
+    this.columns = ordered;
+    this.cdr.markForCheck();
+  }
+
+  onDragStart(index: number): void {
+    this.dragFromIndex = index;
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  onDrop(index: number): void {
+    if (this.dragFromIndex === null || this.dragFromIndex === index) return;
+    const cols = [...this.columns];
+    const [moved] = cols.splice(this.dragFromIndex, 1);
+    cols.splice(index, 0, moved);
+    this.columns = cols;
+    this.dragFromIndex = null;
+    this.tablePrefs.saveColumnOrder('supplierDues', cols.map((c) => c.key)).subscribe();
+  }
+
   load(): void {
     this.loading = true;
     this.service.getOpen().subscribe({
@@ -86,12 +121,28 @@ export class SupplierDuesList implements OnInit {
     });
   }
 
-  get businessUnitOptions(): string[] {
-    return [...new Set(this.allRows.map((r) => r.businessUnit))].sort();
+  private ensureFilterKey(key: string): void {
+    if (!this.filters[key]) this.filters[key] = new Set();
   }
 
-  get paymentTermOptions(): string[] {
-    return [...new Set(this.allRows.map((r) => r.paymentTerm))].sort();
+  private getValue(row: SupplierDueRow, col: string): string {
+    return String((row as any)[col] ?? '');
+  }
+
+  optionsFor(col: string): string[] {
+    this.ensureFilterKey(col);
+    return columnOptions(this.allRows, this.filters, col, (r, c) => this.getValue(r, c));
+  }
+
+  onFilterChange(col: string, values: Set<string>): void {
+    this.filters[col] = values;
+    this.cdr.markForCheck();
+  }
+
+  isColumnFiltered(col: string): boolean {
+    const selected = this.filters[col];
+    if (!selected || selected.size === 0) return false;
+    return selected.size < this.optionsFor(col).length;
   }
 
   get rows(): SupplierDueRow[] {
@@ -104,8 +155,7 @@ export class SupplierDuesList implements OnInit {
         r.blAwbNo.toLowerCase().includes(q)
       );
     }
-    if (this.filterBusinessUnit) filtered = filtered.filter((r) => r.businessUnit === this.filterBusinessUnit);
-    if (this.filterPaymentTerm) filtered = filtered.filter((r) => r.paymentTerm === this.filterPaymentTerm);
+    filtered = applyFilters(filtered, this.filters, (r, col) => this.getValue(r, col));
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
       const av = a[this.sortColumn];
