@@ -11,6 +11,7 @@
       <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
     </select>
   </div>
+  <p style="color: #888; font-size: 12px; margin-top: 6px;">Drag a column header to reorder it — your layout is saved automatically.</p>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
@@ -18,42 +19,42 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">Business Unit</th>
-        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO Number</th>
-        <th (click)="sortBy('supplier')" style="padding: 8px 6px; cursor: pointer;">Supplier</th>
-        <th (click)="sortBy('lineItemCount')" style="padding: 8px 6px; cursor: pointer;">Line Items</th>
-        <th (click)="sortBy('orderValueUsd')" style="padding: 8px 6px; cursor: pointer;">Order Value</th>
-        <th (click)="sortBy('percentShipped')" style="padding: 8px 6px; cursor: pointer;">% Shipped</th>
-        <th (click)="sortBy('status')" style="padding: 8px 6px; cursor: pointer;">Status</th>
-        <th (click)="sortBy('createdAt')" style="padding: 8px 6px; cursor: pointer;">Created</th>
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          style="padding: 8px 6px; cursor: grab; user-select: none;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+        </th>
         <th style="padding: 8px 6px;"></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let o of orders" (click)="viewDetails(o.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
-        <td style="padding: 8px 6px;">{{ o.businessUnit }}</td>
-        <td style="padding: 8px 6px; font-family: monospace;">{{ o.poNumber }}</td>
-        <td style="padding: 8px 6px;">{{ o.supplier }}</td>
-        <td style="padding: 8px 6px;">{{ o.lineItemCount }}</td>
-        <td style="padding: 8px 6px;">{{ o.orderValueUsd | number: '1.2-2' }} USD</td>
-        <td style="padding: 8px 6px;">
-          <div style="display:flex; align-items:center; gap:6px;">
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'poNumber'" style="font-family: monospace;">{{ o.poNumber }}</span>
+          <span *ngSwitchCase="'orderValueUsd'">{{ o.orderValueUsd | number: '1.2-2' }} USD</span>
+          <div *ngSwitchCase="'percentShipped'" style="display:flex; align-items:center; gap:6px;">
             <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
               <div [style.width.%]="o.percentShipped" [style.background]="o.percentShipped >= 100 ? '#1e7e34' : '#0a3d62'" style="height:100%;"></div>
             </div>
             <span style="font-size:12px; color:#666;">{{ o.percentShipped | number: '1.0-0' }}%</span>
           </div>
-        </td>
-        <td style="padding: 8px 6px;">
-          <span
-            [style.background]="o.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
-            [style.color]="o.status === 'Confirmed' ? '#1e7e34' : '#a66a00'"
-            style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
-          >
-            {{ o.status }}
+          <span *ngSwitchCase="'status'">
+            <span
+              [style.background]="o.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
+              [style.color]="o.status === 'Confirmed' ? '#1e7e34' : '#a66a00'"
+              style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
+            >
+              {{ o.status }}
+            </span>
           </span>
+          <span *ngSwitchCase="'createdAt'" style="color: #888; font-size: 12px;">{{ o.createdAt | date: 'MMM d, y' }}</span>
+          <span *ngSwitchDefault>{{ o[col.key] }}</span>
         </td>
-        <td style="padding: 8px 6px; color: #888; font-size: 12px;">{{ o.createdAt | date: 'MMM d, y' }}</td>
         <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
           <button
             *ngIf="o.status === 'Draft' && auth.canCreateOrders()"
