@@ -1,16 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { ClearanceService, FzInventoryItemRow } from '../../clearance/clearance.service';
+import { FzDepositOption, WithdrawalService } from '../../withdrawal/withdrawal.service';
 
 type SortColumn = keyof FzInventoryItemRow;
 type FilterColumn = 'businessUnit' | 'category' | 'modelProduct' | 'depositRefNo';
 
 @Component({
   selector: 'app-fz-inventory-list',
-  imports: [CommonModule, ExcelHeaderFilter],
+  imports: [CommonModule, FormsModule, ExcelHeaderFilter],
   templateUrl: './fz-inventory-list.html'
 })
 export class FzInventoryList implements OnInit {
@@ -30,7 +33,38 @@ export class FzInventoryList implements OnInit {
     depositRefNo: new Set()
   };
 
-  constructor(private service: ClearanceService, private tablePrefs: TablePreferencesService) {}
+  depositOptions: FzDepositOption[] = [];
+  showNewWithdrawalForm = false;
+  newWithdrawalDepositId: number | null = null;
+  creatingWithdrawal = false;
+
+  constructor(
+    private service: ClearanceService,
+    private tablePrefs: TablePreferencesService,
+    private withdrawalService: WithdrawalService,
+    private router: Router
+  ) {}
+
+  toggleNewWithdrawalForm(): void {
+    this.showNewWithdrawalForm = !this.showNewWithdrawalForm;
+    if (this.showNewWithdrawalForm && this.depositOptions.length === 0) {
+      this.withdrawalService.getDepositOptions().subscribe({
+        next: (r) => { this.depositOptions = r; this.cdr.markForCheck(); }
+      });
+    }
+  }
+
+  startWithdrawal(): void {
+    if (!this.newWithdrawalDepositId) return;
+    this.creatingWithdrawal = true;
+    this.withdrawalService.create(this.newWithdrawalDepositId).subscribe({
+      next: (w) => {
+        this.creatingWithdrawal = false;
+        this.router.navigate(['/withdrawals', w.id]);
+      },
+      error: () => { this.creatingWithdrawal = false; this.error = 'Could not start withdrawal.'; this.cdr.markForCheck(); }
+    });
+  }
 
   ngOnInit(): void {
     this.tablePrefs.get('fzInventory').subscribe({
