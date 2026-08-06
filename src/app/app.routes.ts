@@ -24,6 +24,7 @@ import { ClearanceDetailComponent } from './clearance/clearance-detail/clearance
 import { ClearanceSla } from './settings/clearance-sla/clearance-sla';
 import { HomeRedirect } from './home-redirect';
 import { FzInventoryList } from './fz-inventory/fz-inventory-list/fz-inventory-list';
+import { WithdrawalDetailComponent } from './withdrawal/withdrawal-detail/withdrawal-detail';
 
 
 export const routes: Routes = [
@@ -54,6 +55,7 @@ export const routes: Routes = [
   { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard] },
   { path: 'users', component: Users, canActivate: [authGuard] },
   { path: 'fz-inventory', component: FzInventoryList, canActivate: [authGuard] },
+  { path: 'withdrawals/:id', component: WithdrawalDetailComponent, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
