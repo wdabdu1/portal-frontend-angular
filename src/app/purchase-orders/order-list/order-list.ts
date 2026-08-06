@@ -8,6 +8,22 @@ import { PurchaseOrderSummary, PurchaseOrdersService } from '../purchase-orders.
 
 type SortColumn = keyof PurchaseOrderSummary;
 
+interface ColumnDef {
+  key: SortColumn;
+  label: string;
+}
+
+const DEFAULT_COLUMNS: ColumnDef[] = [
+  { key: 'businessUnit', label: 'Business Unit' },
+  { key: 'poNumber', label: 'PO Number' },
+  { key: 'supplier', label: 'Supplier' },
+  { key: 'lineItemCount', label: 'Line Items' },
+  { key: 'orderValueUsd', label: 'Order Value' },
+  { key: 'percentShipped', label: '% Shipped' },
+  { key: 'status', label: 'Status' },
+  { key: 'createdAt', label: 'Created' }
+];
+
 @Component({
   selector: 'app-order-list',
   imports: [CommonModule, FormsModule],
@@ -26,6 +42,9 @@ export class OrderList implements OnInit {
 
   filterBusinessUnit = '';
   filterStatus = '';
+
+  columns: ColumnDef[] = [...DEFAULT_COLUMNS];
+  private dragFromIndex: number | null = null;
 
   constructor(
     private ordersService: PurchaseOrdersService,
@@ -49,6 +68,45 @@ export class OrderList implements OnInit {
       },
       error: () => this.load()
     });
+
+    this.tablePrefs.getColumnOrder('orders').subscribe({
+      next: (order) => {
+        if (order && order.length > 0) this.applyColumnOrder(order);
+      }
+    });
+  }
+
+  // Reorders `columns` to match the saved key order; any column not in the
+  // saved list (e.g. a new one added later) is appended at the end; any
+  // saved key no longer valid is silently dropped.
+  private applyColumnOrder(savedOrder: string[]): void {
+    const byKey = new Map(DEFAULT_COLUMNS.map((c) => [c.key, c]));
+    const ordered: ColumnDef[] = [];
+    for (const key of savedOrder) {
+      const col = byKey.get(key as SortColumn);
+      if (col) { ordered.push(col); byKey.delete(key as SortColumn); }
+    }
+    ordered.push(...byKey.values());
+    this.columns = ordered;
+    this.cdr.markForCheck();
+  }
+
+  onDragStart(index: number): void {
+    this.dragFromIndex = index;
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  onDrop(index: number): void {
+    if (this.dragFromIndex === null || this.dragFromIndex === index) return;
+    const cols = [...this.columns];
+    const [moved] = cols.splice(this.dragFromIndex, 1);
+    cols.splice(index, 0, moved);
+    this.columns = cols;
+    this.dragFromIndex = null;
+    this.tablePrefs.saveColumnOrder('orders', cols.map((c) => c.key)).subscribe();
   }
 
   load(): void {
