@@ -30,7 +30,8 @@ export class FzInventoryList implements OnInit {
     businessUnit: new Set(),
     category: new Set(),
     modelProduct: new Set(),
-    depositRefNo: new Set()
+    depositRefNo: new Set(),
+    blAwbNo: new Set()
   };
 
   depositOptions: FzDepositOption[] = [];
@@ -144,6 +145,11 @@ export class FzInventoryList implements OnInit {
       withdrawn: rows.reduce((s, r) => s + r.qtyWithdrawn, 0),
       stock: rows.reduce((s, r) => s + r.currentStock, 0)
     };
+  }
+
+  sortIndicator(column: SortColumn): string {
+    if (this.sortColumn !== column) return '';
+    return this.sortAsc ? ' ▲' : ' ▼';
   }
 
   sortBy(column: SortColumn): void {
