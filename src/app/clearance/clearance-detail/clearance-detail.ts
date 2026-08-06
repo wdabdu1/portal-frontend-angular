@@ -48,7 +48,8 @@ export class ClearanceDetailComponent implements OnInit {
 
   generalInfoForm = {
     copyOfBlReceivedDate: '', originalShipmentSetReceivedDate: '', shipmentEta: '',
-    lcNo: '', imFormNo: '', imFormDate: ''
+    lcNo: '', imFormNo: '', imFormDate: '',
+    withdrawalRequestDate: '', withdrawalRequestRefNo: ''
   };
 
   deliveryOrderForm: ClearanceDeliveryOrder = { copyOfDoCollectedDate: null, receiveDoDate: null, actualArrivalDate: null, depositRequired: false, doActualFeesSdg: null, doFeesSettledDate: null, doReceivedDate: null };
@@ -203,7 +204,9 @@ export class ClearanceDetailComponent implements OnInit {
           shipmentEta: detail.eta ?? '',
           lcNo: detail.lcNo ?? '',
           imFormNo: detail.imFormNo ?? '',
-          imFormDate: detail.imFormDate ?? ''
+          imFormDate: detail.imFormDate ?? '',
+          withdrawalRequestDate: detail.withdrawalRequestDate ?? '',
+          withdrawalRequestRefNo: detail.withdrawalRequestRefNo ?? ''
         };
         this.loading = false;
         this.loadGeneralSubSections();
@@ -289,7 +292,9 @@ export class ClearanceDetailComponent implements OnInit {
       lcNo: this.generalInfoForm.lcNo || null,
       imFormNo: this.generalInfoForm.imFormNo || null,
       imFormDate: this.generalInfoForm.imFormDate || null,
-      shipmentEta: this.generalInfoForm.shipmentEta || null
+      shipmentEta: this.generalInfoForm.shipmentEta || null,
+      withdrawalRequestDate: this.generalInfoForm.withdrawalRequestDate || null,
+      withdrawalRequestRefNo: this.generalInfoForm.withdrawalRequestRefNo || null
     } as any).subscribe({
       next: () => {
         this.savingGeneralInfo = false;
