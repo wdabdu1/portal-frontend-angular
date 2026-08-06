@@ -6,7 +6,7 @@ import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { ClearanceService, FzInventoryItemRow } from '../../clearance/clearance.service';
-import { FzDepositOption, WithdrawalService } from '../../withdrawal/withdrawal.service';
+import { FzDepositOption, WithdrawalService, WithdrawalSummary } from '../../withdrawal/withdrawal.service';
 
 type SortColumn = keyof FzInventoryItemRow;
 type FilterColumn = 'businessUnit' | 'category' | 'modelProduct' | 'depositRefNo';
@@ -38,6 +38,9 @@ export class FzInventoryList implements OnInit {
   newWithdrawalDepositId: number | null = null;
   creatingWithdrawal = false;
 
+  withdrawals: WithdrawalSummary[] = [];
+  loadingWithdrawals = true;
+
   constructor(
     private service: ClearanceService,
     private tablePrefs: TablePreferencesService,
@@ -66,7 +69,20 @@ export class FzInventoryList implements OnInit {
     });
   }
 
+  loadWithdrawals(): void {
+    this.loadingWithdrawals = true;
+    this.withdrawalService.getAll().subscribe({
+      next: (r) => { this.withdrawals = r; this.loadingWithdrawals = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingWithdrawals = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  openWithdrawal(id: number): void {
+    this.router.navigate(['/withdrawals', id]);
+  }
+
   ngOnInit(): void {
+    this.loadWithdrawals();
     this.tablePrefs.get('fzInventory').subscribe({
       next: (pref) => {
         if (pref) {
