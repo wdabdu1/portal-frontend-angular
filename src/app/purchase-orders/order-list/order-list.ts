@@ -136,7 +136,7 @@ export class OrderList implements OnInit {
 
   optionsFor(col: string): string[] {
     this.ensureFilterKey(col);
-    return columnOptions(this.allOrders, this.filters, col as any, (r) => this.getValue(r, col));
+    return columnOptions(this.allOrders, this.filters, col, (r, c) => this.getValue(r, c));
   }
 
   onFilterChange(col: string, values: Set<string>): void {
