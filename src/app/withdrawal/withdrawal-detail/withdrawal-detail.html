@@ -1,0 +1,245 @@
+<div style="max-width: 800px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/fz-inventory" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to FZ Inventory</a>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading && detail">
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Withdrawal from {{ detail.depositBlAwbNo }}</h1>
+
+    <!-- Withdrawing From -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('withdrawingFrom')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Withdrawing From</strong>
+      </div>
+      <div *ngIf="expanded === 'withdrawingFrom'" style="padding: 16px;">
+        <p style="font-size: 13px; color: #555; margin-top: 0;">Deposit BL: <strong>{{ detail.depositBlAwbNo }}</strong></p>
+
+        <p *ngIf="loadingBalance" style="color: #888; font-size: 12px;">Loading balance...</p>
+        <table *ngIf="!loadingBalance && balanceLines.length > 0" style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
+          <thead>
+            <tr style="text-align:left; border-bottom:1px solid #ddd;">
+              <th style="padding:5px;">Item</th>
+              <th style="padding:5px;">Balance Remaining</th>
+              <th style="padding:5px;">Qty to Withdraw</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of balanceLines" style="border-bottom:1px solid #eee;">
+              <td style="padding:5px;">{{ l.modelProduct }}</td>
+              <td style="padding:5px;">{{ l.balance | number: '1.0-2' }}</td>
+              <td style="padding:5px;"><input type="text" appThousands [(ngModel)]="withdrawQtyByLineItem[l.shipmentLineItemId]" style="width:100px; padding:4px;" /></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveLineItems(false)" [disabled]="savingLineItems" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveLineItems(true)" [disabled]="savingLineItems" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingLineItems ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- General Info -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('generalInfo')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">General Info</strong>
+      </div>
+      <div *ngIf="expanded === 'generalInfo'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Withdrawal Request Date</label><input type="date" [(ngModel)]="generalInfoForm.withdrawalRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Withdrawal Request Ref. No.</label><input [(ngModel)]="generalInfoForm.withdrawalRequestRefNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveGeneralInfo(false)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveGeneralInfo(true)" [disabled]="savingGeneralInfo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingGeneralInfo ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cost Estimate -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('costEstimate')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Clearance Cost Estimate</strong>
+      </div>
+      <div *ngIf="expanded === 'costEstimate'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Estimate Date</label><input type="date" [(ngModel)]="costEstimateForm.estimateDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Notify BU Date</label><input type="date" [(ngModel)]="costEstimateForm.notifyBuDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Amount Settled Date</label><input type="date" [(ngModel)]="costEstimateForm.amountSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+
+        <h4 style="font-size:13px; margin:20px 0 8px; color:#333;">Estimate Line Items</h4>
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+          <thead>
+            <tr style="text-align:left; border-bottom:1px solid #ddd;">
+              <th style="padding:5px;">Charge Type</th>
+              <th style="padding:5px;">Value (SDG)</th>
+              <th style="padding:5px;">Due Date</th>
+              <th style="padding:5px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of estimateLineItems" style="border-bottom:1px solid #eee;">
+              <td style="padding:5px;">{{ item.chargeTypeName }}</td>
+              <td style="padding:5px;">{{ item.valueSdg | number: '1.2-2' }}</td>
+              <td style="padding:5px;">{{ item.dueDate ? (item.dueDate | date: 'MMM d, y') : '—' }}</td>
+              <td style="padding:5px;"><a (click)="removeLineItem(item.id)" style="color:#c0392b; cursor:pointer; font-size:12px;">Remove</a></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:600;"><td style="padding:5px;">Total</td><td style="padding:5px;">{{ estimateTotalSdg | number: '1.2-2' }}</td><td colspan="2"></td></tr>
+          </tfoot>
+        </table>
+
+        <div style="display:flex; gap:8px; align-items:flex-end; margin-top:10px; flex-wrap:wrap;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Charge Type</label>
+            <select [(ngModel)]="newChargeTypeId" style="padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of chargeTypes" [ngValue]="c.id">{{ c['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Value (SDG)</label>
+            <input type="text" appThousands [(ngModel)]="newValueSdg" style="padding:6px; width:120px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Due Date</label>
+            <input type="date" [(ngModel)]="newDueDate" style="padding:6px;" />
+          </div>
+          <button (click)="addLineItem()" [disabled]="addingLineItem" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Add</button>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveCostEstimate(false)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveCostEstimate(true)" [disabled]="savingCostEstimate" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingCostEstimate ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customs Certificate Entry -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('certificateEntry')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Customs Certificate Entry</strong>
+      </div>
+      <div *ngIf="expanded === 'certificateEntry'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Certificate Entry Date</label><input type="date" [(ngModel)]="processingForm.certificateEntryDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SCUDA Declaration No.</label><input [(ngModel)]="processingForm.scudaDeclarationNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, 'ssmoFile')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SSMO File Process -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('ssmoFile')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">SSMO File Process</strong>
+      </div>
+      <div *ngIf="expanded === 'ssmoFile'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO File Request Date</label><input type="date" [(ngModel)]="processingForm.ssmoFileRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Inspection Amount (SDG)</label><input type="text" appThousands [(ngModel)]="processingForm.ssmoInspectionAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="processingForm.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, 'customsExam')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customs Examination -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('customsExam')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Customs Examination (Form 48)</strong>
+      </div>
+      <div *ngIf="expanded === 'customsExam'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Start Date</label><input type="date" [(ngModel)]="processingForm.custExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="processingForm.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, 'customsLab')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customs Lab -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('customsLab')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Customs Lab</strong>
+      </div>
+      <div *ngIf="expanded === 'customsLab'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="processingForm.customsLabRequired" id="wdlab" /><label for="wdlab" style="font-size:13px;">Customs Lab Required</label></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="processingForm.customsLabFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="processingForm.labFeesPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="processingForm.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, 'ssmoExam')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SSMO Examination -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('ssmoExam')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">SSMO Examination</strong>
+      </div>
+      <div *ngIf="expanded === 'ssmoExam'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Exam. Start Date</label><input type="date" [(ngModel)]="processingForm.ssmoExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Cert. Issuance Date</label><input type="date" [(ngModel)]="processingForm.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, 'customsEval')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customs Evaluation -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('customsEval')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Customs Evaluation</strong>
+      </div>
+      <div *ngIf="expanded === 'customsEval'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Cust. Evaluation Date</label><input type="date" [(ngModel)]="processingForm.custEvaluationDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Duty (SDG)</label><input type="text" appThousands [(ngModel)]="processingForm.customsDutySdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Customs Settlement Date</label><input type="date" [(ngModel)]="processingForm.customsSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Release Exit Pass Date</label><input type="date" [(ngModel)]="processingForm.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, 'truck')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Truck & Containers -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('truck')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Truck & Containers</strong>
+      </div>
+      <div *ngIf="expanded === 'truck'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="processingForm.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="processingForm.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
