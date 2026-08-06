@@ -141,6 +141,7 @@ export class OrderList implements OnInit {
 
   onFilterChange(col: string, values: Set<string>): void {
     this.filters[col] = values;
+    this.cdr.markForCheck();
   }
 
   get orders(): PurchaseOrderSummary[] {
