@@ -65,7 +65,9 @@ export interface FzInventoryItemRow {
   depositRefNo: string | null;
   qtyDeposited: number;
   qtyWithdrawn: number;
+  qtyUnderClearance: number;
   currentStock: number;
+  availableStock: number;
   inventoryDays: number;
   percentWithdrawn: number;
 }
