@@ -125,6 +125,8 @@ export interface ClearanceDetail {
   consignee: string;
   category: string;
   fclCount: number;
+  withdrawalRequestDate: string | null;
+  withdrawalRequestRefNo: string | null;
 }
 
 export interface ScheduleItem {
