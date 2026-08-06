@@ -58,28 +58,31 @@
       <div style="overflow-x: auto;">
         <table style="width: 100%; min-width: 1300px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
           <thead>
+            <thead>
             <tr style="text-align: left; border-bottom: 1px solid #ddd;">
               <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('businessUnit')">
-                BU <app-excel-header-filter [options]="optionsFor('businessUnit')" [selected]="filters.businessUnit" (selectedChange)="onFilterChange('businessUnit', $event)" />
+                BU{{ sortIndicator('businessUnit') }} <app-excel-header-filter [options]="optionsFor('businessUnit')" [selected]="filters.businessUnit" (selectedChange)="onFilterChange('businessUnit', $event)" />
               </th>
               <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('category')">
-                Cat <app-excel-header-filter [options]="optionsFor('category')" [selected]="filters.category" (selectedChange)="onFilterChange('category', $event)" />
+                Cat{{ sortIndicator('category') }} <app-excel-header-filter [options]="optionsFor('category')" [selected]="filters.category" (selectedChange)="onFilterChange('category', $event)" />
               </th>
               <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('modelProduct')">
-                Product/Model <app-excel-header-filter [options]="optionsFor('modelProduct')" [selected]="filters.modelProduct" (selectedChange)="onFilterChange('modelProduct', $event)" />
+                Product/Model{{ sortIndicator('modelProduct') }} <app-excel-header-filter [options]="optionsFor('modelProduct')" [selected]="filters.modelProduct" (selectedChange)="onFilterChange('modelProduct', $event)" />
               </th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('dateOfDeposit')">Date of Deposit</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('dateOfDeposit')">Date of Deposit{{ sortIndicator('dateOfDeposit') }}</th>
               <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('depositRefNo')">
-                Deposit Ref. No <app-excel-header-filter [options]="optionsFor('depositRefNo')" [selected]="filters.depositRefNo" (selectedChange)="onFilterChange('depositRefNo', $event)" />
+                Deposit Ref. No{{ sortIndicator('depositRefNo') }} <app-excel-header-filter [options]="optionsFor('depositRefNo')" [selected]="filters.depositRefNo" (selectedChange)="onFilterChange('depositRefNo', $event)" />
               </th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('blAwbNo')">BL No.</th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyDeposited')">Qty Deposited</th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyWithdrawn')">Withdrawn Qty</th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyUnderClearance')">Under Clearance</th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('currentStock')">Current Stock</th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('availableStock')">Available Stock</th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('inventoryDays')">No. Inventory Days</th>
-              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('percentWithdrawn')">% Withdrawn</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('blAwbNo')">
+                BL No.{{ sortIndicator('blAwbNo') }} <app-excel-header-filter [options]="optionsFor('blAwbNo')" [selected]="filters.blAwbNo" (selectedChange)="onFilterChange('blAwbNo', $event)" />
+              </th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyDeposited')">Qty Deposited{{ sortIndicator('qtyDeposited') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyWithdrawn')">Withdrawn Qty{{ sortIndicator('qtyWithdrawn') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyUnderClearance')">Under Clearance{{ sortIndicator('qtyUnderClearance') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('currentStock')">Current Stock{{ sortIndicator('currentStock') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('availableStock')">Available Stock{{ sortIndicator('availableStock') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('inventoryDays')">No. Inventory Days{{ sortIndicator('inventoryDays') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('percentWithdrawn')">% Withdrawn{{ sortIndicator('percentWithdrawn') }}</th>
             </tr>
           </thead>
           <tbody>
