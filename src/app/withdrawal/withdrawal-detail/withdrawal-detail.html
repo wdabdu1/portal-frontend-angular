@@ -20,14 +20,20 @@
           <thead>
             <tr style="text-align:left; border-bottom:1px solid #ddd;">
               <th style="padding:5px;">Item</th>
-              <th style="padding:5px;">Balance Remaining</th>
+              <th style="padding:5px;">Deposited</th>
+              <th style="padding:5px;">Withdrawn (Completed)</th>
+              <th style="padding:5px;">Under Clearance (Elsewhere)</th>
+              <th style="padding:5px;">Available</th>
               <th style="padding:5px;">Qty to Withdraw</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let l of balanceLines" style="border-bottom:1px solid #eee;">
               <td style="padding:5px;">{{ l.modelProduct }}</td>
-              <td style="padding:5px;">{{ l.balance | number: '1.0-2' }}</td>
+              <td style="padding:5px;">{{ l.deposited | number: '1.0-2' }}</td>
+              <td style="padding:5px;">{{ l.withdrawn | number: '1.0-2' }}</td>
+              <td style="padding:5px;">{{ l.underClearance | number: '1.0-2' }}</td>
+              <td style="padding:5px; font-weight:600; color:#0a3d62;">{{ l.available | number: '1.0-2' }}</td>
               <td style="padding:5px;"><input type="text" appThousands [(ngModel)]="withdrawQtyByLineItem[l.shipmentLineItemId]" style="width:100px; padding:4px;" /></td>
             </tr>
           </tbody>
@@ -233,7 +239,7 @@
       <div *ngIf="expanded === 'truck'" style="padding: 16px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="processingForm.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-          <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="processingForm.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Clearance Completed & Cargo Withdrawn</label><input type="date" [(ngModel)]="processingForm.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
