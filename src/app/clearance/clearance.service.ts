@@ -54,17 +54,20 @@ export interface FzBalanceLine {
   balance: number;
 }
 
-export interface FzInventoryRow {
-  shipmentId: number;
+export interface FzInventoryItemRow {
+  shipmentLineItemId: number;
+  destination: string;
   businessUnit: string;
+  category: string;
+  modelProduct: string;
   blAwbNo: string;
-  depositRefNo: string | null;
   dateOfDeposit: string | null;
-  division: string | null;
-  categories: string[];
-  totalQty: number;
-  totalWithdrawn: number;
-  balance: number;
+  depositRefNo: string | null;
+  qtyDeposited: number;
+  qtyWithdrawn: number;
+  currentStock: number;
+  inventoryDays: number;
+  percentWithdrawn: number;
 }
 
 export interface ClearanceDeliveryOrder {
@@ -256,6 +259,6 @@ export class ClearanceService {
     return this.http.get<FzBalanceLine[]>(`${API_URL}/fz-inventory/${depositShipmentId}/balance`);
   }
   getFzInventory() {
-    return this.http.get<FzInventoryRow[]>(`${API_URL}/fz-inventory`);
+    return this.http.get<FzInventoryItemRow[]>(`${API_URL}/fz-inventory`);
   }
 }
