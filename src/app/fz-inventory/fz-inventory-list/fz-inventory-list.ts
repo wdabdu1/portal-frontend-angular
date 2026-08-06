@@ -9,7 +9,7 @@ import { ClearanceService, FzInventoryItemRow } from '../../clearance/clearance.
 import { FzDepositOption, WithdrawalService, WithdrawalSummary } from '../../withdrawal/withdrawal.service';
 
 type SortColumn = keyof FzInventoryItemRow;
-type FilterColumn = 'businessUnit' | 'category' | 'modelProduct' | 'depositRefNo';
+type FilterColumn = 'businessUnit' | 'category' | 'modelProduct' | 'depositRefNo' | 'blAwbNo';
 
 @Component({
   selector: 'app-fz-inventory-list',
