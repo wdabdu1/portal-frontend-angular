@@ -20,6 +20,32 @@
     </div>
   </div>
 
+  <div style="margin-top: 1.5rem;">
+    <h2 style="font-size: 15px; font-weight: 600; color: #333;">Withdrawals</h2>
+    <p *ngIf="loadingWithdrawals" style="color: #888; font-size: 13px;">Loading...</p>
+    <table *ngIf="!loadingWithdrawals && withdrawals.length > 0" style="width: 100%; max-width: 700px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th style="padding: 6px;">Deposit BL</th>
+          <th style="padding: 6px;">Withdrawal Ref. No.</th>
+          <th style="padding: 6px;">Request Date</th>
+          <th style="padding: 6px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let w of withdrawals" (click)="openWithdrawal(w.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
+          <td style="padding: 6px; font-family: monospace;">{{ w.depositBlAwbNo }}</td>
+          <td style="padding: 6px;">{{ w.withdrawalRequestRefNo || '—' }}</td>
+          <td style="padding: 6px; color: #888;">{{ w.withdrawalRequestDate ? (w.withdrawalRequestDate | date: 'MMM d, y') : '—' }}</td>
+          <td style="padding: 6px; color: #0a3d62;">Open →</td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="!loadingWithdrawals && withdrawals.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">
+      No withdrawals started yet.
+    </p>
+  </div>
+
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
 
