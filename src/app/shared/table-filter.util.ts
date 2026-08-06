@@ -2,14 +2,14 @@
 // column's available checklist options by applying every OTHER active
 // filter first (but not its own), so picking a value in one column
 // narrows what shows up in the others — matching Excel's AutoFilter.
-export function columnOptions<T>(rows: T[], filters: Record<string, Set<string>>, column: keyof T, getValue: (row: T) => string): string[] {
+export function columnOptions<T>(rows: T[], filters: Record<string, Set<string>>, column: string, getValue: (row: T, col: string) => string): string[] {
   const filtered = rows.filter((row) =>
     Object.entries(filters).every(([col, selected]) => {
       if (col === column || selected.size === 0) return true;
-      return selected.has(getValue(row));
+      return selected.has(getValue(row, col));
     })
   );
-  return [...new Set(filtered.map(getValue))].sort();
+  return [...new Set(filtered.map((row) => getValue(row, column)))].sort();
 }
 
 export function applyFilters<T>(rows: T[], filters: Record<string, Set<string>>, getValue: (row: T, col: string) => string): T[] {
