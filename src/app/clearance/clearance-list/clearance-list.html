@@ -1,23 +1,13 @@
 <div style="max-width: 1050px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Clearance — Select Shipment</h1>
-  <p style="color: #888; font-size: 13px;">Click a column header to sort. Click a row to continue Clearance data entry.</p>
+  <p style="color: #888; font-size: 13px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column. Click a row to continue Clearance data entry.</p>
 
-  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
-    <input
-      [(ngModel)]="searchText"
-      (ngModelChange)="onSearchChange()"
-      placeholder="Search by BL/AWB or Declaration No."
-      style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
-    />
-    <select [(ngModel)]="filterBusinessUnit" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Business Units</option>
-      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
-    </select>
-    <select [(ngModel)]="filterCategory" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Categories</option>
-      <option *ngFor="let c of categoryOptions" [value]="c">{{ c }}</option>
-    </select>
-  </div>
+  <input
+    [(ngModel)]="searchText"
+    (ngModelChange)="onSearchChange()"
+    placeholder="Search by BL/AWB or Declaration No."
+    style="width: 100%; max-width: 400px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+  />
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
@@ -26,16 +16,20 @@
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
         <th style="padding: 8px 6px;"></th>
-        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
-        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB</th>
-        <th (click)="sortBy('category')" style="padding: 8px 6px; cursor: pointer;">Category</th>
-        <th (click)="sortBy('eta')" style="padding: 8px 6px; cursor: pointer;">ETA</th>
-        <th (click)="sortBy('fclCount')" style="padding: 8px 6px; cursor: pointer;">FCL</th>
-        <th (click)="sortBy('declarationNo')" style="padding: 8px 6px; cursor: pointer;">Declaration No.</th>
-        <th (click)="sortBy('product')" style="padding: 8px 6px; cursor: pointer;">Product/Model</th>
-        <th (click)="sortBy('qty')" style="padding: 8px 6px; cursor: pointer;">Qty</th>
-        <th style="padding: 8px 6px;">Units</th>
-        <th (click)="sortBy('routeStatus')" style="padding: 8px 6px; cursor: pointer;">Route</th>
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+          style="padding: 8px 6px; cursor: grab; user-select: none;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
         <th style="padding: 8px 6px;"></th>
       </tr>
     </thead>
@@ -48,17 +42,14 @@
         <td style="padding: 8px 6px;">
           <span [style.background]="trafficColor(s.trafficLight)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span>
         </td>
-        <td style="padding: 8px 6px;">{{ s.businessUnit }}</td>
-        <td style="padding: 8px 6px; font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</td>
-        <td style="padding: 8px 6px;">{{ s.category }}</td>
-        <td style="padding: 8px 6px; color: #888;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</td>
-        <td style="padding: 8px 6px;">{{ s.fclCount }}</td>
-        <td style="padding: 8px 6px;">{{ s.declarationNo || '—' }}</td>
-        <td style="padding: 8px 6px;">{{ s.product }}</td>
-        <td style="padding: 8px 6px;">{{ s.qty }}</td>
-        <td style="padding: 8px 6px;">{{ s.unit }}</td>
-        <td style="padding: 8px 6px; font-size: 12px; color: #666;">{{ routeLabel(s.routeStatus) }}</td>
-        <td style="padding: 8px 6px;">
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</span>
+          <span *ngSwitchCase="'eta'" style="color: #888;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'declarationNo'">{{ s.declarationNo || '—' }}</span>
+          <span *ngSwitchCase="'routeStatus'" style="font-size: 12px; color: #666;">{{ routeLabel(s.routeStatus) }}</span>
+          <span *ngSwitchDefault>{{ s[col.key] }}</span>
+        </td>
+        <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
           <button (click)="viewDetails(s.shipmentId, $event)" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">
             View Order
           </button>
