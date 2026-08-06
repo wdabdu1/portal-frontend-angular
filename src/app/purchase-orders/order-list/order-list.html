@@ -15,6 +15,7 @@
           (dragstart)="onDragStart(i)"
           (dragover)="onDragOver($event)"
           (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
           style="padding: 8px 6px; cursor: grab; user-select: none;"
         >
           <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
