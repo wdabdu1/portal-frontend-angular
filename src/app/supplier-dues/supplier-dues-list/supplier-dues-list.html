@@ -1,22 +1,12 @@
 <div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Supplier Payments & Dues</h1>
-  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding supplier balance. Click a row to view and record payments.</p>
+  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding supplier balance. Drag a column header to reorder it. Click the ▼ arrow to filter. Click a row to view and record payments.</p>
 
-  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
-    <input
-      [(ngModel)]="searchText"
-      placeholder="Search by Supplier, PO No., or BL/AWB"
-      style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
-    />
-    <select [(ngModel)]="filterBusinessUnit" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Business Units</option>
-      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
-    </select>
-    <select [(ngModel)]="filterPaymentTerm" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Payment Terms</option>
-      <option *ngFor="let t of paymentTermOptions" [value]="t">{{ t }}</option>
-    </select>
-  </div>
+  <input
+    [(ngModel)]="searchText"
+    placeholder="Search by Supplier, PO No., or BL/AWB"
+    style="width: 100%; max-width: 400px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+  />
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
@@ -24,17 +14,20 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
-        <th (click)="sortBy('supplierName')" style="padding: 8px 6px; cursor: pointer;">Supplier</th>
-        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO No.</th>
-        <th (click)="sortBy('supplierInvoiceNo')" style="padding: 8px 6px; cursor: pointer;">Sup. Invoice No.</th>
-        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">AWB/BL</th>
-        <th (click)="sortBy('sob')" style="padding: 8px 6px; cursor: pointer;">SOB</th>
-        <th (click)="sortBy('paymentTerm')" style="padding: 8px 6px; cursor: pointer;">Payment Term</th>
-        <th (click)="sortBy('invoiceValue')" style="padding: 8px 6px; cursor: pointer;">Invoice Value</th>
-        <th (click)="sortBy('invoiceCurrency')" style="padding: 8px 6px; cursor: pointer;">Currency</th>
-        <th (click)="sortBy('totalValueUsd')" style="padding: 8px 6px; cursor: pointer;">Total Value $</th>
-        <th (click)="sortBy('totalUnpaidUsd')" style="padding: 8px 6px; cursor: pointer;">Total Unpaid $</th>
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+          style="padding: 8px 6px; cursor: grab; user-select: none;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -44,22 +37,21 @@
         [style.background]="selectedShipmentId === r.shipmentId ? '#f0f6fb' : 'transparent'"
         style="border-bottom: 1px solid #eee; cursor: pointer;"
       >
-        <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
-        <td style="padding: 8px 6px;">{{ r.supplierName }}</td>
-        <td style="padding: 8px 6px; font-family: monospace;">{{ r.poNumber }}</td>
-        <td style="padding: 8px 6px;">{{ r.supplierInvoiceNo || '—' }}</td>
-        <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
-        <td style="padding: 8px 6px; color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.paymentTerm }}</td>
-        <td style="padding: 8px 6px;">{{ r.invoiceValue | number: '1.2-2' }}</td>
-        <td style="padding: 8px 6px;">{{ r.invoiceCurrency }}</td>
-        <td style="padding: 8px 6px;">{{ r.totalValueUsd | number: '1.2-2' }}</td>
-        <td style="padding: 8px 6px; font-weight: 600; color: #c0392b;">{{ r.totalUnpaidUsd | number: '1.2-2' }}</td>
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'poNumber'" style="font-family: monospace;">{{ r.poNumber }}</span>
+          <span *ngSwitchCase="'supplierInvoiceNo'">{{ r.supplierInvoiceNo || '—' }}</span>
+          <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ r.blAwbNo }}</span>
+          <span *ngSwitchCase="'sob'" style="color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'invoiceValue'">{{ r.invoiceValue | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'totalValueUsd'">{{ r.totalValueUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'totalUnpaidUsd'" style="font-weight: 600; color: #c0392b;">{{ r.totalUnpaidUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchDefault>{{ r[col.key] }}</span>
+        </td>
       </tr>
     </tbody>
     <tfoot *ngIf="rows.length > 0">
       <tr style="border-top: 2px solid #ccc; font-weight: 600;">
-        <td colspan="9" style="padding: 8px 6px; text-align: right;">Totals:</td>
+        <td [attr.colspan]="columns.length - 2" style="padding: 8px 6px; text-align: right;">Totals:</td>
         <td style="padding: 8px 6px;">{{ totalValueUsd | number: '1.2-2' }}</td>
         <td style="padding: 8px 6px; color: #c0392b;">{{ totalUnpaidUsd | number: '1.2-2' }}</td>
       </tr>
