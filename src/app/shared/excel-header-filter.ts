@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output } from '@angular/core';
 
 // Click the small arrow next to a column header to open a checklist of
 // every distinct value in that column — check/uncheck to filter, same
@@ -36,8 +36,17 @@ export class ExcelHeaderFilter implements OnChanges {
   open = false;
   draft: Set<string> = new Set();
 
+  constructor(private elRef: ElementRef) {}
+
   ngOnChanges(): void {
     this.draft = new Set(this.selected);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.open && !this.elRef.nativeElement.contains(event.target)) {
+      this.open = false;
+    }
   }
 
   onToggleClick(event: MouseEvent): void {
