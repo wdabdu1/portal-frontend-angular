@@ -18,7 +18,7 @@
           style="padding: 8px 6px; cursor: grab; user-select: none;"
         >
           <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
-          <span *ngIf="col.key === 'businessUnit' || col.key === 'status'" (mousedown)="$event.stopPropagation()">
+          <span (mousedown)="$event.stopPropagation()">
             <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
           </span>
         </th>
