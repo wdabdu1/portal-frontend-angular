@@ -1,17 +1,7 @@
 <div style="max-width: 950px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Purchase Orders</h1>
 
-  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
-    <select [(ngModel)]="filterBusinessUnit" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Business Units</option>
-      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
-    </select>
-    <select [(ngModel)]="filterStatus" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Statuses</option>
-      <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
-    </select>
-  </div>
-  <p style="color: #888; font-size: 12px; margin-top: 6px;">Drag a column header to reorder it — your layout is saved automatically.</p>
+  <p style="color: #888; font-size: 12px; margin-top: 1rem;">Drag a column header to reorder it. Click the ▼ arrow to filter that column.</p>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
@@ -28,6 +18,9 @@
           style="padding: 8px 6px; cursor: grab; user-select: none;"
         >
           <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span *ngIf="col.key === 'businessUnit' || col.key === 'status'" (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
         </th>
         <th style="padding: 8px 6px;"></th>
       </tr>
