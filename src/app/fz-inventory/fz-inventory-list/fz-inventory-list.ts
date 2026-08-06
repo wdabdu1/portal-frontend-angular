@@ -109,7 +109,7 @@ export class FzInventoryList implements OnInit {
   }
 
   optionsFor(col: FilterColumn): string[] {
-    return columnOptions(this.allRows, this.filters, col, (r) => this.getValue(r, col));
+    return columnOptions(this.allRows, this.filters, col, (r, c) => this.getValue(r, c));
   }
 
   onFilterChange(col: FilterColumn, values: Set<string>): void {
