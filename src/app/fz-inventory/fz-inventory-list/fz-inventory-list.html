@@ -1,55 +1,67 @@
-<div style="max-width: 1100px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">FZ Inventory</h1>
-  <p style="color: #888; font-size: 13px;">Open Free Zone deposits with remaining balance. Click a column header to sort.</p>
-
-  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
-    <select [(ngModel)]="filterBusinessUnit" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Business Units</option>
-      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
-    </select>
-  </div>
+  <p style="color: #888; font-size: 13px;">Full deposit/withdrawal history, grouped by Free Zone location. Click a column filter arrow to narrow results; click a header to sort.</p>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
 
-  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
-    <thead>
-      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
-        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL</th>
-        <th (click)="sortBy('depositRefNo')" style="padding: 8px 6px; cursor: pointer;">Deposit Ref.</th>
-        <th (click)="sortBy('dateOfDeposit')" style="padding: 8px 6px; cursor: pointer;">Date of Deposit</th>
-        <th (click)="sortBy('division')" style="padding: 8px 6px; cursor: pointer;">Div</th>
-        <th style="padding: 8px 6px;">Cat</th>
-        <th (click)="sortBy('totalQty')" style="padding: 8px 6px; cursor: pointer;">Total Qty</th>
-        <th (click)="sortBy('totalWithdrawn')" style="padding: 8px 6px; cursor: pointer;">Total Withdrawn</th>
-        <th (click)="sortBy('balance')" style="padding: 8px 6px; cursor: pointer;">Balance</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let r of sortedRows" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
-        <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
-        <td style="padding: 8px 6px;">{{ r.depositRefNo || '—' }}</td>
-        <td style="padding: 8px 6px; color: #888;">{{ r.dateOfDeposit ? (r.dateOfDeposit | date: 'MMM d, y') : '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.division || '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.categories.join(', ') || '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.totalQty | number: '1.0-2' }}</td>
-        <td style="padding: 8px 6px;">{{ r.totalWithdrawn | number: '1.0-2' }}</td>
-        <td style="padding: 8px 6px; font-weight: 600; color: #0a3d62;">{{ r.balance | number: '1.0-2' }}</td>
-      </tr>
-    </tbody>
-    <tfoot *ngIf="rows.length > 0">
-      <tr style="border-top: 2px solid #ccc; font-weight: 600;">
-        <td colspan="6" style="padding: 8px 6px; text-align: right;">Totals:</td>
-        <td style="padding: 8px 6px;">{{ totalQty | number: '1.0-2' }}</td>
-        <td style="padding: 8px 6px;">{{ totalWithdrawn | number: '1.0-2' }}</td>
-        <td style="padding: 8px 6px; color: #0a3d62;">{{ totalBalance | number: '1.0-2' }}</td>
-      </tr>
-    </tfoot>
-  </table>
+  <div *ngIf="!loading">
+    <div *ngFor="let destination of destinations" style="margin-top: 2rem;">
+      <h2 style="font-size: 16px; font-weight: 600; color: #0a3d62; border-bottom: 2px solid #0a3d62; padding-bottom: 6px;">
+        {{ destination }}
+      </h2>
 
-  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
-    No open FZ deposits.
-  </p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('businessUnit')">
+              BU <app-excel-header-filter [options]="optionsFor('businessUnit')" [selected]="filters.businessUnit" (selectedChange)="onFilterChange('businessUnit', $event)" />
+            </th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('category')">
+              Cat <app-excel-header-filter [options]="optionsFor('category')" [selected]="filters.category" (selectedChange)="onFilterChange('category', $event)" />
+            </th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('modelProduct')">
+              Product/Model <app-excel-header-filter [options]="optionsFor('modelProduct')" [selected]="filters.modelProduct" (selectedChange)="onFilterChange('modelProduct', $event)" />
+            </th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('dateOfDeposit')">Date of Deposit</th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('depositRefNo')">
+              Deposit Ref. No <app-excel-header-filter [options]="optionsFor('depositRefNo')" [selected]="filters.depositRefNo" (selectedChange)="onFilterChange('depositRefNo', $event)" />
+            </th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('qtyDeposited')">Qty Deposited</th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('qtyWithdrawn')">Withdrawn Qty</th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('currentStock')">Current Stock</th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('inventoryDays')">No. Inventory Days</th>
+            <th style="padding: 8px 6px; cursor: pointer;" (click)="sortBy('percentWithdrawn')">% Withdrawn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rowsFor(destination)" style="border-bottom: 1px solid #eee; cursor: pointer;" title="Item detail view coming soon">
+            <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
+            <td style="padding: 8px 6px;">{{ r.category }}</td>
+            <td style="padding: 8px 6px;">{{ r.modelProduct }}</td>
+            <td style="padding: 8px 6px; color: #888;">{{ r.dateOfDeposit ? (r.dateOfDeposit | date: 'MMM d, y') : '—' }}</td>
+            <td style="padding: 8px 6px;">{{ r.depositRefNo || '—' }}</td>
+            <td style="padding: 8px 6px;">{{ r.qtyDeposited | number: '1.0-2' }}</td>
+            <td style="padding: 8px 6px;">{{ r.qtyWithdrawn | number: '1.0-2' }}</td>
+            <td style="padding: 8px 6px; font-weight: 600;" [style.color]="r.currentStock > 0 ? '#0a3d62' : '#888'">{{ r.currentStock | number: '1.0-2' }}</td>
+            <td style="padding: 8px 6px;">{{ r.inventoryDays }}</td>
+            <td style="padding: 8px 6px;">{{ r.percentWithdrawn | number: '1.0-0' }}%</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+            <td colspan="5" style="padding: 8px 6px; text-align: right;">Totals:</td>
+            <td style="padding: 8px 6px;">{{ totalsFor(destination).deposited | number: '1.0-2' }}</td>
+            <td style="padding: 8px 6px;">{{ totalsFor(destination).withdrawn | number: '1.0-2' }}</td>
+            <td style="padding: 8px 6px; color: #0a3d62;">{{ totalsFor(destination).stock | number: '1.0-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <p *ngIf="destinations.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+      No FZ deposits recorded yet.
+    </p>
+  </div>
 </div>
