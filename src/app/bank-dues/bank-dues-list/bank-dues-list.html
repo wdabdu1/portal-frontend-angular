@@ -1,18 +1,12 @@
 <div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Collecting Bank Dues</h1>
-  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding collection balance. Click a row to view and record collections.</p>
+  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding collection balance. Drag a column header to reorder it. Click the ▼ arrow to filter. Click a row to view and record collections.</p>
 
-  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
-    <input
-      [(ngModel)]="searchText"
-      placeholder="Search by Consignee, Receiver Bank, BL/AWB, or IM Number"
-      style="width: 100%; max-width: 450px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
-    />
-    <select [(ngModel)]="filterBusinessUnit" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Business Units</option>
-      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
-    </select>
-  </div>
+  <input
+    [(ngModel)]="searchText"
+    placeholder="Search by Consignee, Receiver Bank, BL/AWB, or IM Number"
+    style="width: 100%; max-width: 450px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+  />
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
@@ -21,21 +15,20 @@
   <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
-        <th (click)="sortBy('consignee')" style="padding: 8px 6px; cursor: pointer;">Consignee</th>
-        <th (click)="sortBy('receiverBank')" style="padding: 8px 6px; cursor: pointer;">Receiver Bank</th>
-        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB</th>
-        <th (click)="sortBy('sob')" style="padding: 8px 6px; cursor: pointer;">Actual SOB</th>
-        <th (click)="sortBy('lastOffshoreInvoiceNo')" style="padding: 8px 6px; cursor: pointer;">Last Offshore Invoice No.</th>
-        <th (click)="sortBy('tenorDays')" style="padding: 8px 6px; cursor: pointer;">Tenor</th>
-        <th (click)="sortBy('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date</th>
-        <th (click)="sortBy('imFormNo')" style="padding: 8px 6px; cursor: pointer;">IM Form No.</th>
-        <th (click)="sortBy('imFormDate')" style="padding: 8px 6px; cursor: pointer;">IM Form Date</th>
-        <th (click)="sortBy('value')" style="padding: 8px 6px; cursor: pointer;">Value</th>
-        <th (click)="sortBy('currency')" style="padding: 8px 6px; cursor: pointer;">Currency</th>
-        <th (click)="sortBy('valueAed')" style="padding: 8px 6px; cursor: pointer;">Value (AED)</th>
-        <th (click)="sortBy('paidAed')" style="padding: 8px 6px; cursor: pointer;">Paid (AED)</th>
-        <th (click)="sortBy('balanceAed')" style="padding: 8px 6px; cursor: pointer;">Balance (AED)</th>
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -45,26 +38,26 @@
         [style.background]="selectedShipmentId === r.shipmentId ? '#f0f6fb' : 'transparent'"
         style="border-bottom: 1px solid #eee; cursor: pointer;"
       >
-        <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
-        <td style="padding: 8px 6px;">{{ r.consignee }}</td>
-        <td style="padding: 8px 6px;">{{ r.receiverBank || '—' }}</td>
-        <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
-        <td style="padding: 8px 6px; color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.lastOffshoreInvoiceNo || '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.tenorDays ? (r.tenorDays + ' days') : '—' }}</td>
-        <td style="padding: 8px 6px; color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.imFormNo || '—' }}</td>
-        <td style="padding: 8px 6px; color: #888;">{{ r.imFormDate ? (r.imFormDate | date: 'MMM d, y') : '—' }}</td>
-        <td style="padding: 8px 6px;">{{ r.value | number: '1.2-2' }}</td>
-        <td style="padding: 8px 6px;">{{ r.currency }}</td>
-        <td style="padding: 8px 6px;">{{ r.valueAed | number: '1.2-2' }}</td>
-        <td style="padding: 8px 6px;">{{ r.paidAed | number: '1.2-2' }}</td>
-        <td style="padding: 8px 6px; font-weight: 600; color: #c0392b;">{{ r.balanceAed | number: '1.2-2' }}</td>
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'receiverBank'">{{ r.receiverBank || '—' }}</span>
+          <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ r.blAwbNo }}</span>
+          <span *ngSwitchCase="'sob'" style="color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'lastOffshoreInvoiceNo'">{{ r.lastOffshoreInvoiceNo || '—' }}</span>
+          <span *ngSwitchCase="'tenorDays'">{{ r.tenorDays ? (r.tenorDays + ' days') : '—' }}</span>
+          <span *ngSwitchCase="'dueDate'" style="color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'imFormNo'">{{ r.imFormNo || '—' }}</span>
+          <span *ngSwitchCase="'imFormDate'" style="color: #888;">{{ r.imFormDate ? (r.imFormDate | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'value'">{{ r.value | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'valueAed'">{{ r.valueAed | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'paidAed'">{{ r.paidAed | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'balanceAed'" style="font-weight: 600; color: #c0392b;">{{ r.balanceAed | number: '1.2-2' }}</span>
+          <span *ngSwitchDefault>{{ r[col.key] }}</span>
+        </td>
       </tr>
     </tbody>
     <tfoot *ngIf="rows.length > 0">
       <tr style="border-top: 2px solid #ccc; font-weight: 600;">
-        <td colspan="11" style="padding: 8px 6px; text-align: right;">Totals:</td>
+        <td [attr.colspan]="columns.length - 3" style="padding: 8px 6px; text-align: right;">Totals:</td>
         <td style="padding: 8px 6px;">{{ totalValueAed | number: '1.2-2' }}</td>
         <td></td>
         <td style="padding: 8px 6px; color: #c0392b;">{{ totalBalanceAed | number: '1.2-2' }}</td>
