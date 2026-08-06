@@ -56,7 +56,8 @@ export interface FzBalanceLine {
   modelProduct: string;
   deposited: number;
   withdrawn: number;
-  balance: number;
+  underClearance: number;
+  available: number;
 }
 
 export interface FzDepositOption {
