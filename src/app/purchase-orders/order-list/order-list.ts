@@ -3,6 +3,8 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
+import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { PurchaseOrderSummary, PurchaseOrdersService } from '../purchase-orders.service';
 
@@ -26,7 +28,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
 
 @Component({
   selector: 'app-order-list',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ExcelHeaderFilter],
   templateUrl: './order-list.html'
 })
 export class OrderList implements OnInit {
@@ -40,8 +42,10 @@ export class OrderList implements OnInit {
   sortColumn: SortColumn = 'createdAt';
   sortAsc = false;
 
-  filterBusinessUnit = '';
-  filterStatus = '';
+  filters: Record<string, Set<string>> = {
+    businessUnit: new Set(),
+    status: new Set()
+  };
 
   columns: ColumnDef[] = [...DEFAULT_COLUMNS];
   private dragFromIndex: number | null = null;
@@ -125,18 +129,20 @@ export class OrderList implements OnInit {
     });
   }
 
-  get businessUnitOptions(): string[] {
-    return [...new Set(this.allOrders.map((o) => o.businessUnit))].sort();
+  private getValue(row: PurchaseOrderSummary, col: string): string {
+    return String((row as any)[col] ?? '');
   }
 
-  get statusOptions(): string[] {
-    return [...new Set(this.allOrders.map((o) => o.status))].sort();
+  optionsFor(col: string): string[] {
+    return columnOptions(this.allOrders, this.filters, col as any, (r) => this.getValue(r, col));
+  }
+
+  onFilterChange(col: string, values: Set<string>): void {
+    this.filters[col] = values;
   }
 
   get orders(): PurchaseOrderSummary[] {
-    let filtered = this.allOrders;
-    if (this.filterBusinessUnit) filtered = filtered.filter((o) => o.businessUnit === this.filterBusinessUnit);
-    if (this.filterStatus) filtered = filtered.filter((o) => o.status === this.filterStatus);
+    const filtered = applyFilters(this.allOrders, this.filters, (r, col) => this.getValue(r, col));
 
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
