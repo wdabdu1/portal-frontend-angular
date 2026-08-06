@@ -18,4 +18,12 @@ export class TablePreferencesService {
   save(tableKey: string, sortColumn: string, sortAsc: boolean) {
     return this.http.put(`${API_URL}/table-preferences/${tableKey}`, { sortColumn, sortAsc });
   }
+
+  getColumnOrder(tableKey: string) {
+    return this.http.get<string[] | null>(`${API_URL}/table-preferences/${tableKey}/column-order`);
+  }
+
+  saveColumnOrder(tableKey: string, columnOrder: string[]) {
+    return this.http.put(`${API_URL}/table-preferences/${tableKey}/column-order`, { columnOrder });
+  }
 }
