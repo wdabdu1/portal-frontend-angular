@@ -42,10 +42,11 @@ export class OrderList implements OnInit {
   sortColumn: SortColumn = 'createdAt';
   sortAsc = false;
 
-  filters: Record<string, Set<string>> = {
-    businessUnit: new Set(),
-    status: new Set()
-  };
+  filters: Record<string, Set<string>> = {};
+
+  private ensureFilterKey(key: string): void {
+    if (!this.filters[key]) this.filters[key] = new Set();
+  }
 
   columns: ColumnDef[] = [...DEFAULT_COLUMNS];
   private dragFromIndex: number | null = null;
@@ -134,6 +135,7 @@ export class OrderList implements OnInit {
   }
 
   optionsFor(col: string): string[] {
+    this.ensureFilterKey(col);
     return columnOptions(this.allOrders, this.filters, col as any, (r) => this.getValue(r, col));
   }
 
