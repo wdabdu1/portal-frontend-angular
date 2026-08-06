@@ -5,17 +5,7 @@
       + New Shipment
     </a>
   </div>
-
-  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
-    <select [(ngModel)]="filterBusinessUnit" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Business Units</option>
-      <option *ngFor="let bu of businessUnitOptions" [value]="bu">{{ bu }}</option>
-    </select>
-    <select [(ngModel)]="filterStatus" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-      <option value="">All Statuses</option>
-      <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
-    </select>
-  </div>
+  <p style="color: #888; font-size: 12px; margin-top: 8px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column.</p>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
@@ -23,32 +13,38 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th (click)="sortBy('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU</th>
-        <th (click)="sortBy('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB No.</th>
-        <th (click)="sortBy('poNumber')" style="padding: 8px 6px; cursor: pointer;">PO Number</th>
-        <th (click)="sortBy('shippingLine')" style="padding: 8px 6px; cursor: pointer;">Shipping Line</th>
-        <th (click)="sortBy('lineItemCount')" style="padding: 8px 6px; cursor: pointer;">Line Items</th>
-        <th (click)="sortBy('eta')" style="padding: 8px 6px; cursor: pointer;">ETA</th>
-        <th (click)="sortBy('status')" style="padding: 8px 6px; cursor: pointer;">Status</th>
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+          style="padding: 8px 6px; cursor: grab; user-select: none;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
         <th style="padding: 8px 6px;"></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let s of shipments" (click)="viewDetails(s.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
-        <td style="padding: 8px 6px;">{{ s.businessUnit }}</td>
-        <td style="padding: 8px 6px; font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</td>
-        <td style="padding: 8px 6px;">{{ s.poNumber }}</td>
-        <td style="padding: 8px 6px;">{{ s.shippingLine }}</td>
-        <td style="padding: 8px 6px;">{{ s.lineItemCount }}</td>
-        <td style="padding: 8px 6px; color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</td>
-        <td style="padding: 8px 6px;">
-          <span
-            [style.background]="s.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
-            [style.color]="s.status === 'Confirmed' ? '#1e7e34' : '#a66a00'"
-            style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
-          >
-            {{ s.status }}
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</span>
+          <span *ngSwitchCase="'eta'" style="color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'status'">
+            <span
+              [style.background]="s.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
+              [style.color]="s.status === 'Confirmed' ? '#1e7e34' : '#a66a00'"
+              style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
+            >
+              {{ s.status }}
+            </span>
           </span>
+          <span *ngSwitchDefault>{{ s[col.key] }}</span>
         </td>
         <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
           <a [routerLink]="['/shipments', s.id, 'update']" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border-radius: 4px; text-decoration: none;">
