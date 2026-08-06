@@ -144,6 +144,16 @@ export class OrderList implements OnInit {
     this.cdr.markForCheck();
   }
 
+  // Mirrors the child filter's own "genuinely active" logic (a full
+  // selection behaves like no filter) so the header background agrees
+  // with the arrow's color.
+  isColumnFiltered(col: string): boolean {
+    const selected = this.filters[col];
+    if (!selected || selected.size === 0) return false;
+    const total = this.optionsFor(col).length;
+    return selected.size < total;
+  }
+
   get orders(): PurchaseOrderSummary[] {
     const filtered = applyFilters(this.allOrders, this.filters, (r, col) => this.getValue(r, col));
 
