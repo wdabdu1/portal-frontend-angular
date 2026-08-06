@@ -39,7 +39,10 @@ export class ExcelHeaderFilter implements OnChanges {
   constructor(private elRef: ElementRef) {}
 
   ngOnChanges(): void {
-    this.draft = new Set(this.selected);
+    // Only sync draft from the confirmed selection while the popover is
+    // closed — while open, the user's in-progress checkbox clicks must
+    // never be overwritten by an unrelated re-render elsewhere on the page.
+    if (!this.open) this.draft = new Set(this.selected);
   }
 
   @HostListener('document:click', ['$event'])
