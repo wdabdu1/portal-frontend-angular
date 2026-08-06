@@ -10,7 +10,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Ou
   imports: [CommonModule],
   template: `
     <span style="position:relative; display:inline-flex; align-items:center;">
-      <span (click)="onToggleClick($event)" style="cursor:pointer; font-size:9px; margin-left:4px;" [style.color]="selected.size > 0 ? '#0a3d62' : '#bbb'">▼</span>
+      <span (click)="onToggleClick($event)" style="cursor:pointer; font-size:9px; margin-left:4px;" [style.color]="isActive ? '#0a3d62' : '#bbb'">▼</span>
       <div *ngIf="open" (click)="$event.stopPropagation()" style="position:absolute; top:18px; left:0; z-index:50; background:white; border:1px solid #ccc; border-radius:4px; box-shadow:0 2px 10px rgba(0,0,0,0.18); padding:8px; min-width:170px; max-height:260px; overflow-y:auto; font-weight:normal;">
         <div style="font-size:12px; margin-bottom:6px; white-space:nowrap;">
           <a (click)="selectAll()" style="color:#0a3d62; cursor:pointer; margin-right:10px;">Select All</a>
@@ -37,6 +37,13 @@ export class ExcelHeaderFilter implements OnChanges {
   draft: Set<string> = new Set();
 
   constructor(private elRef: ElementRef) {}
+
+  // "Active" only if it's a genuine partial filter — a full selection
+  // (e.g. from clicking "Select All" as a reset) behaves identically to
+  // no filter at all, so it shouldn't look active either.
+  get isActive(): boolean {
+    return this.selected.size > 0 && this.selected.size < this.options.length;
+  }
 
   ngOnChanges(): void {
     // Only sync draft from the confirmed selection while the popover is
