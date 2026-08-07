@@ -26,7 +26,24 @@ export interface TruckLoadDropDetail {
   warehouseId: number;
   warehouseName: string;
   city: string | null;
+  expectedDeliveryDate: string | null;
   items: TruckLoadItemSummary[];
+}
+
+export interface TruckLoadItemRow {
+  truckLoadItemId: number;
+  truckLoadId: number;
+  plateNo: string;
+  driverName: string | null;
+  loadDate: string;
+  warehouseName: string;
+  city: string | null;
+  expectedDeliveryDate: string | null;
+  modelProduct: string;
+  unit: string;
+  qty: number;
+  inHousePrice: number | null;
+  parallelMarketPrice: number | null;
 }
 
 export interface TruckLoadDetail {
@@ -64,8 +81,12 @@ export class TruckLoadService {
     return this.http.get<TruckLoadDetail>(`${API_URL}/truck-loads/${id}`);
   }
 
-  addDrop(truckLoadId: number, warehouseId: number) {
-    return this.http.post<{ id: number }>(`${API_URL}/truck-loads/${truckLoadId}/drops`, { warehouseId });
+  addDrop(truckLoadId: number, warehouseId: number, expectedDeliveryDate: string | null) {
+    return this.http.post<{ id: number }>(`${API_URL}/truck-loads/${truckLoadId}/drops`, { warehouseId, expectedDeliveryDate });
+  }
+
+  getItems() {
+    return this.http.get<TruckLoadItemRow[]>(`${API_URL}/truck-loads/items`);
   }
 
   deleteDrop(dropId: number) {
