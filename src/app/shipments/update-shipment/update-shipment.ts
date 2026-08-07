@@ -127,7 +127,32 @@ export class UpdateShipment implements OnInit {
         };
 
         this.loading = false;
-        get middleOffshoreColumns(): ErpColumn[] {
+        this.loadErpInfo();
+        this.loadLastOffshoreDetails();
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.error = 'Could not load shipment.';
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  this.loading = false;
+        this.loadErpInfo();
+        this.loadLastOffshoreDetails();
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.error = 'Could not load shipment.';
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  get middleOffshoreColumns(): ErpColumn[] {
     return this.erpColumns.filter((c) => !c.isLast);
   }
 
@@ -175,17 +200,6 @@ export class UpdateShipment implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => { this.savingLastOffshore = false; this.error = 'Could not save Last Offshore Details.'; this.cdr.markForCheck(); }
-    });
-  }
-
-  loadErpInfo(): void {
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.error = 'Could not load shipment.';
-        this.loading = false;
-        this.cdr.markForCheck();
-      }
     });
   }
 
