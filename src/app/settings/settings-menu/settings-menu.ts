@@ -48,7 +48,11 @@ export class SettingsMenu {
         { label: 'Shipment Destinations', path: '/settings/shipment-destinations' },
         { label: 'Public Holidays', path: '/settings/public-holidays' },
         { label: 'Clearance SLA', path: '/settings/clearance-sla' },
-        { label: 'Clearance Charge Types', path: '/settings/clearance-charge-types' }
+        { label: 'Clearance Charge Types', path: '/settings/clearance-charge-types' },
+        { label: 'Logistics Cities', path: '/settings/logistics-cities' },
+        { label: 'Drivers', path: '/settings/drivers' },
+        { label: 'Trucks', path: '/settings/trucks' },
+        { label: 'Warehouses', path: '/settings/warehouses' }
       ]
     },
     {
