@@ -1,0 +1,99 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/logistics/truck-loads" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Truck Loads</a>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading && detail">
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">
+      Truck {{ detail.plateNo }} — {{ detail.loadDate | date: 'MMM d, y' }}
+    </h1>
+    <p style="color: #666; font-size: 13px;">
+      Driver: {{ detail.driverName || '—' }}<span *ngIf="detail.notes"> — {{ detail.notes }}</span>
+    </p>
+
+    <!-- Add a drop -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1rem; background: #f9f9f9;">
+      <label style="display:block; font-size:12px; color:#555;">Add a Drop (Destination)</label>
+      <div style="display:flex; gap:8px; margin-top:4px;">
+        <select [(ngModel)]="newDropWarehouseId" style="padding: 6px; flex: 1; max-width: 300px;">
+          <option [ngValue]="null">-- select warehouse --</option>
+          <option *ngFor="let w of warehouses" [ngValue]="w.id">{{ w['name'] }}</option>
+        </select>
+        <button (click)="addDrop()" [disabled]="addingDrop || !newDropWarehouseId" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          {{ addingDrop ? 'Adding...' : 'Add Drop' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Drops -->
+    <div *ngFor="let drop of detail.drops" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleDrop(drop.id)" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">{{ drop.warehouseName }}<span *ngIf="drop.city" style="color: #888; font-weight: normal;"> — {{ drop.city }}</span></strong>
+        <span style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size: 12px; color: #666;">{{ drop.items.length }} item(s)</span>
+          <a (click)="removeDrop(drop.id); $event.stopPropagation()" style="color:#c0392b; cursor:pointer; font-size:12px;">Remove Drop</a>
+        </span>
+      </div>
+
+      <div *ngIf="expandedDropId === drop.id" style="padding: 16px;">
+        <table *ngIf="drop.items.length > 0" style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom: 12px;">
+          <thead>
+            <tr style="text-align:left; border-bottom:1px solid #ddd;">
+              <th style="padding:5px;">Product</th>
+              <th style="padding:5px;">Qty</th>
+              <th style="padding:5px;">Unit</th>
+              <th style="padding:5px;">In-House Price</th>
+              <th style="padding:5px;">Parallel Market Price</th>
+              <th style="padding:5px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of drop.items" style="border-bottom:1px solid #eee;">
+              <td style="padding:5px;">{{ item.modelProduct }}</td>
+              <td style="padding:5px;">{{ item.qty | number: '1.0-2' }}</td>
+              <td style="padding:5px;">{{ item.unit }}</td>
+              <td style="padding:5px;">{{ item.inHousePrice !== null ? (item.inHousePrice | number: '1.2-2') : '—' }}</td>
+              <td style="padding:5px;">{{ item.parallelMarketPrice !== null ? (item.parallelMarketPrice | number: '1.2-2') : '—' }}</td>
+              <td style="padding:5px;"><a (click)="removeItem(item.id, drop.id)" style="color:#c0392b; cursor:pointer; font-size:12px;">Remove</a></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4 style="font-size: 13px; margin: 12px 0 8px; color: #333;">Add Item to This Drop</h4>
+        <p *ngIf="loadingAllocationsFor === drop.id" style="color:#888; font-size:12px;">Loading available allocations...</p>
+
+        <div *ngIf="loadingAllocationsFor !== drop.id" style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Item</label>
+            <select [(ngModel)]="newItemAllocationId[drop.id]" style="padding:6px; min-width: 220px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let a of loadableByDrop[drop.id]" [ngValue]="a.warehouseAllocationId">
+                {{ a.blAwbNo }} — {{ a.modelProduct }} (remaining: {{ a.remainingToLoad | number: '1.0-2' }} {{ a.unit }})
+              </option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Qty</label>
+            <input type="number" [(ngModel)]="newItemQty[drop.id]" style="padding:6px; width:90px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">In-House Price</label>
+            <input type="text" appThousands [(ngModel)]="newItemInHousePrice[drop.id]" style="padding:6px; width:110px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Parallel Market Price</label>
+            <input type="text" appThousands [(ngModel)]="newItemMarketPrice[drop.id]" style="padding:6px; width:110px;" />
+          </div>
+          <button (click)="addItem(drop.id)" [disabled]="addingItem || !newItemAllocationId[drop.id] || !newItemQty[drop.id]" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+            {{ addingItem ? 'Adding...' : 'Add Item' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p *ngIf="detail.drops.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+      No drops added yet — add a destination above to start loading items.
+    </p>
+  </div>
+</div>
