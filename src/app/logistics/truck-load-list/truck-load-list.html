@@ -77,7 +77,7 @@
     </table>
   </div>
 
-  <p *ngIf="!loading && items.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+  <p *ngIf="!loading && !error && items.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
     No truck load items yet.
   </p>
 </div>
