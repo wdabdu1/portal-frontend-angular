@@ -139,8 +139,6 @@ export class UpdateShipment implements OnInit {
     });
   }
 
-  }
-
   get middleOffshoreColumns(): ErpColumn[] {
     return this.erpColumns.filter((c) => !c.isLast);
   }
@@ -307,7 +305,6 @@ export class UpdateShipment implements OnInit {
       costSettledDate: this.acdForm.costSettledDate || null, refNumber: this.acdForm.refNumber || null
     }), andNext);
   }
-
 
   saveDraftDocuments(andNext: boolean): void {
     this.genericSave('draftDocuments', () => this.service.saveDraftDocuments(this.shipmentId, {
