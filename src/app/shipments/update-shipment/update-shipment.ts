@@ -6,7 +6,7 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
-import { ErpColumn, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
+import { ErpColumn, LastOffshoreDetails, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
 
 type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'banking' | 'erpInfo';
 
@@ -127,7 +127,58 @@ export class UpdateShipment implements OnInit {
         };
 
         this.loading = false;
-        this.loadErpInfo();
+        get middleOffshoreColumns(): ErpColumn[] {
+    return this.erpColumns.filter((c) => !c.isLast);
+  }
+
+  loadLastOffshoreDetails(): void {
+    this.loadingLastOffshore = true;
+    this.service.getLastOffshoreDetails(this.shipmentId).subscribe({
+      next: (d) => {
+        this.lastOffshoreData = d;
+        this.lastOffshoreForm = {
+          inspectionNo: d.inspectionNo ?? '', grn: d.grn ?? '', invoiceNo: d.invoiceNo ?? '',
+          remarks: d.remarks ?? '', currencyId: d.currencyId
+        };
+        this.lastOffshoreItemEdits = {};
+        for (const item of d.items) {
+          this.lastOffshoreItemEdits[item.shipmentLineItemId] = {
+            hsCode: item.hsCode ?? '', description: item.description ?? '', unitPrice: item.unitPrice
+          };
+        }
+        this.loadingLastOffshore = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.loadingLastOffshore = false; this.error = 'Could not load Last Offshore Details.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveLastOffshoreDetails(): void {
+    this.savingLastOffshore = true;
+    const items = Object.entries(this.lastOffshoreItemEdits).map(([lineItemId, edit]) => ({
+      shipmentLineItemId: Number(lineItemId),
+      hsCode: edit.hsCode || null,
+      description: edit.description || null,
+      unitPrice: edit.unitPrice
+    }));
+    this.service.saveLastOffshoreDetails(this.shipmentId, {
+      inspectionNo: this.lastOffshoreForm.inspectionNo || null,
+      grn: this.lastOffshoreForm.grn || null,
+      invoiceNo: this.lastOffshoreForm.invoiceNo || null,
+      remarks: this.lastOffshoreForm.remarks || null,
+      currencyId: this.lastOffshoreForm.currencyId,
+      items
+    }).subscribe({
+      next: () => {
+        this.savingLastOffshore = false;
+        this.loadLastOffshoreDetails();
+        this.cdr.markForCheck();
+      },
+      error: () => { this.savingLastOffshore = false; this.error = 'Could not save Last Offshore Details.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  loadErpInfo(): void {
         this.cdr.markForCheck();
       },
       error: () => {
