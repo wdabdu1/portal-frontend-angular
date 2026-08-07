@@ -139,17 +139,6 @@ export class UpdateShipment implements OnInit {
     });
   }
 
-  this.loading = false;
-        this.loadErpInfo();
-        this.loadLastOffshoreDetails();
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.error = 'Could not load shipment.';
-        this.loading = false;
-        this.cdr.markForCheck();
-      }
-    });
   }
 
   get middleOffshoreColumns(): ErpColumn[] {
