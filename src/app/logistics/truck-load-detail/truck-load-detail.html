@@ -15,11 +15,12 @@
     <!-- Add a drop -->
     <div style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1rem; background: #f9f9f9;">
       <label style="display:block; font-size:12px; color:#555;">Add a Drop (Destination)</label>
-      <div style="display:flex; gap:8px; margin-top:4px;">
+      <div style="display:flex; gap:8px; margin-top:4px; flex-wrap: wrap;">
         <select [(ngModel)]="newDropWarehouseId" style="padding: 6px; flex: 1; max-width: 300px;">
           <option [ngValue]="null">-- select warehouse --</option>
           <option *ngFor="let w of warehouses" [ngValue]="w.id">{{ w['name'] }}</option>
         </select>
+        <input type="date" [(ngModel)]="newDropExpectedDeliveryDate" title="Expected Delivery Date" style="padding: 6px;" />
         <button (click)="addDrop()" [disabled]="addingDrop || !newDropWarehouseId" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
           {{ addingDrop ? 'Adding...' : 'Add Drop' }}
         </button>
@@ -29,7 +30,7 @@
     <!-- Drops -->
     <div *ngFor="let drop of detail.drops" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
       <div (click)="toggleDrop(drop.id)" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
-        <strong style="font-size: 14px;">{{ drop.warehouseName }}<span *ngIf="drop.city" style="color: #888; font-weight: normal;"> — {{ drop.city }}</span></strong>
+        <strong style="font-size: 14px;">{{ drop.warehouseName }}<span *ngIf="drop.city" style="color: #888; font-weight: normal;"> — {{ drop.city }}</span><span *ngIf="drop.expectedDeliveryDate" style="color: #0a3d62; font-weight: normal; font-size: 12px;"> — Expected: {{ drop.expectedDeliveryDate | date: 'MMM d, y' }}</span></strong>
         <span style="display:flex; align-items:center; gap:10px;">
           <span style="font-size: 12px; color: #666;">{{ drop.items.length }} item(s)</span>
           <a (click)="removeDrop(drop.id); $event.stopPropagation()" style="color:#c0392b; cursor:pointer; font-size:12px;">Remove Drop</a>
