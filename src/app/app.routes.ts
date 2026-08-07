@@ -243,7 +243,6 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    {
     path: 'settings/acd-cost-settings',
     component: SimpleLookup,
     canActivate: [authGuard],
