@@ -1,0 +1,107 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Logistics — Warehouse Allocation</h1>
+  <p style="color: #888; font-size: 13px;">Items approaching or at clearance completion. Drag a column header to reorder it. Click the ▼ arrow to filter. Click a row to allocate quantities to warehouses.</p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+    <table style="width: 100%; min-width: 1500px; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th
+            *ngFor="let col of columns; let i = index"
+            draggable="true"
+            (dragstart)="onDragStart(i)"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop(i)"
+            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+          >
+            <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+            <span (mousedown)="$event.stopPropagation()">
+              <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let item of items">
+          <tr
+            (click)="selectItem(item)"
+            [style.background]="selectedItem === item ? '#f0f6fb' : 'transparent'"
+            style="border-bottom: 1px solid #eee; cursor: pointer;"
+          >
+            <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+              <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ item.blAwbNo }}</span>
+              <span *ngSwitchCase="'plannedCompletionDate'" style="color: #888;">{{ item.plannedCompletionDate ? (item.plannedCompletionDate | date: 'MMM d, y') : '—' }}</span>
+              <span *ngSwitchCase="'actualCompletionDate'" style="color: #888;">{{ item.actualCompletionDate ? (item.actualCompletionDate | date: 'MMM d, y') : '—' }}</span>
+              <span *ngSwitchCase="'fzDestination'">{{ item.fzDestination || '—' }}</span>
+              <span *ngSwitchCase="'allocatedQty'">{{ item.allocatedQty | number: '1.0-2' }}</span>
+              <span *ngSwitchCase="'remainingQty'" [style.color]="item.remainingQty > 0 ? '#0a3d62' : '#888'" style="font-weight: 600;">{{ item.remainingQty | number: '1.0-2' }}</span>
+              <span *ngSwitchDefault>{{ item[col.key] }}</span>
+            </td>
+          </tr>
+
+          <tr *ngIf="selectedItem === item">
+            <td [attr.colspan]="columns.length" style="padding: 16px; background: #f9f9f9;">
+              <p *ngIf="loadingAllocations" style="color: #888; font-size: 12px;">Loading allocations...</p>
+
+              <table *ngIf="!loadingAllocations && allocations.length > 0" style="width:100%; max-width:600px; border-collapse:collapse; font-size:13px; margin-bottom: 12px;">
+                <thead>
+                  <tr style="text-align:left; border-bottom:1px solid #ddd;">
+                    <th style="padding:5px;">Warehouse</th>
+                    <th style="padding:5px;">City</th>
+                    <th style="padding:5px;">Qty</th>
+                    <th style="padding:5px;">Contact</th>
+                    <th style="padding:5px;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let a of allocations" style="border-bottom:1px solid #eee;">
+                    <td style="padding:5px;">{{ a.warehouseName }}</td>
+                    <td style="padding:5px;">{{ a.deliveryCity || '—' }}</td>
+                    <td style="padding:5px;">{{ a.qty | number: '1.0-2' }}</td>
+                    <td style="padding:5px;">{{ a.contactName || '—' }}<span *ngIf="a.contactPhone"> — {{ a.contactPhone }}</span></td>
+                    <td style="padding:5px;"><a (click)="removeAllocation(a.id)" style="color:#c0392b; cursor:pointer; font-size:12px;">Remove</a></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p *ngIf="allocateError" style="color:#c0392b; font-size:12px;">{{ allocateError }}</p>
+
+              <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Warehouse</label>
+                  <select [(ngModel)]="newWarehouseId" (change)="onWarehouseChange()" style="padding:6px;">
+                    <option [ngValue]="null">-- select --</option>
+                    <option *ngFor="let w of warehouses" [ngValue]="w.id">{{ w['name'] }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Qty (remaining: {{ item.remainingQty | number: '1.0-2' }})</label>
+                  <input type="number" [(ngModel)]="newQty" style="padding:6px; width:100px;" />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Contact Name</label>
+                  <input [(ngModel)]="newContactName" style="padding:6px;" />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Contact Phone</label>
+                  <input [(ngModel)]="newContactPhone" style="padding:6px;" />
+                </div>
+                <button (click)="addAllocation()" [disabled]="allocating || !newWarehouseId || !newQty" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+                  {{ allocating ? 'Saving...' : 'Allocate' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="!loading && items.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No items pending allocation.
+  </p>
+</div>
