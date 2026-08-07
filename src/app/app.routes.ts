@@ -26,6 +26,8 @@ import { HomeRedirect } from './home-redirect';
 import { FzInventoryList } from './fz-inventory/fz-inventory-list/fz-inventory-list';
 import { WithdrawalDetailComponent } from './withdrawal/withdrawal-detail/withdrawal-detail';
 import { LogisticsList } from './logistics/logistics-list/logistics-list';
+import { TruckLoadList } from './logistics/truck-load-list/truck-load-list';
+import { TruckLoadDetailComponent } from './logistics/truck-load-detail/truck-load-detail';
 
 
 export const routes: Routes = [
@@ -58,6 +60,8 @@ export const routes: Routes = [
   { path: 'fz-inventory', component: FzInventoryList, canActivate: [authGuard] },
   { path: 'withdrawals/:id', component: WithdrawalDetailComponent, canActivate: [authGuard] },
   { path: 'logistics', component: LogisticsList, canActivate: [authGuard] },
+  { path: 'logistics/truck-loads', component: TruckLoadList, canActivate: [authGuard] },
+  { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
