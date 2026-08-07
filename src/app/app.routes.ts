@@ -241,6 +241,7 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    {
     path: 'settings/acd-cost-settings',
     component: SimpleLookup,
     canActivate: [authGuard],
@@ -251,6 +252,57 @@ export const routes: Routes = [
         { key: 'rate20Usd', label: '20\' Rate (USD)', type: 'number' },
         { key: 'rate40Usd', label: '40\' Rate (USD)', type: 'number' },
         { key: 'effectiveDate', label: 'Effective Date', type: 'date' }
+      ]
+    }
+  },
+  {
+    path: 'settings/logistics-cities',
+    component: SimpleLookup,
+    canActivate: [authGuard],
+    data: {
+      title: 'Logistics — Cities',
+      resource: 'logistics-cities',
+      fields: [{ key: 'name', label: 'Name', type: 'text' }]
+    }
+  },
+  {
+    path: 'settings/drivers',
+    component: SimpleLookup,
+    canActivate: [authGuard],
+    data: {
+      title: 'Logistics — Drivers',
+      resource: 'drivers',
+      fields: [
+        { key: 'name', label: 'Name', type: 'text' },
+        { key: 'phone', label: 'Phone', type: 'text' }
+      ]
+    }
+  },
+  {
+    path: 'settings/trucks',
+    component: SimpleLookup,
+    canActivate: [authGuard],
+    data: {
+      title: 'Logistics — Trucks',
+      resource: 'trucks',
+      fields: [
+        { key: 'plateNo', label: 'Plate No.', type: 'text' },
+        { key: 'driverId', label: 'Assigned Driver', type: 'select', optionsResource: 'drivers' }
+      ]
+    }
+  },
+  {
+    path: 'settings/warehouses',
+    component: SimpleLookup,
+    canActivate: [authGuard],
+    data: {
+      title: 'Logistics — Warehouses',
+      resource: 'warehouses',
+      fields: [
+        { key: 'name', label: 'Name', type: 'text' },
+        { key: 'cityId', label: 'City', type: 'select', optionsResource: 'logistics-cities' },
+        { key: 'contactName', label: 'Default Contact Name', type: 'text' },
+        { key: 'contactPhone', label: 'Default Contact Phone', type: 'text' }
       ]
     }
   },
