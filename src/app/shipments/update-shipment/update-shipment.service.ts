@@ -76,6 +76,31 @@ export interface ErpColumn {
   invoiceNo: string | null;
   inspectionNo: string | null;
   remarks: string | null;
+  isLast: boolean;
+}
+
+export interface LastOffshoreItem {
+  shipmentLineItemId: number;
+  businessUnit: string;
+  category: string;
+  modelProduct: string;
+  hsCode: string | null;
+  description: string | null;
+  unitPrice: number | null;
+  qty: number;
+  total: number | null;
+}
+
+export interface LastOffshoreDetails {
+  piNo: string | null;
+  inspectionNo: string | null;
+  grn: string | null;
+  invoiceNo: string | null;
+  remarks: string | null;
+  currencyId: number | null;
+  currencyCode: string | null;
+  items: LastOffshoreItem[];
+  grandTotal: number;
 }
 
 export interface ShipmentLineItemHsCode {
@@ -159,5 +184,16 @@ export class UpdateShipmentService {
 
   saveErpColumn(shipmentId: number, offshorePartnerId: number, req: Partial<ErpColumn>) {
     return this.http.put<ErpColumn>(`${API_URL}/shipments/${shipmentId}/erp-info/${offshorePartnerId}`, req);
+  }
+
+  getLastOffshoreDetails(shipmentId: number) {
+    return this.http.get<LastOffshoreDetails>(`${API_URL}/shipments/${shipmentId}/last-offshore`);
+  }
+
+  saveLastOffshoreDetails(shipmentId: number, req: {
+    inspectionNo: string | null; grn: string | null; invoiceNo: string | null; remarks: string | null; currencyId: number | null;
+    items: { shipmentLineItemId: number; hsCode: string | null; description: string | null; unitPrice: number | null }[];
+  }) {
+    return this.http.put(`${API_URL}/shipments/${shipmentId}/last-offshore`, req);
   }
 }
