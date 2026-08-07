@@ -1,0 +1,66 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Truck Loads</h1>
+    <button (click)="toggleNewForm()" style="padding: 8px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      + New Truck Load
+    </button>
+  </div>
+
+  <div *ngIf="showNewForm" style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1rem; background: #f9f9f9;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Truck</label>
+        <select [(ngModel)]="newTruckId" (change)="onTruckChange()" style="padding: 6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let t of trucks" [ngValue]="t.id">{{ t['plateNo'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Driver</label>
+        <select [(ngModel)]="newDriverId" style="padding: 6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Load Date</label>
+        <input type="date" [(ngModel)]="newLoadDate" style="padding: 6px;" />
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Notes</label>
+        <input [(ngModel)]="newNotes" style="padding: 6px;" />
+      </div>
+      <button (click)="createLoad()" [disabled]="creating || !newTruckId || !newLoadDate" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        {{ creating ? 'Creating...' : 'Create' }}
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">Truck</th>
+        <th style="padding: 8px 6px;">Driver</th>
+        <th style="padding: 8px 6px;">Load Date</th>
+        <th style="padding: 8px 6px;">Drops</th>
+        <th style="padding: 8px 6px;">Items</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let l of loads" (click)="openLoad(l.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
+        <td style="padding: 8px 6px; font-family: monospace;">{{ l.plateNo }}</td>
+        <td style="padding: 8px 6px;">{{ l.driverName || '—' }}</td>
+        <td style="padding: 8px 6px; color: #888;">{{ l.loadDate | date: 'MMM d, y' }}</td>
+        <td style="padding: 8px 6px;">{{ l.dropCount }}</td>
+        <td style="padding: 8px 6px;">{{ l.itemCount }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && loads.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No truck loads yet.
+  </p>
+</div>
