@@ -8,7 +8,7 @@ import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { ErpColumn, LastOffshoreDetails, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
 
-type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'banking' | 'erpInfo';
+type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'banking' | 'erpInfo' | 'lastOffshore';
 
 @Component({
   selector: 'app-update-shipment',
@@ -32,10 +32,10 @@ export class UpdateShipment implements OnInit {
   receiverBanks: LookupEntity[] = [];
   tenors: LookupEntity[] = [];
 
-  sectionOrder: SectionKey[] = ['shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'banking', 'erpInfo'];
+  sectionOrder: SectionKey[] = ['shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'banking', 'erpInfo', 'lastOffshore'];
   expandedSection: SectionKey | null = 'shipOnBoard';
   saving: Record<SectionKey, boolean> = {
-    shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, banking: false, erpInfo: false
+    shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, banking: false, erpInfo: false, lastOffshore: false
   };
 
   erpColumns: ErpColumn[] = [];
