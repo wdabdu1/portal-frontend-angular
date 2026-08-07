@@ -1,10 +1,11 @@
-<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 style="font-size: 20px; font-weight: 500;">Truck Loads</h1>
     <button (click)="toggleNewForm()" style="padding: 8px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
       + New Truck Load
     </button>
   </div>
+  <p style="color: #888; font-size: 12px; margin-top: 8px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column. Click a row to open that truck load.</p>
 
   <div *ngIf="showNewForm" style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1rem; background: #f9f9f9;">
     <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
@@ -39,28 +40,44 @@
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
 
-  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
-    <thead>
-      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 8px 6px;">Truck</th>
-        <th style="padding: 8px 6px;">Driver</th>
-        <th style="padding: 8px 6px;">Load Date</th>
-        <th style="padding: 8px 6px;">Drops</th>
-        <th style="padding: 8px 6px;">Items</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let l of loads" (click)="openLoad(l.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
-        <td style="padding: 8px 6px; font-family: monospace;">{{ l.plateNo }}</td>
-        <td style="padding: 8px 6px;">{{ l.driverName || '—' }}</td>
-        <td style="padding: 8px 6px; color: #888;">{{ l.loadDate | date: 'MMM d, y' }}</td>
-        <td style="padding: 8px 6px;">{{ l.dropCount }}</td>
-        <td style="padding: 8px 6px;">{{ l.itemCount }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div *ngIf="!loading" style="overflow-x: auto;">
+    <table style="width: 100%; min-width: 1400px; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th
+            *ngFor="let col of columns; let i = index"
+            draggable="true"
+            (dragstart)="onDragStart(i)"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop(i)"
+            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+          >
+            <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+            <span (mousedown)="$event.stopPropagation()">
+              <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items" (click)="openTruckLoad(item.truckLoadId)" style="border-bottom: 1px solid #eee; cursor: pointer;">
+          <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+            <span *ngSwitchCase="'plateNo'" style="font-family: monospace;">{{ item.plateNo }}</span>
+            <span *ngSwitchCase="'driverName'">{{ item.driverName || '—' }}</span>
+            <span *ngSwitchCase="'loadDate'" style="color: #888;">{{ item.loadDate | date: 'MMM d, y' }}</span>
+            <span *ngSwitchCase="'city'">{{ item.city || '—' }}</span>
+            <span *ngSwitchCase="'expectedDeliveryDate'" style="color: #0a3d62;">{{ item.expectedDeliveryDate ? (item.expectedDeliveryDate | date: 'MMM d, y') : '—' }}</span>
+            <span *ngSwitchCase="'inHousePrice'">{{ item.inHousePrice !== null ? (item.inHousePrice | number: '1.2-2') : '—' }}</span>
+            <span *ngSwitchCase="'parallelMarketPrice'">{{ item.parallelMarketPrice !== null ? (item.parallelMarketPrice | number: '1.2-2') : '—' }}</span>
+            <span *ngSwitchDefault>{{ item[col.key] }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <p *ngIf="!loading && loads.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
-    No truck loads yet.
+  <p *ngIf="!loading && items.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No truck load items yet.
   </p>
 </div>
