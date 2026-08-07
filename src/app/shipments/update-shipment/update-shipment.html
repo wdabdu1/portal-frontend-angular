@@ -111,25 +111,7 @@
           <button (click)="goToNext('acd')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
 
-        <h4 style="font-size:13px; margin:20px 0 8px; color:#333;">HS Codes</h4>
-        <table style="width:100%; border-collapse:collapse; font-size:13px;">
-          <thead>
-            <tr style="text-align:left; border-bottom:1px solid #ddd;">
-              <th style="padding:5px;">Product</th>
-              <th style="padding:5px;">HS Code</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let l of hsCodeLines" style="border-bottom:1px solid #eee;">
-              <td style="padding:5px;">{{ l.modelProduct }}</td>
-              <td style="padding:5px;"><input [(ngModel)]="l.hsCode" [disabled]="isLocked('acd')" style="width:200px; padding:4px;" /></td>
-            </tr>
-          </tbody>
-        </table>
-        <button (click)="saveHsCodes()" [disabled]="savingHsCodes || isLocked('acd')" style="margin-top:10px; padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">
-          {{ savingHsCodes ? 'Saving...' : 'Save HS Codes' }}
-        </button>
-      </div>
+        </div>
     </div>
 
     <!-- Draft Documents -->
