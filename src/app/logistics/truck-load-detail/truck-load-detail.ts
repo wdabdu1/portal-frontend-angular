@@ -22,6 +22,7 @@ export class TruckLoadDetailComponent implements OnInit {
 
   warehouses: LookupEntity[] = [];
   newDropWarehouseId: number | null = null;
+  newDropExpectedDeliveryDate = '';
   addingDrop = false;
 
   expandedDropId: number | null = null;
@@ -52,10 +53,11 @@ export class TruckLoadDetailComponent implements OnInit {
   addDrop(): void {
     if (!this.newDropWarehouseId) return;
     this.addingDrop = true;
-    this.service.addDrop(this.truckLoadId, this.newDropWarehouseId).subscribe({
+    this.service.addDrop(this.truckLoadId, this.newDropWarehouseId, this.newDropExpectedDeliveryDate || null).subscribe({
       next: () => {
         this.addingDrop = false;
         this.newDropWarehouseId = null;
+        this.newDropExpectedDeliveryDate = '';
         this.load();
       },
       error: () => { this.addingDrop = false; this.error = 'Could not add drop.'; this.cdr.markForCheck(); }
