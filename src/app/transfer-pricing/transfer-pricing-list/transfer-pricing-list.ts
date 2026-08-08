@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TpOrderSummary, TransferPricingService } from '../transfer-pricing.service';
 
 @Component({
   selector: 'app-transfer-pricing-list',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './transfer-pricing-list.html'
 })
 export class TransferPricingList implements OnInit {
