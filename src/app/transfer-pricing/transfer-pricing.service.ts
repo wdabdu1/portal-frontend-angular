@@ -22,6 +22,7 @@ export interface TpLineItem {
   blAwbNo: string;
   supplierTotal: number;
   supplierCurrencyCode: string;
+  supplierTotalUsd: number;
   supplierCnfUsd: number;
   stages: TpStage[];
 }
