@@ -42,7 +42,7 @@ export class TransferPricingDetailComponent implements OnInit {
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('shipmentId'));
     this.lookups.getAll<LookupEntity>('currencies').subscribe({ next: (r) => { this.currencies = r; this.cdr.markForCheck(); } });
-    this.lookups.getAll<{ currencyId: number; rateToUsd: number; effectiveDate: string }>('fx-rates').subscribe({
+    this.lookups.getAll<{ id: number; currencyId: number; rateToUsd: number; effectiveDate: string }>('fx-rates').subscribe({
       next: (rates) => {
         // Keep only the most recent rate per currency, matching the
         // backend's own "OrderByDescending(EffectiveDate).First()" logic.
