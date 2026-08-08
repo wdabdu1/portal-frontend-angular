@@ -49,8 +49,14 @@
             </select>
           </div>
           <div>
-            <label style="display:block; font-size:12px; color:#555;">Actual Shipping Cost</label>
-            <input type="text" appThousands [(ngModel)]="forwarderForm.actualShippingCost" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <label style="display:block; font-size:12px; color:#555;">Amount Saved</label>
+            <input type="text" appThousands [(ngModel)]="forwarderForm.amountSaved" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <p *ngIf="amountSavedPercentOfBudget !== null" style="font-size:11px; color:#1e7e34; margin:4px 0 0;">
+              {{ amountSavedPercentOfBudget | number: '1.1-1' }}% of BU Shipping Budget
+            </p>
+            <p *ngIf="amountSavedPercentOfBudget === null && !detail?.buShippingBudget" style="font-size:11px; color:#888; margin:4px 0 0;">
+              No BU Shipping Budget set on this order
+            </p>
           </div>
           <div>
             <label style="display:block; font-size:12px; color:#555;">Currency</label>
