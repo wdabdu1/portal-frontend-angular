@@ -148,11 +148,12 @@
           </div>
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Copy of DO Collected Date</label><input type="date" [(ngModel)]="deliveryOrderForm.copyOfDoCollectedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Receive DO Date</label><input type="date" [(ngModel)]="deliveryOrderForm.receiveDoDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Actual Arrival Date</label><input type="date" [(ngModel)]="deliveryOrderForm.actualArrivalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; font-weight:bold; color:#c0392b;">Vessel Actual Arrival Date</label><input type="date" [(ngModel)]="deliveryOrderForm.actualArrivalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="deliveryOrderForm.depositRequired" id="depreq" /><label for="depreq" style="font-size:13px;">Deposit Required?</label></div>
             <div><label style="display:block; font-size:12px; color:#555;">DO Actual Fees (SDG)</label><input type="text" appThousands [(ngModel)]="deliveryOrderForm.doActualFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">DO Fees Settled Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doFeesSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">DO Received Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
@@ -337,7 +338,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route1Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route1Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Shipping Line Deposit Return Date</label><input type="date" [(ngModel)]="route1Form.shippingLineDepositReturnDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Deposit Value</label><input type="text" appThousands [(ngModel)]="route1Form.depositValue" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Amount Returned from Deposit</label><input type="text" appThousands [(ngModel)]="route1Form.depositValue" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route1Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px;">
