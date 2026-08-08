@@ -27,6 +27,27 @@ export interface TpLineItem {
   stages: TpStage[];
 }
 
+export interface TpOrderSummary {
+  shipmentId: number;
+  blAwbNo: string;
+  poNumber: string;
+  businessUnit: string;
+  isConfirmed: boolean;
+}
+
+export interface BuStageAccumulated {
+  sequenceOrder: number;
+  isLast: boolean;
+  totalUsd: number;
+  markupPercent: number;
+}
+
+export interface BuAccumulatedRow {
+  businessUnit: string;
+  totalSupplierUsd: number;
+  stages: BuStageAccumulated[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class TransferPricingService {
   constructor(private http: HttpClient) {}
@@ -37,5 +58,13 @@ export class TransferPricingService {
 
   saveLineItem(shipmentLineItemId: number, stages: { purchaseOrderOffshorePartnerId: number; currencyId: number; markupPercent: number | null }[]) {
     return this.http.put(`${API_URL}/transfer-pricing/line-item/${shipmentLineItemId}`, { stages });
+  }
+
+  getOrders() {
+    return this.http.get<TpOrderSummary[]>(`${API_URL}/transfer-pricing/orders`);
+  }
+
+  getAccumulated() {
+    return this.http.get<BuAccumulatedRow[]>(`${API_URL}/transfer-pricing/accumulated`);
   }
 }
