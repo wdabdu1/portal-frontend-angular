@@ -1,18 +1,45 @@
-<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
-  <a routerLink="/transfer-pricing" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Orders</a>
+<h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Accumulated Orders History</h1>
+  <p style="color: #888; font-size: 13px;">Totals across every confirmed shipment.</p>
 
-  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Accumulated Orders History</h1>
-  <p style="color: #888; font-size: 13px;">Totals across every confirmed shipment, grouped by Business Unit. A stage's Markup % is blended from aggregate totals, not averaged per shipment.</p>
+  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2rem;">By Offshore Company</h2>
+  <p style="color: #888; font-size: 13px;">Every offshore entity's accumulated performance, regardless of which BU or chain position they occupied — the dollar Markup quantifies the actual action needed (rectify a loss, trim an over-large margin, etc.), not just the rate.</p>
+
+  <p *ngIf="loadingOffshore" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <table *ngIf="!loadingOffshore" style="width: 100%; max-width: 800px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">Offshore Company</th>
+        <th style="padding: 8px 6px;">Accumulated Revenue (USD)</th>
+        <th style="padding: 8px 6px;">Accumulated Markup (USD)</th>
+        <th style="padding: 8px 6px;">Markup %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of offshoreRows" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px 6px; font-weight: 600;">{{ r.companyName }}</td>
+        <td style="padding: 8px 6px;">{{ r.accumulatedRevenueUsd | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;" [style.color]="r.accumulatedMarkupUsd >= 0 ? '#1e7e34' : '#c0392b'">{{ r.accumulatedMarkupUsd | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;" [style.color]="r.markupPercent >= 0 ? '#1e7e34' : '#c0392b'">{{ r.markupPercent | number: '1.1-1' }}%</td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="!loadingOffshore && offshoreRows.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">
+    No confirmed orders yet.
+  </p>
+
+  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2.5rem;">By Business Unit</h2>
+  <p style="color: #888; font-size: 13px;">Grouped by BU and chain position. A stage's Markup % is blended from aggregate totals, not averaged per shipment.</p>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
 
   <div *ngIf="!loading" style="overflow-x: auto;">
-    <table style="width: 100%; min-width: 900px; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+    <table style="width: 100%; min-width: 900px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
           <th style="padding: 8px 6px;">BU</th>
-          <th style="padding: 8px 6px;">TTL Supplier (USD)</th>
+          <th style="padding: 8px 6px;">Supplier CNF TTL (USD)</th>
           <ng-container *ngFor="let seq of allSequenceOrders">
             <th style="padding: 8px 6px; background: #f7f7f7;" colspan="2">{{ stageLabel(seq) }}</th>
           </ng-container>
