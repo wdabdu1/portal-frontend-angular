@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { BuAccumulatedRow, TransferPricingService } from '../transfer-pricing.service';
 
 @Component({
   selector: 'app-transfer-pricing-accumulated',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './transfer-pricing-accumulated.html'
 })
 export class TransferPricingAccumulated implements OnInit {
