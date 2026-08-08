@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { BuAccumulatedRow, TransferPricingService } from '../transfer-pricing.service';
+import { BuAccumulatedRow, OffshoreCompanyAccumulated, TransferPricingService } from '../transfer-pricing.service';
 
 @Component({
   selector: 'app-transfer-pricing-accumulated',
@@ -12,13 +12,24 @@ export class TransferPricingAccumulated implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   rows: BuAccumulatedRow[] = [];
+  offshoreRows: OffshoreCompanyAccumulated[] = [];
   loading = true;
+  loadingOffshore = true;
   error = '';
 
   constructor(private service: TransferPricingService) {}
 
   ngOnInit(): void {
     this.load();
+    this.loadOffshore();
+  }
+
+  loadOffshore(): void {
+    this.loadingOffshore = true;
+    this.service.getAccumulatedByOffshore().subscribe({
+      next: (r) => { this.offshoreRows = r; this.loadingOffshore = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingOffshore = false; this.cdr.markForCheck(); }
+    });
   }
 
   load(): void {
