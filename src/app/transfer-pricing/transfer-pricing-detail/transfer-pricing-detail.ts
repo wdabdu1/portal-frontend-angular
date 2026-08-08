@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
-import { TpLineItem, TransferPricingService } from '../transfer-pricing.service';
+import { TpLineItem, TpStage, TransferPricingService } from '../transfer-pricing.service';
 
 @Component({
   selector: 'app-transfer-pricing-detail',
@@ -24,6 +24,11 @@ export class TransferPricingDetailComponent implements OnInit {
   currencies: LookupEntity[] = [];
   locks: Record<string, SectionLockInfo | null> = {};
 
+  // Latest RateToUsd per currency, used to replicate the backend's exact
+  // markup-cascade formula client-side, so every stage recalculates live
+  // as the user types — no save/reload round-trip needed to see the impact.
+  fxRates: Record<number, number> = {};
+
   // Editable draft state per (lineItemId, offshorePartnerId)
   drafts: Record<string, { currencyId: number | null; markupPercent: number | null }> = {};
   savingItem: Record<number, boolean> = {};
@@ -37,8 +42,58 @@ export class TransferPricingDetailComponent implements OnInit {
   ngOnInit(): void {
     this.shipmentId = Number(this.route.snapshot.paramMap.get('shipmentId'));
     this.lookups.getAll<LookupEntity>('currencies').subscribe({ next: (r) => { this.currencies = r; this.cdr.markForCheck(); } });
+    this.lookups.getAll<{ currencyId: number; rateToUsd: number; effectiveDate: string }>('fx-rates').subscribe({
+      next: (rates) => {
+        // Keep only the most recent rate per currency, matching the
+        // backend's own "OrderByDescending(EffectiveDate).First()" logic.
+        const latest: Record<number, { rateToUsd: number; effectiveDate: string }> = {};
+        for (const r of rates) {
+          if (!latest[r.currencyId] || r.effectiveDate > latest[r.currencyId].effectiveDate) {
+            latest[r.currencyId] = r;
+          }
+        }
+        this.fxRates = {};
+        for (const [currencyId, r] of Object.entries(latest)) this.fxRates[Number(currencyId)] = r.rateToUsd;
+        this.cdr.markForCheck();
+      }
+    });
     this.load();
     this.loadLocks();
+  }
+
+  getRateToUsd(currencyId: number | null): number {
+    if (!currencyId) return 1;
+    return this.fxRates[currencyId] ?? 1;
+  }
+
+  // Recomputes the ENTIRE chain for one line item from current draft
+  // inputs (not the last-saved server values), so every downstream stage
+  // — including the last offshore's margin % — updates live as markups
+  // or currencies change.
+  computeLiveStages(item: TpLineItem): (TpStage & { liveTotal: number | null; liveTotalUsd: number | null; liveMarkupPercent: number | null })[] {
+    let runningUsd = item.supplierCnfUsd;
+    const result: (TpStage & { liveTotal: number | null; liveTotalUsd: number | null; liveMarkupPercent: number | null })[] = [];
+
+    for (const stage of item.stages) {
+      if (!stage.isLast) {
+        const draft = this.draftFor(item.shipmentLineItemId, stage.purchaseOrderOffshorePartnerId);
+        const currencyId = draft.currencyId ?? stage.currencyId;
+        const markup = draft.markupPercent ?? 0;
+        const rate = this.getRateToUsd(currencyId);
+
+        const stageValueInCurrency = runningUsd * rate;
+        const total = stageValueInCurrency * (1 + markup / 100);
+        const totalUsd = rate === 0 ? total : total / rate;
+
+        result.push({ ...stage, liveTotal: total, liveTotalUsd: totalUsd, liveMarkupPercent: markup });
+        runningUsd = totalUsd;
+      } else {
+        const lastTotalUsd = stage.totalUsd;
+        const liveMarkupPercent = lastTotalUsd !== null && runningUsd !== 0 ? ((lastTotalUsd - runningUsd) / runningUsd) * 100 : null;
+        result.push({ ...stage, liveTotal: stage.total, liveTotalUsd: lastTotalUsd, liveMarkupPercent });
+      }
+    }
+    return result;
   }
 
   get isLocked(): boolean {
