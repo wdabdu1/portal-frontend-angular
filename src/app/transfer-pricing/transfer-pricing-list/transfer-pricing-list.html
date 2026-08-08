@@ -18,20 +18,29 @@
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
 
-  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+  <div style="overflow-x: auto;">
+  <table *ngIf="!loading" style="width: 100%; min-width: 1100px; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 8px 6px;">BU</th>
-        <th style="padding: 8px 6px;">BL/AWB No.</th>
-        <th style="padding: 8px 6px;">PO Number</th>
-        <th style="padding: 8px 6px;">Status</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">Created</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">BU</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">BL/AWB No.</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">PO Number</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">Supplier</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">Supplier Value (USD)</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">Route</th>
+        <th style="padding: 8px 6px; white-space: nowrap;">Status</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let o of orders" (click)="openOrder(o.shipmentId)" style="border-bottom: 1px solid #eee; cursor: pointer;">
+        <td style="padding: 8px 6px; color: #888; white-space: nowrap;">{{ o.createdAt | date: 'MMM d, y' }}</td>
         <td style="padding: 8px 6px;">{{ o.businessUnit }}</td>
         <td style="padding: 8px 6px; font-family: monospace;">{{ o.blAwbNo }}</td>
         <td style="padding: 8px 6px;">{{ o.poNumber }}</td>
+        <td style="padding: 8px 6px;">{{ o.supplierName }}</td>
+        <td style="padding: 8px 6px;">{{ o.supplierValueUsd | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px; font-size: 12px; color: #555; white-space: nowrap;">{{ o.routeCompanyNames.join(' → ') }} → Onshore</td>
         <td style="padding: 8px 6px;">
           <span [style.background]="o.isConfirmed ? '#e6f4ea' : '#fff4e5'" [style.color]="o.isConfirmed ? '#1e7e34' : '#a66a00'" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
             {{ o.isConfirmed ? 'Confirmed' : 'Pending' }}
@@ -40,6 +49,7 @@
       </tr>
     </tbody>
   </table>
+  </div>
 
   <p *ngIf="!loading && orders.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
     No {{ statusFilter === 'All' ? '' : (statusFilter.toLowerCase() + ' ') }}orders.
