@@ -65,7 +65,6 @@ export const routes: Routes = [
   { path: 'logistics', component: LogisticsList, canActivate: [authGuard] },
   { path: 'logistics/truck-loads', component: TruckLoadList, canActivate: [authGuard] },
   { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard] },
-  { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard] },
   { path: 'transfer-pricing', component: TransferPricingList, canActivate: [authGuard] },
   { path: 'transfer-pricing/accumulated', component: TransferPricingAccumulated, canActivate: [authGuard] },
   { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard] },
