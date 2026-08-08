@@ -32,6 +32,7 @@ export class TransferPricingDetailComponent implements OnInit {
   // Editable draft state per (lineItemId, offshorePartnerId)
   drafts: Record<string, { currencyId: number | null; markupPercent: number | null }> = {};
   savingItem: Record<number, boolean> = {};
+  confirming = false;
 
   constructor(
     private service: TransferPricingService,
@@ -98,6 +99,14 @@ export class TransferPricingDetailComponent implements OnInit {
 
   get isLocked(): boolean {
     return !!this.locks['transferPricing'];
+  }
+
+  confirmAndLock(): void {
+    this.confirming = true;
+    this.lockService.confirm('Shipment', this.shipmentId, 'transferPricing').subscribe({
+      next: () => { this.confirming = false; this.loadLocks(); },
+      error: () => { this.confirming = false; this.error = 'Could not confirm & lock.'; this.cdr.markForCheck(); }
+    });
   }
 
   loadLocks(): void {
