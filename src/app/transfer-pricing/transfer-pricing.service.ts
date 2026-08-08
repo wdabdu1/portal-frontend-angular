@@ -52,6 +52,13 @@ export interface BuAccumulatedRow {
   stages: BuStageAccumulated[];
 }
 
+export interface OffshoreCompanyAccumulated {
+  companyName: string;
+  accumulatedRevenueUsd: number;
+  accumulatedMarkupUsd: number;
+  markupPercent: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TransferPricingService {
   constructor(private http: HttpClient) {}
@@ -70,5 +77,9 @@ export class TransferPricingService {
 
   getAccumulated() {
     return this.http.get<BuAccumulatedRow[]>(`${API_URL}/transfer-pricing/accumulated`);
+  }
+
+  getAccumulatedByOffshore() {
+    return this.http.get<OffshoreCompanyAccumulated[]>(`${API_URL}/transfer-pricing/accumulated-by-offshore`);
   }
 }
