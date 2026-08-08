@@ -1,0 +1,47 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Transfer Pricing — Orders</h1>
+    <a routerLink="/transfer-pricing/accumulated" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px;">
+      Accumulated Orders History
+    </a>
+  </div>
+
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
+    <select [(ngModel)]="statusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Pending">Pending</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="All">All</option>
+    </select>
+    <input [(ngModel)]="searchText" placeholder="Search by BL/AWB, PO No., or BU" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 280px;" />
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">BU</th>
+        <th style="padding: 8px 6px;">BL/AWB No.</th>
+        <th style="padding: 8px 6px;">PO Number</th>
+        <th style="padding: 8px 6px;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let o of orders" (click)="openOrder(o.shipmentId)" style="border-bottom: 1px solid #eee; cursor: pointer;">
+        <td style="padding: 8px 6px;">{{ o.businessUnit }}</td>
+        <td style="padding: 8px 6px; font-family: monospace;">{{ o.blAwbNo }}</td>
+        <td style="padding: 8px 6px;">{{ o.poNumber }}</td>
+        <td style="padding: 8px 6px;">
+          <span [style.background]="o.isConfirmed ? '#e6f4ea' : '#fff4e5'" [style.color]="o.isConfirmed ? '#1e7e34' : '#a66a00'" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+            {{ o.isConfirmed ? 'Confirmed' : 'Pending' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && orders.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No {{ statusFilter === 'All' ? '' : (statusFilter.toLowerCase() + ' ') }}orders.
+  </p>
+</div>
