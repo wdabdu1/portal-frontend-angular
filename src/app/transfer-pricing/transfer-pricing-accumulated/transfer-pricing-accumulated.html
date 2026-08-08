@@ -1,0 +1,50 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/transfer-pricing" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Orders</a>
+
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Accumulated Orders History</h1>
+  <p style="color: #888; font-size: 13px;">Totals across every confirmed shipment, grouped by Business Unit. A stage's Markup % is blended from aggregate totals, not averaged per shipment.</p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+    <table style="width: 100%; min-width: 900px; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th style="padding: 8px 6px;">BU</th>
+          <th style="padding: 8px 6px;">TTL Supplier (USD)</th>
+          <ng-container *ngFor="let seq of allSequenceOrders">
+            <th style="padding: 8px 6px; background: #f7f7f7;" colspan="2">{{ stageLabel(seq) }}</th>
+          </ng-container>
+        </tr>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd; font-size: 11px; color: #888;">
+          <th colspan="2"></th>
+          <ng-container *ngFor="let seq of allSequenceOrders">
+            <th style="padding: 4px 6px;">Total (USD)</th>
+            <th style="padding: 4px 6px;">Markup %</th>
+          </ng-container>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 8px 6px; font-weight: 600;">{{ row.businessUnit }}</td>
+          <td style="padding: 8px 6px;">{{ row.totalSupplierUsd | number: '1.2-2' }}</td>
+          <ng-container *ngFor="let seq of allSequenceOrders">
+            <ng-container *ngIf="stageFor(row, seq) as stage; else emptyStage">
+              <td style="padding: 8px 6px;">{{ stage.totalUsd | number: '1.2-2' }}</td>
+              <td style="padding: 8px 6px;" [style.font-weight]="stage.isLast ? '600' : 'normal'">{{ stage.markupPercent | number: '1.1-1' }}%</td>
+            </ng-container>
+            <ng-template #emptyStage>
+              <td style="padding: 8px 6px; color: #ccc;">—</td>
+              <td style="padding: 8px 6px; color: #ccc;">—</td>
+            </ng-template>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No confirmed orders yet.
+  </p>
+</div>
