@@ -127,6 +127,7 @@ export interface ShipmentDetail {
   category: string;
   sobActualDate: string | null;
   lineItemHsCodes: ShipmentLineItemHsCode[];
+  buShippingBudget: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
