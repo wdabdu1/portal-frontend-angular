@@ -34,6 +34,13 @@ export class TransferPricingDetailComponent implements OnInit {
   savingItem: Record<number, boolean> = {};
   confirming = false;
 
+  // Stored, not recomputed on every change-detection cycle — only
+  // recalculated explicitly via onDraftChange(), triggered by actual
+  // user input. Calling the calculation directly inside *ngFor was
+  // rebuilding the array (and every input/select in the row) on every
+  // CD cycle, which is what was causing the page to hang.
+  liveStagesByItem: Record<number, (TpStage & { liveTotal: number | null; liveTotalUsd: number | null; liveMarkupPercent: number | null })[]> = {};
+
   constructor(
     private service: TransferPricingService,
     private lookups: SettingsLookupService,
@@ -71,7 +78,11 @@ export class TransferPricingDetailComponent implements OnInit {
   // inputs (not the last-saved server values), so every downstream stage
   // — including the last offshore's margin % — updates live as markups
   // or currencies change.
-  computeLiveStages(item: TpLineItem): (TpStage & { liveTotal: number | null; liveTotalUsd: number | null; liveMarkupPercent: number | null })[] {
+  // Recalculates and STORES the live chain for one item — call this from
+  // (ngModelChange) on the actual inputs, never from inside a template's
+  // *ngFor, which would rebuild everything on every CD cycle instead of
+  // only when something real changes.
+  onDraftChange(item: TpLineItem): void {
     let runningUsd = item.supplierCnfUsd;
     const result: (TpStage & { liveTotal: number | null; liveTotalUsd: number | null; liveMarkupPercent: number | null })[] = [];
 
@@ -94,7 +105,7 @@ export class TransferPricingDetailComponent implements OnInit {
         result.push({ ...stage, liveTotal: stage.total, liveTotalUsd: lastTotalUsd, liveMarkupPercent });
       }
     }
-    return result;
+    this.liveStagesByItem[item.shipmentLineItemId] = result;
   }
 
   get isLocked(): boolean {
@@ -138,6 +149,7 @@ export class TransferPricingDetailComponent implements OnInit {
             };
           }
         }
+        for (const item of r) this.onDraftChange(item);
         this.loading = false;
         this.cdr.markForCheck();
       },
