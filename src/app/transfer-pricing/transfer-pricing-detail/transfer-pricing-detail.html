@@ -51,14 +51,14 @@
           <td style="padding: 8px 6px;">{{ item.supplierTotalUsd | number: '1.2-2' }}</td>
           <td style="padding: 8px 6px;">{{ item.supplierCnfUsd | number: '1.2-2' }}</td>
 
-          <ng-container *ngFor="let stage of computeLiveStages(item)">
+          <ng-container *ngFor="let stage of liveStagesByItem[item.shipmentLineItemId]">
             <ng-container *ngIf="!stage.isLast">
               <td style="padding: 8px 6px;">
-                <select [(ngModel)]="draftFor(item.shipmentLineItemId, stage.purchaseOrderOffshorePartnerId).currencyId" [disabled]="isLocked" style="width:80px; padding:4px;">
+                <select [(ngModel)]="draftFor(item.shipmentLineItemId, stage.purchaseOrderOffshorePartnerId).currencyId" (ngModelChange)="onDraftChange(item)" [disabled]="isLocked" style="width:80px; padding:4px;">
                   <option [ngValue]="null">--</option>
                   <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
                 </select>
-                <input type="number" [(ngModel)]="draftFor(item.shipmentLineItemId, stage.purchaseOrderOffshorePartnerId).markupPercent" [disabled]="isLocked" placeholder="%" style="width:60px; padding:4px; margin-left:4px;" />
+                <input type="number" [(ngModel)]="draftFor(item.shipmentLineItemId, stage.purchaseOrderOffshorePartnerId).markupPercent" (ngModelChange)="onDraftChange(item)" [disabled]="isLocked" placeholder="%" style="width:60px; padding:4px; margin-left:4px;" />
               </td>
               <td style="padding: 8px 6px;">{{ stage.liveTotalUsd !== null ? (stage.liveTotalUsd | number: '1.2-2') : '—' }}</td>
             </ng-container>
