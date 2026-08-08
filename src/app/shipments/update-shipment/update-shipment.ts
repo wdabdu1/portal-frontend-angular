@@ -251,6 +251,12 @@ export class UpdateShipment implements OnInit {
     return (currency?.['code'] as string) ?? '';
   }
 
+  get amountSavedPercentOfBudget(): number | null {
+    const budget = this.detail?.buShippingBudget;
+    if (!budget || !this.forwarderForm.amountSaved) return null;
+    return (this.forwarderForm.amountSaved / budget) * 100;
+  }
+
   toggleSection(key: SectionKey): void {
     this.expandedSection = this.expandedSection === key ? null : key;
   }
