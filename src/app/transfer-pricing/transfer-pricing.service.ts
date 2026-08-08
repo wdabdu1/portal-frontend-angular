@@ -32,6 +32,10 @@ export interface TpOrderSummary {
   blAwbNo: string;
   poNumber: string;
   businessUnit: string;
+  supplierName: string;
+  supplierValueUsd: number;
+  createdAt: string;
+  routeCompanyNames: string[];
   isConfirmed: boolean;
 }
 
