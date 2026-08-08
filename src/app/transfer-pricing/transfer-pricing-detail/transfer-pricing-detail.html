@@ -3,7 +3,7 @@
 
   <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
     <h1 style="font-size: 20px; font-weight: 500;">Transfer Pricing</h1>
-    <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="transferPricing" [lockInfo]="locks['transferPricing']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+    <app-section-lock-badge *ngIf="locks['transferPricing']" entityType="Shipment" [entityId]="shipmentId" sectionKey="transferPricing" [lockInfo]="locks['transferPricing']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
   </div>
   <p style="color: #888; font-size: 13px;">Enter Markup % at each middle offshore stage — totals cascade automatically. The last offshore's total and margin are pulled from Last Offshore Details.</p>
 
@@ -82,4 +82,21 @@
   <p *ngIf="!loading && items.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
     No line items on this shipment.
   </p>
+
+  <div *ngIf="!loading && items.length > 0" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #ddd;">
+    <p *ngIf="!isLocked" style="font-size: 12px; color: #888; margin-bottom: 8px;">
+      Once confirmed, this shipment's pricing is locked from further edits — save every line item above first.
+    </p>
+    <button
+      *ngIf="!isLocked"
+      (click)="confirmAndLock()"
+      [disabled]="confirming"
+      style="padding:10px 20px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer; font-size:14px;"
+    >
+      {{ confirming ? 'Confirming...' : 'Confirm & Lock Transfer Pricing' }}
+    </button>
+    <span *ngIf="isLocked" style="font-size:13px; color:#1e7e34; font-weight:600;">
+      ✓ Confirmed & Locked
+    </span>
+  </div>
 </div>
