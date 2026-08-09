@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { BuAccumulatedRow, OffshoreCompanyAccumulated, TransferPricingService } from '../transfer-pricing.service';
 
 @Component({
@@ -57,5 +58,33 @@ export class TransferPricingAccumulated implements OnInit {
   stageLabel(sequenceOrder: number): string {
     const isLastAnywhere = this.rows.some((r) => r.stages.some((s) => s.sequenceOrder === sequenceOrder && s.isLast));
     return isLastAnywhere ? `Offshore-${sequenceOrder} (Last, where applicable)` : `Offshore-${sequenceOrder}`;
+  }
+
+  onExportOffshoreClick(): void {
+    exportToExcel('Accumulated By Offshore Company', [
+      { label: 'Offshore Company', key: 'companyName' },
+      { label: 'Accumulated Revenue (USD)', key: 'accumulatedRevenueUsd' },
+      { label: 'Accumulated Markup (USD)', key: 'accumulatedMarkupUsd' },
+      { label: 'Markup %', key: 'markupPercent' }
+    ], this.offshoreRows);
+  }
+
+  onExportBuClick(): void {
+    const flattened = this.rows.flatMap((row) =>
+      row.stages.map((stage) => ({
+        businessUnit: row.businessUnit,
+        supplierCnfTtlUsd: row.totalSupplierUsd,
+        sequenceOrder: stage.isLast ? `Offshore-${stage.sequenceOrder} (Last)` : `Offshore-${stage.sequenceOrder}`,
+        totalUsd: stage.totalUsd,
+        markupPercent: stage.markupPercent
+      }))
+    );
+    exportToExcel('Accumulated By Business Unit', [
+      { label: 'BU', key: 'businessUnit' },
+      { label: 'Supplier CNF TTL (USD)', key: 'supplierCnfTtlUsd' },
+      { label: 'Stage', key: 'sequenceOrder' },
+      { label: 'Total (USD)', key: 'totalUsd' },
+      { label: 'Markup %', key: 'markupPercent' }
+    ], flattened);
   }
 }
