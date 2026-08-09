@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { ClearanceService, ClearanceShipmentSummary } from '../clearance.service';
 
 type SortColumn = keyof ClearanceShipmentSummary;
@@ -152,6 +153,10 @@ export class ClearanceList implements OnInit {
       if (av > bv) return 1 * dir;
       return 0;
     });
+  }
+
+  onExportClick(): void {
+    exportToExcel('Clearance', this.columns, this.shipments);
   }
 
   sortBy(column: SortColumn): void {
