@@ -39,7 +39,8 @@
       <tr *ngFor="let s of shipments" (click)="viewDetails(s.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
         <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
           <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</span>
-          <span *ngSwitchCase="'eta'" style="color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</span>
+         <span *ngSwitchCase="'eta'" style="color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'createdAt'" style="color: #888; font-size: 12px;">{{ s.createdAt | date: 'MMM d, y' }}</span>
           <span *ngSwitchCase="'status'">
             <span
               [style.background]="s.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
