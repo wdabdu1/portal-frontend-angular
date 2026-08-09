@@ -6,13 +6,14 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
+import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
 import { ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
 
 type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'paymentDue' | 'banking' | 'erpInfo' | 'lastOffshore';
 
 @Component({
   selector: 'app-update-shipment',
-  imports: [CommonModule, FormsModule, ThousandsInputDirective, RouterLink, SectionLockBadge],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective, RouterLink, SectionLockBadge, ShipmentInfoPanel],
   templateUrl: './update-shipment.html'
 })
 export class UpdateShipment implements OnInit {
