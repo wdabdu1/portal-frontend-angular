@@ -8,6 +8,9 @@ export interface ShipmentLineItemDetail {
   qtyInBl: number;
   unitOfMeasure: string | null;
   hsCode: string | null;
+  unitPrice: number | null;
+  currency: string | null;
+  total: number | null;
 }
 
 export interface ErpColumnDetail {
@@ -34,6 +37,7 @@ export interface ShipmentFullDetail {
   eta: string | null;
   sobActualDate: string | null;
   lineItems: ShipmentLineItemDetail[];
+  percentOfPoQty: number | null;
   forwarder: Record<string, unknown> | null;
   acd: Record<string, unknown> | null;
   draftDocuments: Record<string, unknown> | null;
