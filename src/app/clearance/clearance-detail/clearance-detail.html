@@ -605,5 +605,18 @@
         </div>
       </div>
     </ng-container>
+
+    <div *ngIf="isLastGroupSaved" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #ddd;">
+      <p style="font-size: 12px; color: #888; margin-bottom: 8px;">
+        All sections for this route are complete — confirming closes this clearance and returns you to the list.
+      </p>
+      <button
+        (click)="confirmAndCompleteClearance()"
+        [disabled]="completingClearance"
+        style="padding:10px 20px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer; font-size:14px;"
+      >
+        {{ completingClearance ? 'Completing...' : 'Confirm & Complete Clearance' }}
+      </button>
+    </div>
   </div>
 </div>
