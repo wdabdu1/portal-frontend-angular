@@ -7,6 +7,7 @@
   <div *ngIf="!loading && detail">
     <h1 style="font-size: 20px; font-weight: 500;">Shipment {{ detail.blAwbNo }}</h1>
     <p style="color: #888; font-size: 13px;">{{ detail.businessUnit }} — PO {{ detail.poNumber }} — {{ detail.supplier }} — {{ detail.category }} — Status: {{ detail.status }}</p>
+    <p style="color: #888; font-size: 13px;">{{ detail.fcl20Count }}× 20' + {{ detail.fcl40Count }}× 40'</p>
 
     <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; overflow: hidden;">
       <div (click)="toggleSection('shipOnBoard')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
@@ -48,15 +49,13 @@
               <option *ngFor="let f of forwarders" [ngValue]="f.id">{{ f['name'] }}</option>
             </select>
           </div>
+          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
+            <input type="checkbox" [(ngModel)]="forwarderForm.marineInsurance" id="marine" />
+            <label for="marine" style="font-size:13px;">Marine Insurance</label>
+          </div>
           <div>
-            <label style="display:block; font-size:12px; color:#555;">Amount Saved</label>
-            <input type="text" appThousands [(ngModel)]="forwarderForm.amountSaved" style="width:100%; padding:6px; box-sizing:border-box;" />
-            <p *ngIf="amountSavedPercentOfBudget !== null" style="font-size:11px; color:#1e7e34; margin:4px 0 0;">
-              {{ amountSavedPercentOfBudget | number: '1.1-1' }}% of BU Shipping Budget
-            </p>
-            <p *ngIf="amountSavedPercentOfBudget === null && !detail?.buShippingBudget" style="font-size:11px; color:#888; margin:4px 0 0;">
-              No BU Shipping Budget set on this order
-            </p>
+            <label style="display:block; font-size:12px; color:#555;">Freight Cost</label>
+            <input type="text" appThousands [(ngModel)]="forwarderForm.actualShippingCost" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
           <div>
             <label style="display:block; font-size:12px; color:#555;">Currency</label>
@@ -66,12 +65,14 @@
             </select>
           </div>
           <div>
-            <label style="display:block; font-size:12px; color:#555;">Amount Saved</label>
-            <input type="text" appThousands [(ngModel)]="forwarderForm.amountSaved" style="width:100%; padding:6px; box-sizing:border-box;" />
-          </div>
-          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
-            <input type="checkbox" [(ngModel)]="forwarderForm.marineInsurance" id="marine" />
-            <label for="marine" style="font-size:13px;">Marine Insurance</label>
+            <label style="display:block; font-size:12px; color:#555;">Amount Saved <span style="font-weight:normal; color:#888;">(calculated)</span></label>
+            <input type="text" [value]="amountSaved !== null ? (amountSaved | number: '1.2-2') : '—'" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5;" />
+            <p *ngIf="amountSavedPercentOfBudget !== null" style="font-size:11px; color:#1e7e34; margin:4px 0 0;">
+              {{ amountSavedPercentOfBudget | number: '1.1-1' }}% of BU Shipping Budget
+            </p>
+            <p *ngIf="amountSavedPercentOfBudget === null && !detail?.buShippingBudget" style="font-size:11px; color:#888; margin:4px 0 0;">
+              No BU Shipping Budget set on this order
+            </p>
           </div>
         </div>
         <p *ngIf="detail.forwarder?.actualShippingCostUsd" style="font-size:12px; color:#666; margin-top:8px;">Converted: {{ detail.forwarder!.actualShippingCostUsd | number: '1.2-2' }} USD</p>
