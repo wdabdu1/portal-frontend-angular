@@ -16,6 +16,9 @@
         <p style="font-size: 13px; color: #555; margin-top: 0;">Deposit BL: <strong>{{ detail.depositBlAwbNo }}</strong></p>
 
         <p *ngIf="loadingBalance" style="color: #888; font-size: 12px;">Loading balance...</p>
+        <p *ngIf="!loadingBalance && balanceLines.length === 0" style="color: #c0392b; font-size: 12px;">
+          No items with available balance found for this deposit BL.
+        </p>
         <table *ngIf="!loadingBalance && balanceLines.length > 0" style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
           <thead>
             <tr style="text-align:left; border-bottom:1px solid #ddd;">
