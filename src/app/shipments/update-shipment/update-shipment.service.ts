@@ -128,6 +128,7 @@ export interface ShipmentDetail {
   sobActualDate: string | null;
   lineItemHsCodes: ShipmentLineItemHsCode[];
   buShippingBudget: number | null;
+  offshorePoNo: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
