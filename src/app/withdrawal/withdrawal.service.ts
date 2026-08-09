@@ -59,6 +59,7 @@ export interface FzBalanceLine {
   withdrawn: number;
   underClearance: number;
   available: number;
+  thisWithdrawalQty: number;
 }
 
 export interface FzDepositOption {
@@ -122,5 +123,9 @@ export class WithdrawalService {
 
   saveLineItems(id: number, lines: { shipmentLineItemId: number; qty: number }[]) {
     return this.http.put(`${API_URL}/withdrawals/${id}/line-items`, { lines });
+  }
+
+  deleteLineItem(withdrawalId: number, shipmentLineItemId: number) {
+    return this.http.delete(`${API_URL}/withdrawals/${withdrawalId}/line-items/${shipmentLineItemId}`);
   }
 }
