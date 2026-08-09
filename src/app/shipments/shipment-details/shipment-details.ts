@@ -49,6 +49,9 @@ export class ShipmentDetails implements OnInit {
   formatValue(value: unknown): string {
     if (value === null || value === undefined || value === '') return '—';
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    // Numeric fields (costs, quantities, fees) get thousands separators —
+    // dates and text arrive as strings, so this only affects real numbers.
+    if (typeof value === 'number') return value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     return String(value);
   }
 }
