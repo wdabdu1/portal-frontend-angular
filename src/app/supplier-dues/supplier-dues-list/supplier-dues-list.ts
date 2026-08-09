@@ -229,6 +229,19 @@ export class SupplierDuesList implements OnInit {
     return due.label || (due.dueDate ? new Date(due.dueDate).toLocaleDateString() : '—');
   }
 
+  get totalDueUsd(): number {
+    return this.paymentDues.reduce((sum, d) => sum + d.amountUsd, 0);
+  }
+
+  get totalPaidUsdOnShipment(): number {
+    return this.paymentRecords.reduce((sum, p) => sum + p.valueUsd, 0);
+  }
+
+  get dueScheduleExceedsShipmentValue(): boolean {
+    if (!this.summary) return false;
+    return this.totalDueUsd > this.summary.invoiceValueUsd + 0.01;
+  }
+
   addPayment(): void {
     if (!this.selectedShipmentId || !this.newPaymentDate || !this.newPaymentCurrencyId || !this.newPaymentValue) return;
     this.addingPayment = true;
