@@ -1,9 +1,10 @@
-import * as XLSX from 'xlsx';
-
 // Generic Excel export — takes whatever columns/rows are currently
 // visible (respects the user's own filter, sort, and column order,
 // since callers pass in their already-processed getter output).
-export function exportToExcel<T>(filename: string, columns: { label: string; key: keyof T | string }[], rows: T[]): void {
+// xlsx is loaded lazily (only when export is actually clicked), since
+// it's a large library that shouldn't bloat everyone's initial page load.
+export async function exportToExcel<T>(filename: string, columns: { label: string; key: keyof T | string }[], rows: T[]): Promise<void> {
+  const XLSX = await import('xlsx');
   const data = rows.map((row) => {
     const obj: Record<string, any> = {};
     for (const col of columns) {
