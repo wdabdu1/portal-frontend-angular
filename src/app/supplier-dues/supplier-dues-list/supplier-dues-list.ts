@@ -222,6 +222,13 @@ export class SupplierDuesList implements OnInit {
     return 'Partial';
   }
 
+  dueLabelFor(paymentDueId: number | null): string {
+    if (!paymentDueId) return '—';
+    const due = this.paymentDues.find((d) => d.id === paymentDueId);
+    if (!due) return '—';
+    return due.label || (due.dueDate ? new Date(due.dueDate).toLocaleDateString() : '—');
+  }
+
   addPayment(): void {
     if (!this.selectedShipmentId || !this.newPaymentDate || !this.newPaymentCurrencyId || !this.newPaymentValue) return;
     this.addingPayment = true;
