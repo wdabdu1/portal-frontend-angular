@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { ClearanceService, FzInventoryItemRow } from '../../clearance/clearance.service';
 import { FzDepositOption, WithdrawalService, WithdrawalSummary } from '../../withdrawal/withdrawal.service';
 
@@ -150,6 +151,26 @@ export class FzInventoryList implements OnInit {
   sortIndicator(column: SortColumn): string {
     if (this.sortColumn !== column) return '';
     return this.sortAsc ? ' ▲' : ' ▼';
+  }
+
+  onExportClick(): void {
+    const allRows = this.destinations.flatMap((d) => this.rowsFor(d));
+    exportToExcel('FZ Inventory', [
+      { label: 'Destination', key: 'destination' },
+      { label: 'BU', key: 'businessUnit' },
+      { label: 'Cat', key: 'category' },
+      { label: 'Product/Model', key: 'modelProduct' },
+      { label: 'Date of Deposit', key: 'dateOfDeposit' },
+      { label: 'Deposit Ref. No', key: 'depositRefNo' },
+      { label: 'BL No.', key: 'blAwbNo' },
+      { label: 'Qty Deposited', key: 'qtyDeposited' },
+      { label: 'Withdrawn Qty', key: 'qtyWithdrawn' },
+      { label: 'Under Clearance', key: 'qtyUnderClearance' },
+      { label: 'Current Stock', key: 'currentStock' },
+      { label: 'Available Stock', key: 'availableStock' },
+      { label: 'Inventory Days', key: 'inventoryDays' },
+      { label: '% Withdrawn', key: 'percentWithdrawn' }
+    ], allRows);
   }
 
   sortBy(column: SortColumn): void {
