@@ -2,6 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { API_URL } from '../../api-config';
 
+export interface PaymentDue {
+  id: number;
+  dueDate: string;
+  amount: number;
+  currencyId: number;
+  currencyCode: string;
+  label: string | null;
+  paidUsd: number;
+  amountUsd: number;
+}
+
 export interface ShipmentForwarder {
   forwarderId: number | null;
   actualShippingCost: number | null;
@@ -199,5 +210,21 @@ export class UpdateShipmentService {
     items: { shipmentLineItemId: number; hsCode: string | null; description: string | null; unitPrice: number | null }[];
   }) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/last-offshore`, req);
+  }
+
+  getPaymentDues(shipmentId: number) {
+    return this.http.get<PaymentDue[]>(`${API_URL}/shipments/${shipmentId}/supplier-payment/dues`);
+  }
+
+  addPaymentDue(shipmentId: number, req: { dueDate: string; amount: number; currencyId: number; label: string | null }) {
+    return this.http.post<PaymentDue>(`${API_URL}/shipments/${shipmentId}/supplier-payment/dues`, req);
+  }
+
+  updatePaymentDue(shipmentId: number, dueId: number, req: { dueDate: string; amount: number; currencyId: number; label: string | null }) {
+    return this.http.put<PaymentDue>(`${API_URL}/shipments/${shipmentId}/supplier-payment/dues/${dueId}`, req);
+  }
+
+  deletePaymentDue(shipmentId: number, dueId: number) {
+    return this.http.delete(`${API_URL}/shipments/${shipmentId}/supplier-payment/dues/${dueId}`);
   }
 }
