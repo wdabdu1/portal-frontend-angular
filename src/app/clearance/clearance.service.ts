@@ -189,6 +189,10 @@ export class ClearanceService {
     return this.http.get<ClearanceDetail>(`${API_URL}/clearance/${shipmentId}/detail`);
   }
 
+  completeClearance(shipmentId: number) {
+    return this.http.post(`${API_URL}/clearance/${shipmentId}/complete`, {});
+  }
+
   saveGeneralInfo(shipmentId: number, req: Partial<ClearanceDetail> & { shipmentEta?: string | null }) {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/general-info`, req);
   }
