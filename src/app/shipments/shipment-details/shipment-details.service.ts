@@ -7,6 +7,7 @@ export interface ShipmentLineItemDetail {
   modelProduct: string;
   qtyInBl: number;
   unitOfMeasure: string | null;
+  hsCode: string | null;
 }
 
 export interface ErpColumnDetail {
