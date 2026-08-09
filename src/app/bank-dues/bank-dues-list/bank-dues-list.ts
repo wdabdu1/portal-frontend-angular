@@ -6,6 +6,7 @@ import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { BankDueRow, BankDuesService, CollectionRecord } from '../bank-dues.service';
 
 type SortColumn = keyof BankDueRow;
@@ -178,6 +179,10 @@ export class BankDuesList implements OnInit {
       if (av > bv) return 1 * dir;
       return 0;
     });
+  }
+
+  onExportClick(): void {
+    exportToExcel('Bank Dues', this.columns, this.rows);
   }
 
   sortBy(column: SortColumn): void {
