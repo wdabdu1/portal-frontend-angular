@@ -255,10 +255,21 @@ export class UpdateShipment implements OnInit {
     return (currency?.['code'] as string) ?? '';
   }
 
+  // Amount Saved is fully derived — Budget vs. the freight cost already
+  // converted to USD by the backend — never entered directly, so it can't
+  // drift from the two real inputs that actually determine it.
+  get amountSaved(): number | null {
+    const budget = this.detail?.buShippingBudget;
+    const costUsd = this.detail?.forwarder?.actualShippingCostUsd;
+    if (budget == null || costUsd == null) return null;
+    return budget - costUsd;
+  }
+
   get amountSavedPercentOfBudget(): number | null {
     const budget = this.detail?.buShippingBudget;
-    if (!budget || !this.forwarderForm.amountSaved) return null;
-    return (this.forwarderForm.amountSaved / budget) * 100;
+    const saved = this.amountSaved;
+    if (!budget || saved === null) return null;
+    return (saved / budget) * 100;
   }
 
   toggleSection(key: SectionKey): void {
@@ -306,7 +317,12 @@ export class UpdateShipment implements OnInit {
   }
 
   saveForwarder(andNext: boolean): void {
-    this.genericSave('forwarder', () => this.service.saveForwarder(this.shipmentId, this.forwarderForm), andNext);
+    // amountSaved is derived (see the getter above), not entered — never
+    // sent as part of the save; the backend computes actualShippingCostUsd
+    // from actualShippingCost + currencyId, and Amount Saved is calculated
+    // from that plus the order's own BU Shipping Budget.
+    const { amountSaved, ...rest } = this.forwarderForm;
+    this.genericSave('forwarder', () => this.service.saveForwarder(this.shipmentId, { ...rest, amountSaved: null }), andNext);
   }
 
   saveAcd(andNext: boolean): void {
