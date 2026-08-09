@@ -170,7 +170,7 @@ export class OrderList implements OnInit {
     });
   }
 
-  exportToExcel(): void {
+  onExportClick(): void {
     exportToExcel('Orders', this.columns, this.orders);
   }
 
