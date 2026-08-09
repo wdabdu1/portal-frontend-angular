@@ -26,14 +26,23 @@
   </div>
 
   <div style="margin-top: 1.5rem;">
-    <h2 style="font-size: 15px; font-weight: 600; color: #333;">Draft Withdrawals</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 15px; font-weight: 600; color: #333;">Withdrawals</h2>
+      <select [(ngModel)]="withdrawalStatusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+        <option value="Draft">Draft</option>
+        <option value="Completed">Completed</option>
+        <option value="All">All</option>
+      </select>
+    </div>
     <p *ngIf="loadingWithdrawals" style="color: #888; font-size: 13px;">Loading...</p>
-    <table *ngIf="!loadingWithdrawals && withdrawals.length > 0" style="width: 100%; max-width: 700px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+    <table *ngIf="!loadingWithdrawals && withdrawals.length > 0" style="width: 100%; max-width: 800px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
           <th style="padding: 6px;">Deposit BL</th>
           <th style="padding: 6px;">Withdrawal Ref. No.</th>
           <th style="padding: 6px;">Request Date</th>
+          <th style="padding: 6px;">Status</th>
+          <th style="padding: 6px;"></th>
           <th style="padding: 6px;"></th>
         </tr>
       </thead>
@@ -42,12 +51,22 @@
           <td style="padding: 6px; font-family: monospace;">{{ w.depositBlAwbNo }}</td>
           <td style="padding: 6px;">{{ w.withdrawalRequestRefNo || '—' }}</td>
           <td style="padding: 6px; color: #888;">{{ w.withdrawalRequestDate ? (w.withdrawalRequestDate | date: 'MMM d, y') : '—' }}</td>
+          <td style="padding: 6px;">
+            <span [style.background]="w.isCompleted ? '#e6f4ea' : '#fff4e5'" [style.color]="w.isCompleted ? '#1e7e34' : '#a66a00'" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              {{ w.isCompleted ? 'Completed' : 'Draft' }}
+            </span>
+          </td>
           <td style="padding: 6px; color: #0a3d62;">Open →</td>
+          <td style="padding: 6px;">
+            <a *ngIf="!w.isCompleted" (click)="deleteWithdrawal(w.id, $event)" style="color: #c0392b; cursor: pointer; font-size: 12px;">
+              {{ deletingWithdrawal[w.id] ? 'Deleting...' : 'Delete' }}
+            </a>
+          </td>
         </tr>
       </tbody>
     </table>
     <p *ngIf="!loadingWithdrawals && withdrawals.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">
-      No draft withdrawals in progress.
+      No {{ withdrawalStatusFilter === 'All' ? '' : (withdrawalStatusFilter.toLowerCase() + ' ') }}withdrawals.
     </p>
   </div>
 
