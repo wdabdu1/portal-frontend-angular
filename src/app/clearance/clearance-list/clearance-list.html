@@ -7,12 +7,19 @@
   </div>
   <p style="color: #888; font-size: 13px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column. Click a row to continue Clearance data entry.</p>
 
-  <input
-    [(ngModel)]="searchText"
-    (ngModelChange)="onSearchChange()"
-    placeholder="Search by BL/AWB or Declaration No."
-    style="width: 100%; max-width: 400px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
-  />
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
+    <select [(ngModel)]="statusFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Pending">Pending</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="All">All</option>
+    </select>
+    <input
+      [(ngModel)]="searchText"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Search by BL/AWB or Declaration No."
+      style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+    />
+  </div>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
@@ -52,6 +59,12 @@
           <span *ngSwitchCase="'eta'" style="color: #888;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</span>
           <span *ngSwitchCase="'declarationNo'">{{ s.declarationNo || '—' }}</span>
           <span *ngSwitchCase="'routeStatus'" style="font-size: 12px; color: #666;">{{ routeLabel(s.routeStatus) }}</span>
+          <div *ngSwitchCase="'slaPercent'" style="display:flex; align-items:center; gap:6px;">
+            <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
+              <div [style.width.%]="s.slaPercent > 100 ? 100 : s.slaPercent" [style.background]="s.trafficLight === 'Red' ? '#c0392b' : (s.trafficLight === 'Amber' ? '#c98a00' : '#1e7e34')" style="height:100%;"></div>
+            </div>
+            <span style="font-size:12px; color:#666;">{{ s.slaPercent | number: '1.0-0' }}%</span>
+          </div>
           <span *ngSwitchDefault>{{ s[col.key] }}</span>
         </td>
         <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
