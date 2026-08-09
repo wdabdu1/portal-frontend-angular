@@ -19,13 +19,15 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'businessUnit', label: 'BU' },
   { key: 'blAwbNo', label: 'BL/AWB' },
   { key: 'category', label: 'Category' },
+  { key: 'shippingLine', label: 'Shipping Line' },
   { key: 'eta', label: 'ETA' },
   { key: 'fclCount', label: 'FCL' },
   { key: 'declarationNo', label: 'Declaration No.' },
   { key: 'product', label: 'Product/Model' },
   { key: 'qty', label: 'Qty' },
   { key: 'unit', label: 'Units' },
-  { key: 'routeStatus', label: 'Route' }
+  { key: 'routeStatus', label: 'Route' },
+  { key: 'slaPercent', label: 'SLA Progress' }
 ];
 
 const ROUTE_LABELS: Record<string, string> = {
@@ -47,6 +49,11 @@ export class ClearanceList implements OnInit {
   loading = true;
   error = '';
   searchText = '';
+
+  // Defaults to Pending so users land on their actual work queue, same
+  // pattern as TP Orders — Confirmed (completed) clearances are still one
+  // click away.
+  statusFilter: 'Pending' | 'Confirmed' | 'All' = 'Pending';
   sortColumn: SortColumn = 'eta';
   sortAsc = true;
 
@@ -141,7 +148,9 @@ export class ClearanceList implements OnInit {
   }
 
   get shipments(): ClearanceShipmentSummary[] {
-    const filtered = applyFilters(this.allShipments, this.filters, (r, col) => this.getValue(r, col));
+    let filtered = applyFilters(this.allShipments, this.filters, (r, col) => this.getValue(r, col));
+    if (this.statusFilter === 'Pending') filtered = filtered.filter((s) => !s.isCompleted);
+    if (this.statusFilter === 'Confirmed') filtered = filtered.filter((s) => s.isCompleted);
 
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
