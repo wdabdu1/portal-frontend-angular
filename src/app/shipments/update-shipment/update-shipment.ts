@@ -6,7 +6,7 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
-import { ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
+import { ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
 
 type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'paymentDue' | 'banking' | 'erpInfo' | 'lastOffshore';
 
@@ -95,6 +95,7 @@ export class UpdateShipment implements OnInit {
     this.loadDetail();
     this.loadLocks();
     this.loadPaymentDues();
+    this.loadInvoiceSummary();
   }
 
   loadDetail(): void {
@@ -148,6 +149,15 @@ export class UpdateShipment implements OnInit {
 
   get lastOffshoreCompanyName(): string {
     return this.erpColumns.find((c) => c.isLast)?.companyName ?? 'Last Offshore';
+  }
+
+  invoiceSummary: SupplierInvoiceSummary | null = null;
+
+  loadInvoiceSummary(): void {
+    this.service.getSupplierInvoiceSummary(this.shipmentId).subscribe({
+      next: (r) => { this.invoiceSummary = r; this.cdr.markForCheck(); },
+      error: () => {}
+    });
   }
 
   // --- Payment Due Schedule ---
