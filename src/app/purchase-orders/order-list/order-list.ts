@@ -6,6 +6,7 @@ import { AuthService } from '../../auth/auth.service';
 import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { PurchaseOrderSummary, PurchaseOrdersService } from '../purchase-orders.service';
 
 type SortColumn = keyof PurchaseOrderSummary;
@@ -169,6 +170,12 @@ export class OrderList implements OnInit {
     });
   }
 
+  exportToExcel(): void {
+    exportToExcel('Orders', this.columns, this.orders);
+  }
+
+  sortBy(column: SortColumn): void {
+  
   sortBy(column: SortColumn): void {
     if (this.sortColumn === column) {
       this.sortAsc = !this.sortAsc;
