@@ -5,6 +5,7 @@ import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { AllocationResponse, LogisticsItemRow, LogisticsService } from '../logistics.service';
 
 type SortColumn = keyof LogisticsItemRow;
@@ -157,6 +158,10 @@ export class LogisticsList implements OnInit {
       if (av > bv) return 1 * dir;
       return 0;
     });
+  }
+
+  onExportClick(): void {
+    exportToExcel('Logistics', this.columns, this.items);
   }
 
   sortBy(column: SortColumn): void {
