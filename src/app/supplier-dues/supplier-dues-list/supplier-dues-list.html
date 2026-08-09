@@ -80,11 +80,42 @@
         — Balance: {{ summary.balanceUsd | number: '1.2-2' }} USD
       </p>
 
+      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Payment Due Schedule</h4>
+      <p *ngIf="loadingDues" style="color:#888; font-size:12px;">Loading...</p>
+      <table *ngIf="!loadingDues && paymentDues.length > 0" style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="text-align:left; border-bottom:1px solid #ddd;">
+            <th style="padding:5px;">Label</th>
+            <th style="padding:5px;">Due Date</th>
+            <th style="padding:5px;">Amount</th>
+            <th style="padding:5px;">Currency</th>
+            <th style="padding:5px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let due of paymentDues" style="border-bottom:1px solid #eee;">
+            <td style="padding:5px;">{{ due.label || '—' }}</td>
+            <td style="padding:5px;">{{ due.dueDate | date: 'MMM d, y' }}</td>
+            <td style="padding:5px;">{{ due.amount | number: '1.2-2' }}</td>
+            <td style="padding:5px;">{{ due.currencyCode }}</td>
+            <td style="padding:5px;">
+              <span [style.background]="dueStatus(due) === 'Paid' ? '#e6f4ea' : (dueStatus(due) === 'Partial' ? '#fff4e5' : '#fdeaea')" [style.color]="dueStatus(due) === 'Paid' ? '#1e7e34' : (dueStatus(due) === 'Partial' ? '#a66a00' : '#c0392b')" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+                {{ dueStatus(due) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!loadingDues && paymentDues.length === 0" style="color:#888; font-size:12px;">
+        No due schedule entered yet — add one in this shipment's Update Shipment page.
+      </p>
+
       <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Payments Made</h4>
       <table style="width:100%; border-collapse:collapse; font-size:13px;">
         <thead>
           <tr style="text-align:left; border-bottom:1px solid #ddd;">
             <th style="padding:5px;">Date</th>
+            <th style="padding:5px;">Against</th>
             <th style="padding:5px;">Currency</th>
             <th style="padding:5px;">Value</th>
             <th style="padding:5px;">Value (USD)</th>
@@ -94,6 +125,7 @@
         <tbody>
           <tr *ngFor="let p of paymentRecords" style="border-bottom:1px solid #eee;">
             <td style="padding:5px;">{{ p.paymentDate | date: 'MMM d, y' }}</td>
+            <td style="padding:5px; color:#666;">{{ dueLabelFor(p.paymentDueId) }}</td>
             <td style="padding:5px;">{{ p.currencyCode }}</td>
             <td style="padding:5px;">{{ p.value | number: '1.2-2' }}</td>
             <td style="padding:5px;">{{ p.valueUsd | number: '1.2-2' }}</td>
@@ -106,6 +138,13 @@
         <div>
           <label style="display:block; font-size:12px; color:#555;">Date</label>
           <input type="date" [(ngModel)]="newPaymentDate" style="padding:6px;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Against (optional)</label>
+          <select [(ngModel)]="newPaymentDueId" style="padding:6px;">
+            <option [ngValue]="null">-- unlinked --</option>
+            <option *ngFor="let due of paymentDues" [ngValue]="due.id">{{ due.label || (due.dueDate | date: 'MMM d') }} — {{ due.amount | number: '1.0-2' }} {{ due.currencyCode }}</option>
+          </select>
         </div>
         <div>
           <label style="display:block; font-size:12px; color:#555;">Currency</label>
