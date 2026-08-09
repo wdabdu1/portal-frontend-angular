@@ -404,6 +404,39 @@ export class ClearanceDetailComponent implements OnInit {
     return groups[idx + 1]?.key ?? null;
   }
 
+  // True once the last route-specific section for the selected route has
+  // been saved with something recorded — the natural point to offer
+  // closing out the whole clearance, same spirit as Shipment's final
+  // Confirm & Publish action.
+  get isLastGroupSaved(): boolean {
+    const groups = this.activeRouteGroups;
+    if (groups.length === 0) return false;
+    const lastKey = groups[groups.length - 1].key;
+    return this.scheduleFor('Route' + this.selectedRoute, lastKey)?.actualDate != null
+      || this.scheduleFor('ClearanceGeneral', lastKey)?.actualDate != null;
+  }
+
+  completingClearance = false;
+
+  confirmAndCompleteClearance(): void {
+    this.completingClearance = true;
+    const today = new Date().toISOString().slice(0, 10);
+    this.service.saveGeneralInfo(this.shipmentId, {
+      ...this.generalInfoForm,
+      clearanceCompleteDate: today
+    } as any).subscribe({
+      next: () => {
+        this.completingClearance = false;
+        this.router.navigate(['/clearance']);
+      },
+      error: () => {
+        this.completingClearance = false;
+        this.error = 'Could not complete clearance.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   routeName(route: number): string {
     switch (route) {
       case 1: return 'Route 1 — Clear at Port';
