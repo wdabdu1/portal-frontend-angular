@@ -40,8 +40,13 @@ export class FzInventoryList implements OnInit {
   newWithdrawalDepositId: number | null = null;
   creatingWithdrawal = false;
 
-  withdrawals: WithdrawalSummary[] = [];
+  allWithdrawals: WithdrawalSummary[] = [];
   loadingWithdrawals = true;
+
+  // Defaults to Draft so this stays the "needs action" queue you're used
+  // to — Completed ones are still one click away via the toggle.
+  withdrawalStatusFilter: 'Draft' | 'Completed' | 'All' = 'Draft';
+  deletingWithdrawal: Record<number, boolean> = {};
 
   constructor(
     private service: ClearanceService,
@@ -74,13 +79,32 @@ export class FzInventoryList implements OnInit {
   loadWithdrawals(): void {
     this.loadingWithdrawals = true;
     this.withdrawalService.getAll().subscribe({
-      next: (r) => { this.withdrawals = r.filter((w) => !w.isCompleted); this.loadingWithdrawals = false; this.cdr.markForCheck(); },
+      next: (r) => { this.allWithdrawals = r; this.loadingWithdrawals = false; this.cdr.markForCheck(); },
       error: () => { this.loadingWithdrawals = false; this.cdr.markForCheck(); }
     });
   }
 
+  get withdrawals(): WithdrawalSummary[] {
+    if (this.withdrawalStatusFilter === 'Draft') return this.allWithdrawals.filter((w) => !w.isCompleted);
+    if (this.withdrawalStatusFilter === 'Completed') return this.allWithdrawals.filter((w) => w.isCompleted);
+    return this.allWithdrawals;
+  }
+
   openWithdrawal(id: number): void {
     this.router.navigate(['/withdrawals', id]);
+  }
+
+  deleteWithdrawal(id: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.deletingWithdrawal[id] = true;
+    this.withdrawalService.delete(id).subscribe({
+      next: () => { this.deletingWithdrawal[id] = false; this.loadWithdrawals(); },
+      error: (err) => {
+        this.deletingWithdrawal[id] = false;
+        this.error = err?.error?.message || 'Could not delete this withdrawal.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngOnInit(): void {
