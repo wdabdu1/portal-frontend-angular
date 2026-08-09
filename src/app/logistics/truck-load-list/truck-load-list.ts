@@ -23,6 +23,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'warehouseName', label: 'Warehouse' },
   { key: 'city', label: 'City' },
   { key: 'expectedDeliveryDate', label: 'Expected Delivery' },
+  { key: 'actualDropOffDate', label: 'Actual Drop Off' },
   { key: 'modelProduct', label: 'Product/Model' },
   { key: 'unit', label: 'Unit' },
   { key: 'qty', label: 'Qty' },
@@ -44,6 +45,10 @@ export class TruckLoadList implements OnInit {
 
   sortColumn: SortColumn = 'loadDate';
   sortAsc = false;
+
+  // Defaults to Pending so this stays the "not yet delivered" work queue —
+  // Delivered items are still one click away via the toggle.
+  statusFilter: 'Pending' | 'Delivered' | 'All' = 'Pending';
 
   columns: ColumnDef[] = [...DEFAULT_COLUMNS];
   private dragFromIndex: number | null = null;
@@ -143,8 +148,17 @@ export class TruckLoadList implements OnInit {
     return selected.size < this.optionsFor(col).length;
   }
 
+  daysLateOrEarly(item: TruckLoadItemRow): number | null {
+    if (!item.expectedDeliveryDate || !item.actualDropOffDate) return null;
+    const expected = new Date(item.expectedDeliveryDate).getTime();
+    const actual = new Date(item.actualDropOffDate).getTime();
+    return Math.round((actual - expected) / (1000 * 60 * 60 * 24));
+  }
+
   get items(): TruckLoadItemRow[] {
-    const filtered = applyFilters(this.allItems, this.filters, (r, col) => this.getValue(r, col));
+    let filtered = applyFilters(this.allItems, this.filters, (r, col) => this.getValue(r, col));
+    if (this.statusFilter === 'Pending') filtered = filtered.filter((i) => !i.isCompleted);
+    if (this.statusFilter === 'Delivered') filtered = filtered.filter((i) => i.isCompleted);
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
       const av = a[this.sortColumn];
