@@ -129,6 +129,8 @@ export interface ShipmentDetail {
   lineItemHsCodes: ShipmentLineItemHsCode[];
   buShippingBudget: number | null;
   offshorePoNo: string | null;
+  fcl20Count: number;
+  fcl40Count: number;
 }
 
 @Injectable({ providedIn: 'root' })
