@@ -107,8 +107,9 @@
         </tbody>
         <tfoot *ngIf="paymentDues.length > 0">
           <tr style="font-weight:600; border-top:2px solid #ccc;">
-            <td colspan="4" style="padding:5px; text-align:right;">Total (USD):</td>
+            <td colspan="2" style="padding:5px; text-align:right;">Total (USD):</td>
             <td style="padding:5px;">{{ totalDueUsd | number: '1.2-2' }}</td>
+            <td colspan="2" style="padding:5px;"></td>
           </tr>
         </tfoot>
       </table>
