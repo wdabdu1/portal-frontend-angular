@@ -2,6 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { API_URL } from '../../api-config';
 
+export interface SupplierInvoiceSummary {
+  supplierInvoiceNo: string | null;
+  invoiceValue: number;
+  invoiceCurrency: string;
+  invoiceValueUsd: number;
+  totalPaidUsd: number;
+  balanceUsd: number;
+}
+
 export interface PaymentDue {
   id: number;
   dueDate: string;
@@ -210,6 +219,10 @@ export class UpdateShipmentService {
     items: { shipmentLineItemId: number; hsCode: string | null; description: string | null; unitPrice: number | null }[];
   }) {
     return this.http.put(`${API_URL}/shipments/${shipmentId}/last-offshore`, req);
+  }
+  
+  getSupplierInvoiceSummary(shipmentId: number) {
+    return this.http.get<SupplierInvoiceSummary>(`${API_URL}/shipments/${shipmentId}/supplier-invoice-summary`);
   }
 
   getPaymentDues(shipmentId: number) {
