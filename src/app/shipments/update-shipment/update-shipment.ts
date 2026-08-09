@@ -65,7 +65,7 @@ export class UpdateShipment implements OnInit {
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
   acdForm = { processDate: '', costSettledDate: '', refNumber: '' };
   lastOffshoreData: LastOffshoreDetails | null = null;
-  lastOffshoreForm = { inspectionNo: '', grn: '', invoiceNo: '', remarks: '', currencyId: null as number | null };
+  lastOffshoreForm = { currencyId: null as number | null };
   lastOffshoreItemEdits: Record<number, { hsCode: string; description: string; unitPrice: number | null }> = {};
   loadingLastOffshore = false;
   savingLastOffshore = false;
@@ -150,10 +150,7 @@ export class UpdateShipment implements OnInit {
     this.service.getLastOffshoreDetails(this.shipmentId).subscribe({
       next: (d) => {
         this.lastOffshoreData = d;
-        this.lastOffshoreForm = {
-          inspectionNo: d.inspectionNo ?? '', grn: d.grn ?? '', invoiceNo: d.invoiceNo ?? '',
-          remarks: d.remarks ?? '', currencyId: d.currencyId
-        };
+        this.lastOffshoreForm = { currencyId: d.currencyId };
         this.lastOffshoreItemEdits = {};
         for (const item of d.items) {
           this.lastOffshoreItemEdits[item.shipmentLineItemId] = {
@@ -176,10 +173,13 @@ export class UpdateShipment implements OnInit {
       unitPrice: edit.unitPrice
     }));
     this.service.saveLastOffshoreDetails(this.shipmentId, {
-      inspectionNo: this.lastOffshoreForm.inspectionNo || null,
-      grn: this.lastOffshoreForm.grn || null,
-      invoiceNo: this.lastOffshoreForm.invoiceNo || null,
-      remarks: this.lastOffshoreForm.remarks || null,
+      // Inspection No./GRN/Invoice No./Remarks now live in Offshore
+      // Routes' own Last column — not sent from here, so this save
+      // can't silently overwrite that with a stale/blank value.
+      inspectionNo: null,
+      grn: null,
+      invoiceNo: null,
+      remarks: null,
       currencyId: this.lastOffshoreForm.currencyId,
       items
     }).subscribe({
