@@ -22,7 +22,8 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'shippingLine', label: 'Shipping Line' },
   { key: 'lineItemCount', label: 'Line Items' },
   { key: 'eta', label: 'ETA' },
-  { key: 'status', label: 'Status' }
+  { key: 'status', label: 'Status' },
+  { key: 'createdAt', label: 'Created' }
 ];
 
 @Component({
