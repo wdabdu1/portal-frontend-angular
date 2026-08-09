@@ -145,6 +145,10 @@ export class UpdateShipment implements OnInit {
     return this.erpColumns;
   }
 
+  get lastOffshoreCompanyName(): string {
+    return this.erpColumns.find((c) => c.isLast)?.companyName ?? 'Last Offshore';
+  }
+
   loadLastOffshoreDetails(): void {
     this.loadingLastOffshore = true;
     this.service.getLastOffshoreDetails(this.shipmentId).subscribe({
