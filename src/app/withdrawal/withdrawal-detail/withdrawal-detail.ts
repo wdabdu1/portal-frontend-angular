@@ -113,7 +113,7 @@ export class WithdrawalDetailComponent implements OnInit {
     });
   }
 
-  removeLineItem(shipmentLineItemId: number): void {
+  removeBalanceLineItem(shipmentLineItemId: number): void {
     this.service.deleteLineItem(this.withdrawalId, shipmentLineItemId).subscribe({
       next: () => this.loadBalance(),
       error: () => { this.error = 'Could not remove this item.'; this.cdr.markForCheck(); }
