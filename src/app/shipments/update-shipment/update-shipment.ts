@@ -232,6 +232,17 @@ export class UpdateShipment implements OnInit {
     return 'Partial';
   }
 
+  get totalDueUsd(): number {
+    return this.paymentDues.reduce((sum, d) => sum + d.amountUsd, 0);
+  }
+
+  // Compared in USD so mixed-currency due rows still total correctly
+  // against the shipment's own (converted) invoice value.
+  get dueScheduleExceedsShipmentValue(): boolean {
+    if (!this.invoiceSummary) return false;
+    return this.totalDueUsd > this.invoiceSummary.invoiceValueUsd + 0.01;
+  }
+
   loadLastOffshoreDetails(): void {
     this.loadingLastOffshore = true;
     this.service.getLastOffshoreDetails(this.shipmentId).subscribe({
