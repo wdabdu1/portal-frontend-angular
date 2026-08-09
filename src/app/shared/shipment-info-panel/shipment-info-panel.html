@@ -1,0 +1,37 @@
+<div style="position: fixed; top: 90px; right: 12px; width: 230px; z-index: 40; font-family: sans-serif;">
+  <div style="background: white; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden;">
+    <div (click)="toggle()" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #0a3d62; color: white; cursor: pointer;">
+      <strong style="font-size: 12px;">Shipment Info</strong>
+      <span style="font-size: 12px;">{{ collapsed ? '▸' : '▾' }}</span>
+    </div>
+
+    <div *ngIf="!collapsed" style="padding: 10px 12px; font-size: 12px; max-height: 70vh; overflow-y: auto;">
+      <p *ngIf="loading" style="color: #888; margin: 0;">Loading...</p>
+
+      <div *ngIf="!loading && detail">
+        <p style="margin: 0 0 6px; font-weight: 600;">{{ detail.blAwbNo }}</p>
+
+        <div style="display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; color: #555;">
+          <span>BU:</span><span style="color:#222;">{{ detail.businessUnit }}</span>
+          <span *ngIf="detail.poNumber">PO No.:</span><span *ngIf="detail.poNumber" style="color:#222;">{{ detail.poNumber }}</span>
+          <span *ngIf="detail.supplier">Supplier:</span><span *ngIf="detail.supplier" style="color:#222;">{{ detail.supplier }}</span>
+          <span>Consignee:</span><span style="color:#222;">{{ detail.consignee }}</span>
+          <span>Category:</span><span style="color:#222;">{{ detail.category }}</span>
+          <span>Status:</span><span style="color:#222;">{{ detail.status }}</span>
+          <span *ngIf="detail.vesselName">Vessel:</span><span *ngIf="detail.vesselName" style="color:#222;">{{ detail.vesselName }}</span>
+          <span>Containers:</span><span style="color:#222;">{{ detail.fcl20Count }}× 20' + {{ detail.fcl40Count }}× 40'</span>
+          <span *ngIf="detail.etd">ETD:</span><span *ngIf="detail.etd" style="color:#222;">{{ detail.etd | date: 'MMM d, y' }}</span>
+          <span *ngIf="detail.eta">ETA:</span><span *ngIf="detail.eta" style="color:#222;">{{ detail.eta | date: 'MMM d, y' }}</span>
+          <span *ngIf="detail.sobActualDate">SOB:</span><span *ngIf="detail.sobActualDate" style="color:#222;">{{ detail.sobActualDate | date: 'MMM d, y' }}</span>
+        </div>
+
+        <div *ngIf="detail.lineItems.length > 0" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee;">
+          <p style="margin: 0 0 4px; font-weight: 600; color: #555;">Line Items</p>
+          <div *ngFor="let li of detail.lineItems" style="margin-bottom: 4px; color: #444;">
+            {{ li.modelProduct }} — {{ li.qtyInBl | number: '1.0-2' }} {{ li.unitOfMeasure }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
