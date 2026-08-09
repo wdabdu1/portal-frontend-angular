@@ -139,8 +139,10 @@ export class UpdateShipment implements OnInit {
     });
   }
 
-  get middleOffshoreColumns(): ErpColumn[] {
-    return this.erpColumns.filter((c) => !c.isLast);
+  // Every offshore now shows in this one section (including the last),
+  // each showing only the fields relevant to its actual position(s).
+  get allOffshoreColumns(): ErpColumn[] {
+    return this.erpColumns;
   }
 
   loadLastOffshoreDetails(): void {
