@@ -4,7 +4,12 @@
   <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Accumulated Orders History</h1>
   <p style="color: #888; font-size: 13px;">Totals across every confirmed shipment.</p>
 
-  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2rem;">By Offshore Company</h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+    <h2 style="font-size: 16px; font-weight: 600; margin: 0;">By Offshore Company</h2>
+    <button (click)="onExportOffshoreClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      Export to Excel
+    </button>
+  </div>
   <p style="color: #888; font-size: 13px;">Every offshore entity's accumulated performance, regardless of which BU or chain position they occupied — the dollar Markup quantifies the actual action needed (rectify a loss, trim an over-large margin, etc.), not just the rate.</p>
 
   <p *ngIf="loadingOffshore" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
