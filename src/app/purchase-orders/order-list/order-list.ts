@@ -175,8 +175,6 @@ export class OrderList implements OnInit {
   }
 
   sortBy(column: SortColumn): void {
-  
-  sortBy(column: SortColumn): void {
     if (this.sortColumn === column) {
       this.sortAsc = !this.sortAsc;
     } else {
