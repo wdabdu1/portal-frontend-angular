@@ -99,7 +99,7 @@ export class FzInventoryList implements OnInit {
     this.deletingWithdrawal[id] = true;
     this.withdrawalService.delete(id).subscribe({
       next: () => { this.deletingWithdrawal[id] = false; this.loadWithdrawals(); },
-      error: (err) => {
+      error: (err: any) => {
         this.deletingWithdrawal[id] = false;
         this.error = err?.error?.message || 'Could not delete this withdrawal.';
         this.cdr.markForCheck();
