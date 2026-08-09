@@ -209,7 +209,11 @@ export class UpdateShipment implements OnInit {
         this.erpForms = {};
         for (const c of columns) {
           this.erpForms[c.purchaseOrderOffshorePartnerId] = {
-            prNo: c.prNo ?? '', poNo: c.poNo ?? '', sa: c.sa ?? '', billReg: c.billReg ?? '',
+            // The first offshore's PO No. always mirrors the order's own
+            // Offshore PO No. (set once at order creation) — not a
+            // separately-entered value, so it's sourced from there, not
+            // from whatever may have been saved on the ERP row before.
+            prNo: c.prNo ?? '', poNo: c.sequenceOrder === 1 ? (this.detail?.offshorePoNo ?? '') : (c.poNo ?? ''), sa: c.sa ?? '', billReg: c.billReg ?? '',
             grn: c.grn ?? '', invoiceNo: c.invoiceNo ?? '', inspectionNo: c.inspectionNo ?? '', remarks: c.remarks ?? ''
           };
         }
