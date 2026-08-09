@@ -6,6 +6,7 @@ import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { TruckLoadItemRow, TruckLoadService } from '../truck-load.service';
 
 type SortColumn = keyof TruckLoadItemRow;
@@ -154,6 +155,10 @@ export class TruckLoadList implements OnInit {
       if (av > bv) return 1 * dir;
       return 0;
     });
+  }
+
+  onExportClick(): void {
+    exportToExcel('Truck Loads', this.columns, this.items);
   }
 
   sortBy(column: SortColumn): void {
