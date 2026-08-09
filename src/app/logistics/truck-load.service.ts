@@ -27,6 +27,7 @@ export interface TruckLoadDropDetail {
   warehouseName: string;
   city: string | null;
   expectedDeliveryDate: string | null;
+  actualDropOffDate: string | null;
   items: TruckLoadItemSummary[];
 }
 
@@ -39,11 +40,13 @@ export interface TruckLoadItemRow {
   warehouseName: string;
   city: string | null;
   expectedDeliveryDate: string | null;
+  actualDropOffDate: string | null;
   modelProduct: string;
   unit: string;
   qty: number;
   inHousePrice: number | null;
   parallelMarketPrice: number | null;
+  isCompleted: boolean;
 }
 
 export interface TruckLoadDetail {
@@ -63,6 +66,19 @@ export interface LoadableAllocation {
   unit: string;
   blAwbNo: string;
   remainingToLoad: number;
+}
+
+export interface ReadyForTruckAssignment {
+  warehouseAllocationId: number;
+  businessUnit: string;
+  modelProduct: string;
+  unit: string;
+  blAwbNo: string;
+  warehouseName: string;
+  allocatedQty: number;
+  loadedQty: number;
+  remainingQty: number;
+  allocatedAt: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -85,8 +101,16 @@ export class TruckLoadService {
     return this.http.post<{ id: number }>(`${API_URL}/truck-loads/${truckLoadId}/drops`, { warehouseId, expectedDeliveryDate });
   }
 
+  setActualDropOff(dropId: number, actualDropOffDate: string | null) {
+    return this.http.put(`${API_URL}/truck-loads/drops/${dropId}/actual-dropoff`, { actualDropOffDate });
+  }
+
   getItems() {
     return this.http.get<TruckLoadItemRow[]>(`${API_URL}/truck-loads/items`);
+  }
+
+  getReadyForAssignment() {
+    return this.http.get<ReadyForTruckAssignment[]>(`${API_URL}/truck-loads/ready-for-assignment`);
   }
 
   deleteDrop(dropId: number) {
