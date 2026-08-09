@@ -6,9 +6,9 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
-import { ErpColumn, LastOffshoreDetails, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
+import { ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, UpdateShipmentService } from './update-shipment.service';
 
-type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'banking' | 'erpInfo' | 'lastOffshore';
+type SectionKey = 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'paymentDue' | 'banking' | 'erpInfo' | 'lastOffshore';
 
 @Component({
   selector: 'app-update-shipment',
@@ -32,10 +32,10 @@ export class UpdateShipment implements OnInit {
   receiverBanks: LookupEntity[] = [];
   tenors: LookupEntity[] = [];
 
-  sectionOrder: SectionKey[] = ['shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'banking', 'erpInfo', 'lastOffshore'];
+  sectionOrder: SectionKey[] = ['shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'paymentDue', 'banking', 'erpInfo', 'lastOffshore'];
   expandedSection: SectionKey | null = 'shipOnBoard';
   saving: Record<SectionKey, boolean> = {
-    shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, banking: false, erpInfo: false, lastOffshore: false
+    shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, paymentDue: false, banking: false, erpInfo: false, lastOffshore: false
   };
 
   erpColumns: ErpColumn[] = [];
@@ -94,6 +94,7 @@ export class UpdateShipment implements OnInit {
 
     this.loadDetail();
     this.loadLocks();
+    this.loadPaymentDues();
   }
 
   loadDetail(): void {
@@ -147,6 +148,77 @@ export class UpdateShipment implements OnInit {
 
   get lastOffshoreCompanyName(): string {
     return this.erpColumns.find((c) => c.isLast)?.companyName ?? 'Last Offshore';
+  }
+
+  // --- Payment Due Schedule ---
+  paymentDues: PaymentDue[] = [];
+  loadingPaymentDues = true;
+  newDueForm = { dueDate: '', amount: null as number | null, currencyId: null as number | null, label: '' };
+  addingDue = false;
+  editingDueId: number | null = null;
+  editDueForm = { dueDate: '', amount: null as number | null, currencyId: null as number | null, label: '' };
+  savingDueId: number | null = null;
+  deletingDueId: number | null = null;
+
+  loadPaymentDues(): void {
+    this.loadingPaymentDues = true;
+    this.service.getPaymentDues(this.shipmentId).subscribe({
+      next: (r) => { this.paymentDues = r; this.loadingPaymentDues = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingPaymentDues = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  addPaymentDue(): void {
+    if (!this.newDueForm.dueDate || !this.newDueForm.amount || !this.newDueForm.currencyId) return;
+    this.addingDue = true;
+    this.service.addPaymentDue(this.shipmentId, {
+      dueDate: this.newDueForm.dueDate, amount: this.newDueForm.amount, currencyId: this.newDueForm.currencyId, label: this.newDueForm.label || null
+    }).subscribe({
+      next: () => {
+        this.addingDue = false;
+        this.newDueForm = { dueDate: '', amount: null, currencyId: null, label: '' };
+        this.loadPaymentDues();
+      },
+      error: () => { this.addingDue = false; this.error = 'Could not add payment due.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  startEditDue(due: PaymentDue): void {
+    this.editingDueId = due.id;
+    this.editDueForm = { dueDate: due.dueDate, amount: due.amount, currencyId: due.currencyId, label: due.label || '' };
+  }
+
+  cancelEditDue(): void {
+    this.editingDueId = null;
+  }
+
+  saveEditDue(dueId: number): void {
+    if (!this.editDueForm.dueDate || !this.editDueForm.amount || !this.editDueForm.currencyId) return;
+    this.savingDueId = dueId;
+    this.service.updatePaymentDue(this.shipmentId, dueId, {
+      dueDate: this.editDueForm.dueDate, amount: this.editDueForm.amount, currencyId: this.editDueForm.currencyId, label: this.editDueForm.label || null
+    }).subscribe({
+      next: () => {
+        this.savingDueId = null;
+        this.editingDueId = null;
+        this.loadPaymentDues();
+      },
+      error: () => { this.savingDueId = null; this.error = 'Could not save payment due.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  deletePaymentDue(dueId: number): void {
+    this.deletingDueId = dueId;
+    this.service.deletePaymentDue(this.shipmentId, dueId).subscribe({
+      next: () => { this.deletingDueId = null; this.loadPaymentDues(); },
+      error: () => { this.deletingDueId = null; this.error = 'Could not delete payment due.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  dueStatus(due: PaymentDue): 'Unpaid' | 'Partial' | 'Paid' {
+    if (due.paidUsd <= 0) return 'Unpaid';
+    if (due.paidUsd >= due.amountUsd) return 'Paid';
+    return 'Partial';
   }
 
   loadLastOffshoreDetails(): void {
