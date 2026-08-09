@@ -111,6 +111,9 @@ export interface ClearanceShipmentSummary {
   unit: string;
   trafficLight: 'Green' | 'Amber' | 'Red' | 'Grey';
   routeStatus: string;
+  shippingLine: string;
+  slaPercent: number;
+  isCompleted: boolean;
 }
 
 export interface ClearanceDetail {
