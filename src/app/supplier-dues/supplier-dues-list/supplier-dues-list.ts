@@ -8,7 +8,7 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { exportToExcel } from '../../shared/excel-export.util';
 import {
-  PaymentRecord, SupplierDueRow, SupplierDuesService, SupplierInvoiceSummary
+  PaymentDue, PaymentRecord, SupplierDueRow, SupplierDuesService, SupplierInvoiceSummary
 } from '../supplier-dues.service';
 
 type SortColumn = keyof SupplierDueRow;
@@ -62,7 +62,11 @@ export class SupplierDuesList implements OnInit {
   newPaymentDate = '';
   newPaymentCurrencyId: number | null = null;
   newPaymentValue: number | null = null;
+  newPaymentDueId: number | null = null;
   addingPayment = false;
+
+  paymentDues: PaymentDue[] = [];
+  loadingDues = false;
 
   constructor(private service: SupplierDuesService, private lookups: SettingsLookupService, private tablePrefs: TablePreferencesService) {}
 
@@ -194,8 +198,10 @@ export class SupplierDuesList implements OnInit {
   select(shipmentId: number): void {
     this.selectedShipmentId = shipmentId;
     this.loadingDetail = true;
+    this.loadingDues = true;
     this.summary = null;
     this.paymentRecords = [];
+    this.paymentDues = [];
 
     this.service.getInvoiceSummary(shipmentId).subscribe({
       next: (s) => { this.summary = s; this.loadingDetail = false; this.cdr.markForCheck(); },
@@ -204,19 +210,30 @@ export class SupplierDuesList implements OnInit {
     this.service.getPaymentRecords(shipmentId).subscribe({
       next: (r) => { this.paymentRecords = r; this.cdr.markForCheck(); }
     });
+    this.service.getPaymentDues(shipmentId).subscribe({
+      next: (d) => { this.paymentDues = d; this.loadingDues = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingDues = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  dueStatus(due: PaymentDue): 'Unpaid' | 'Partial' | 'Paid' {
+    if (due.paidUsd <= 0) return 'Unpaid';
+    if (due.paidUsd >= due.amountUsd) return 'Paid';
+    return 'Partial';
   }
 
   addPayment(): void {
     if (!this.selectedShipmentId || !this.newPaymentDate || !this.newPaymentCurrencyId || !this.newPaymentValue) return;
     this.addingPayment = true;
     this.service.addPaymentRecord(this.selectedShipmentId, {
-      paymentDate: this.newPaymentDate, currencyId: this.newPaymentCurrencyId, value: this.newPaymentValue
+      paymentDate: this.newPaymentDate, currencyId: this.newPaymentCurrencyId, value: this.newPaymentValue, paymentDueId: this.newPaymentDueId
     }).subscribe({
       next: () => {
         this.addingPayment = false;
         this.newPaymentDate = '';
         this.newPaymentCurrencyId = null;
         this.newPaymentValue = null;
+        this.newPaymentDueId = null;
         this.select(this.selectedShipmentId!);
         this.load();
       },
