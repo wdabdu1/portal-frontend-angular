@@ -1,9 +1,14 @@
 <div style="max-width: 950px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 style="font-size: 20px; font-weight: 500;">Shipments</h1>
-    <a routerLink="/shipments/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
-      + New Shipment
-    </a>
+    <div style="display: flex; gap: 8px;">
+      <button (click)="onExportClick()" style="padding: 8px 16px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        Export to Excel
+      </button>
+      <a routerLink="/shipments/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
+        + New Shipment
+      </a>
+    </div>
   </div>
   <p style="color: #888; font-size: 12px; margin-top: 8px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column.</p>
 
