@@ -45,7 +45,12 @@ export class TruckLoadDetailComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.service.getDetail(this.truckLoadId).subscribe({
-      next: (d) => { this.detail = d; this.loading = false; this.cdr.markForCheck(); },
+      next: (d) => {
+        this.detail = d;
+        for (const drop of d.drops) this.actualDropOffDraft[drop.id] = drop.actualDropOffDate ?? '';
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
       error: () => { this.error = 'Could not load truck load.'; this.loading = false; this.cdr.markForCheck(); }
     });
   }
@@ -66,6 +71,17 @@ export class TruckLoadDetailComponent implements OnInit {
 
   removeDrop(dropId: number): void {
     this.service.deleteDrop(dropId).subscribe({ next: () => this.load() });
+  }
+
+  savingActualDropOff: Record<number, boolean> = {};
+  actualDropOffDraft: Record<number, string> = {};
+
+  saveActualDropOff(dropId: number): void {
+    this.savingActualDropOff[dropId] = true;
+    this.service.setActualDropOff(dropId, this.actualDropOffDraft[dropId] || null).subscribe({
+      next: () => { this.savingActualDropOff[dropId] = false; this.load(); },
+      error: () => { this.savingActualDropOff[dropId] = false; this.error = 'Could not save Actual Drop Off Date.'; this.cdr.markForCheck(); }
+    });
   }
 
   toggleDrop(dropId: number): void {
