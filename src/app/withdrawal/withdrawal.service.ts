@@ -112,6 +112,10 @@ export class WithdrawalService {
     return this.http.delete(`${API_URL}/withdrawals/${id}/estimate-line-items/${lineItemId}`);
   }
 
+  delete(id: number) {
+    return this.http.delete(`${API_URL}/withdrawals/${id}`);
+  }
+
   getLineItems(id: number) {
     return this.http.get<FzBalanceLine[]>(`${API_URL}/withdrawals/${id}/line-items`);
   }
