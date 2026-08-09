@@ -1,9 +1,14 @@
 <div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 style="font-size: 20px; font-weight: 500;">FZ Inventory</h1>
-    <button (click)="toggleNewWithdrawalForm()" style="padding: 8px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
-      + New Withdrawal
-    </button>
+    <div style="display: flex; gap: 8px;">
+      <button (click)="onExportClick()" style="padding: 8px 16px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        Export to Excel
+      </button>
+      <button (click)="toggleNewWithdrawalForm()" style="padding: 8px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        + New Withdrawal
+      </button>
+    </div>
   </div>
   <p style="color: #888; font-size: 13px;">Full deposit/withdrawal history, grouped by Free Zone location. Click a column filter arrow to narrow results; click a header to sort.</p>
 
