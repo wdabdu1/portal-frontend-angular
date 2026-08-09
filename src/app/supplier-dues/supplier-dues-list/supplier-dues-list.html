@@ -105,7 +105,16 @@
             </td>
           </tr>
         </tbody>
+        <tfoot *ngIf="paymentDues.length > 0">
+          <tr style="font-weight:600; border-top:2px solid #ccc;">
+            <td colspan="4" style="padding:5px; text-align:right;">Total (USD):</td>
+            <td style="padding:5px;">{{ totalDueUsd | number: '1.2-2' }}</td>
+          </tr>
+        </tfoot>
       </table>
+      <p *ngIf="dueScheduleExceedsShipmentValue" style="color:#c0392b; font-size:12px; background:#fdeaea; padding:8px 10px; border-radius:4px;">
+        ⚠ Total scheduled ({{ totalDueUsd | number: '1.2-2' }} USD) exceeds the shipment value ({{ summary?.invoiceValueUsd | number: '1.2-2' }} USD) — check for a mistake.
+      </p>
       <p *ngIf="!loadingDues && paymentDues.length === 0" style="color:#888; font-size:12px;">
         No due schedule entered yet — add one in this shipment's Update Shipment page.
       </p>
@@ -132,6 +141,13 @@
             <td style="padding:5px;"><button (click)="removePayment(p.id)" style="color:#c0392b; background:none; border:none; cursor:pointer; font-size:12px;">Remove</button></td>
           </tr>
         </tbody>
+        <tfoot *ngIf="paymentRecords.length > 0">
+          <tr style="font-weight:600; border-top:2px solid #ccc;">
+            <td colspan="4" style="padding:5px; text-align:right;">Total (USD):</td>
+            <td style="padding:5px;">{{ totalPaidUsdOnShipment | number: '1.2-2' }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
       </table>
 
       <div style="margin-top:10px; display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
