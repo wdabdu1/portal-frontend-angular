@@ -10,6 +10,9 @@
 
       <div *ngIf="!loading && detail">
         <p style="margin: 0 0 6px; font-weight: 600;">{{ detail.blAwbNo }}</p>
+        <p *ngIf="detail.percentOfPoQty !== null" style="margin: 0 0 6px; color: #0a3d62; font-weight: 600; background: #f0f6fb; padding: 4px 6px; border-radius: 4px;">
+          {{ detail.percentOfPoQty | number: '1.0-1' }}% of PO Qty
+        </p>
 
         <div style="display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; color: #555;">
           <span>BU:</span><span style="color:#222;">{{ detail.businessUnit }}</span>
@@ -27,8 +30,11 @@
 
         <div *ngIf="detail.lineItems.length > 0" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee;">
           <p style="margin: 0 0 4px; font-weight: 600; color: #555;">Line Items</p>
-          <div *ngFor="let li of detail.lineItems" style="margin-bottom: 4px; color: #444;">
-            {{ li.modelProduct }} — {{ li.qtyInBl | number: '1.0-2' }} {{ li.unitOfMeasure }}
+          <div *ngFor="let li of detail.lineItems" style="margin-bottom: 6px; color: #444;">
+            <div>{{ li.modelProduct }} — {{ li.qtyInBl | number: '1.0-2' }} {{ li.unitOfMeasure }}</div>
+            <div *ngIf="li.unitPrice !== null" style="color: #888; font-size: 11px;">
+              {{ li.unitPrice | number: '1.2-2' }} {{ li.currency }}/unit — Total: {{ li.total | number: '1.2-2' }} {{ li.currency }}
+            </div>
           </div>
         </div>
       </div>
