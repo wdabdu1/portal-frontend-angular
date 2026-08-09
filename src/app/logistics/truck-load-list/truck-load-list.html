@@ -10,6 +10,14 @@
       </button>
     </div>
   </div>
+
+  <div style="margin-top: 1rem;">
+    <select [(ngModel)]="statusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Pending">Pending</option>
+      <option value="Delivered">Delivered</option>
+      <option value="All">All</option>
+    </select>
+  </div>
   <p style="color: #888; font-size: 12px; margin-top: 8px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column. Click a row to open that truck load.</p>
 
   <div *ngIf="showNewForm" style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1rem; background: #f9f9f9;">
@@ -72,7 +80,14 @@
             <span *ngSwitchCase="'driverName'">{{ item.driverName || '—' }}</span>
             <span *ngSwitchCase="'loadDate'" style="color: #888;">{{ item.loadDate | date: 'MMM d, y' }}</span>
             <span *ngSwitchCase="'city'">{{ item.city || '—' }}</span>
-            <span *ngSwitchCase="'expectedDeliveryDate'" style="color: #0a3d62;">{{ item.expectedDeliveryDate ? (item.expectedDeliveryDate | date: 'MMM d, y') : '—' }}</span>
+           <span *ngSwitchCase="'expectedDeliveryDate'" style="color: #0a3d62;">{{ item.expectedDeliveryDate ? (item.expectedDeliveryDate | date: 'MMM d, y') : '—' }}</span>
+            <span *ngSwitchCase="'actualDropOffDate'">
+              <span *ngIf="item.actualDropOffDate" style="color: #1e7e34;">{{ item.actualDropOffDate | date: 'MMM d, y' }}</span>
+              <span *ngIf="!item.actualDropOffDate" style="color: #a66a00;">Pending</span>
+              <span *ngIf="daysLateOrEarly(item) !== null" [style.color]="daysLateOrEarly(item)! > 0 ? '#c0392b' : '#1e7e34'" style="font-size: 11px; margin-left: 4px;">
+                ({{ daysLateOrEarly(item)! > 0 ? '+' + daysLateOrEarly(item) + 'd late' : (daysLateOrEarly(item)! < 0 ? daysLateOrEarly(item) + 'd early' : 'on time') }})
+              </span>
+            </span>
             <span *ngSwitchCase="'inHousePrice'">{{ item.inHousePrice !== null ? (item.inHousePrice | number: '1.2-2') : '—' }}</span>
             <span *ngSwitchCase="'parallelMarketPrice'">{{ item.parallelMarketPrice !== null ? (item.parallelMarketPrice | number: '1.2-2') : '—' }}</span>
             <span *ngSwitchDefault>{{ item[col.key] }}</span>
