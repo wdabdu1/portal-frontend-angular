@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
@@ -34,7 +35,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
 
 @Component({
   selector: 'app-logistics-list',
-  imports: [CommonModule, FormsModule, ExcelHeaderFilter],
+  imports: [CommonModule, FormsModule, RouterLink, ExcelHeaderFilter],
   templateUrl: './logistics-list.html'
 })
 export class LogisticsList implements OnInit {
