@@ -6,6 +6,7 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
+import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
 import {
   ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
   ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details,
@@ -19,7 +20,7 @@ interface GroupItemDef {
 
 @Component({
   selector: 'app-clearance-detail',
-  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective, SectionLockBadge],
+  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective, SectionLockBadge, ShipmentInfoPanel],
   templateUrl: './clearance-detail.html'
 })
 export class ClearanceDetailComponent implements OnInit {
