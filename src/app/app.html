@@ -39,9 +39,12 @@
           (click)="navigate(item)"
           [style.color]="item.canAccess(auth) ? '#333' : '#bbb'"
           [style.cursor]="item.canAccess(auth) ? 'pointer' : 'not-allowed'"
-          style="display: block; padding: 9px 14px; font-size: 13px; text-decoration: none; border-bottom: 1px solid #f0f0f0;"
+          style="display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; font-size: 13px; text-decoration: none; border-bottom: 1px solid #f0f0f0;"
         >
-          {{ item.label }}
+          <span>{{ item.label }}</span>
+          <span *ngIf="item.canAccess(auth)" (click)="toggleFavorite(item, $event)" [style.color]="isFavorite(item) ? '#f0a500' : '#ccc'" style="cursor: pointer; font-size: 14px;" [title]="isFavorite(item) ? 'Remove from Quick Access' : 'Add to Quick Access'">
+            {{ isFavorite(item) ? '★' : '☆' }}
+          </span>
         </a>
       </div>
     </div>
@@ -51,7 +54,10 @@
   <div style="display: flex; align-items: flex-start;">
     <div style="width: 200px; flex-shrink: 0; padding: 16px; border-right: 1px solid #eee; min-height: calc(100vh - 90px);">
       <p style="font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px;">Quick Access</p>
-      <p style="font-size: 12px; color: #bbb;">No favorites yet.</p>
+      <p *ngIf="favorites.length === 0" style="font-size: 12px; color: #bbb;">No favorites yet — click ☆ next to any menu item.</p>
+      <a *ngFor="let fav of favorites" (click)="navigateFavorite(fav)" style="display: block; padding: 5px 0; font-size: 13px; color: #333; text-decoration: none; cursor: pointer;">
+        {{ fav.label }}
+      </a>
 
       <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee;">
         <a *ngIf="auth.canSeeSettings()" routerLink="/settings" style="display: block; padding: 6px 0; font-size: 13px; color: #333; text-decoration: none;">
