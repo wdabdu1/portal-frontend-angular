@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth/auth.service';
@@ -73,6 +73,8 @@ const MENU_GROUPS: MenuGroup[] = [
   styleUrl: './app.css'
 })
 export class App implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
   menuGroups = MENU_GROUPS;
   openMenu: string | null = null;
   favorites: Favorite[] = [];
@@ -84,7 +86,7 @@ export class App implements OnInit {
   }
 
   loadFavorites(): void {
-    this.favoritesService.getAll().subscribe({ next: (r) => { this.favorites = r; } });
+    this.favoritesService.getAll().subscribe({ next: (r) => { this.favorites = r; this.cdr.markForCheck(); } });
   }
 
   isFavorite(item: MenuItem): boolean {
