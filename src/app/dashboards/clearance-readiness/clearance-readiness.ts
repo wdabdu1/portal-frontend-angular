@@ -15,6 +15,13 @@ export class ClearanceReadiness implements OnInit {
   loading = true;
   error = '';
   expandedShipmentId: number | null = null;
+  // Red needs eyes immediately; Yellow/Green start collapsed so a quick
+  // glance at the counts is enough when nothing needs attention.
+  expandedSection: 'Red' | 'Yellow' | 'Green' | null = 'Red';
+
+  toggleSection(section: 'Red' | 'Yellow' | 'Green'): void {
+    this.expandedSection = this.expandedSection === section ? null : section;
+  }
 
   constructor(private service: DashboardsService) {}
 
