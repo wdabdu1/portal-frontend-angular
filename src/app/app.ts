@@ -1,7 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth/auth.service';
+import { Favorite, FavoritesService } from './favorites.service';
 
 interface MenuItem {
   label: string;
@@ -71,11 +72,38 @@ const MENU_GROUPS: MenuGroup[] = [
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnInit {
   menuGroups = MENU_GROUPS;
   openMenu: string | null = null;
+  favorites: Favorite[] = [];
 
-  constructor(public auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router, private favoritesService: FavoritesService) {}
+
+  ngOnInit(): void {
+    if (this.auth.isLoggedIn()) this.loadFavorites();
+  }
+
+  loadFavorites(): void {
+    this.favoritesService.getAll().subscribe({ next: (r) => { this.favorites = r; } });
+  }
+
+  isFavorite(item: MenuItem): boolean {
+    return this.favorites.some((f) => f.route === item.route && f.label === item.label);
+  }
+
+  toggleFavorite(item: MenuItem, event: MouseEvent): void {
+    event.stopPropagation();
+    const existing = this.favorites.find((f) => f.route === item.route && f.label === item.label);
+    if (existing) {
+      this.favoritesService.remove(existing.id).subscribe({ next: () => this.loadFavorites() });
+    } else {
+      this.favoritesService.add(item.label, item.route).subscribe({ next: () => this.loadFavorites() });
+    }
+  }
+
+  navigateFavorite(fav: Favorite): void {
+    this.router.navigate([fav.route]);
+  }
 
   toggleMenu(label: string, event: MouseEvent): void {
     event.stopPropagation();
