@@ -18,7 +18,13 @@ export interface TrackResult {
 export interface ShipmentReadiness {
   shipmentId: number;
   blAwbNo: string;
+  businessUnit: string;
+  category: string;
+  fcl20Count: number;
+  fcl40Count: number;
+  etd: string | null;
   eta: string | null;
+  classification: 'Red' | 'Yellow' | 'Green';
   tracks: TrackResult[];
 }
 
