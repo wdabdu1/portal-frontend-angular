@@ -1,11 +1,26 @@
-<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1400px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Cashflow Dashboard</h1>
   <p style="color: #888; font-size: 13px;">Local payments (Customs & Clearance, Bank) in SDG, and scheduled Supplier payments in USD.</p>
 
   <!-- ==================== CUSTOMS & CLEARANCE PAYMENTS ==================== -->
-  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2rem;">Customs & Clearance Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(SDG, from Cost Estimates)</span></h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+    <h2 style="font-size: 16px; font-weight: 600; margin: 0;">Customs & Clearance Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(SDG, from Cost Estimates)</span></h2>
+    <button (click)="onExportCustoms()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Export to Excel</button>
+  </div>
 
-  <input [(ngModel)]="customsSearch" placeholder="Search by BU, charge type, or BL" style="width: 100%; max-width: 400px; padding: 8px; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+  <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center;">
+    <select [(ngModel)]="customsBuFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="All">All BUs</option>
+      <option *ngFor="let bu of uniqueCustomsBu" [value]="bu">{{ bu }}</option>
+    </select>
+    <select [(ngModel)]="customsChargeTypeFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="All">All Charge Types</option>
+      <option *ngFor="let ct of uniqueChargeTypes" [value]="ct">{{ ct }}</option>
+    </select>
+    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555;">
+      <input type="checkbox" [(ngModel)]="customsNextWeekOnly" /> Next Week only
+    </label>
+  </div>
 
   <p *ngIf="loadingCustoms" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
 
@@ -13,11 +28,20 @@
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th (click)="sortCustoms('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU {{ customsSortColumn === 'businessUnit' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortCustoms('chargeType')" style="padding: 8px 6px; cursor: pointer;">Charge Type {{ customsSortColumn === 'chargeType' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortCustoms('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB No. {{ customsSortColumn === 'blAwbNo' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortCustoms('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date {{ customsSortColumn === 'dueDate' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortCustoms('valueSdg')" style="padding: 8px 6px; cursor: pointer;">Value (SDG) {{ customsSortColumn === 'valueSdg' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
+          <th
+            *ngFor="let col of customsColumns; let i = index"
+            draggable="true"
+            (dragstart)="onCustomsDragStart(i)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onCustomsDrop(i)"
+            [style.background]="isCustomsColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+            style="padding: 8px 6px; cursor: grab; user-select: none;"
+          >
+            <span (click)="sortCustoms(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+            <span (mousedown)="$event.stopPropagation()">
+              <app-excel-header-filter [options]="customsOptionsFor(col.key)" [selected]="customsFilters[col.key]" (selectedChange)="onCustomsFilterChange(col.key, $event)" />
+            </span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -40,9 +64,24 @@
   </div>
 
   <!-- ==================== LOCAL BANK PAYMENTS ==================== -->
-  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2.5rem;">Local Bank Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(open balances only)</span></h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2.5rem;">
+    <h2 style="font-size: 16px; font-weight: 600; margin: 0;">Local Bank Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(open balances only)</span></h2>
+    <button (click)="onExportBank()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Export to Excel</button>
+  </div>
 
-  <input [(ngModel)]="bankSearch" placeholder="Search by BU, consignee, bank, or BL" style="width: 100%; max-width: 400px; padding: 8px; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+  <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center;">
+    <select [(ngModel)]="bankBuFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="All">All BUs</option>
+      <option *ngFor="let bu of uniqueBankBu" [value]="bu">{{ bu }}</option>
+    </select>
+    <select [(ngModel)]="bankBankFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="All">All Banks</option>
+      <option *ngFor="let b of uniqueBanks" [value]="b">{{ b }}</option>
+    </select>
+    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555;">
+      <input type="checkbox" [(ngModel)]="bankNextWeekOnly" /> Next Week only
+    </label>
+  </div>
 
   <p *ngIf="loadingBank" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
 
@@ -50,12 +89,20 @@
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th (click)="sortBank('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU {{ bankSortColumn === 'businessUnit' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortBank('consignee')" style="padding: 8px 6px; cursor: pointer;">Consignee {{ bankSortColumn === 'consignee' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortBank('receiverBank')" style="padding: 8px 6px; cursor: pointer;">Bank {{ bankSortColumn === 'receiverBank' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortBank('imFormNo')" style="padding: 8px 6px; cursor: pointer;">IM Form No. {{ bankSortColumn === 'imFormNo' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortBank('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL {{ bankSortColumn === 'blAwbNo' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortBank('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date {{ bankSortColumn === 'dueDate' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
+          <th
+            *ngFor="let col of bankColumns; let i = index"
+            draggable="true"
+            (dragstart)="onBankDragStart(i)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onBankDrop(i)"
+            [style.background]="isBankColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+            style="padding: 8px 6px; cursor: grab; user-select: none;"
+          >
+            <span (click)="sortBank(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+            <span (mousedown)="$event.stopPropagation()">
+              <app-excel-header-filter [options]="bankOptionsFor(col.key)" [selected]="bankFilters[col.key]" (selectedChange)="onBankFilterChange(col.key, $event)" />
+            </span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -66,6 +113,7 @@
           <td style="padding: 6px;">{{ r.imFormNo || '—' }}</td>
           <td style="padding: 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
           <td style="padding: 6px; color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</td>
+          <td style="padding: 6px;">{{ r.dueAmountDisplay }}</td>
         </tr>
       </tbody>
     </table>
@@ -73,13 +121,15 @@
   </div>
 
   <!-- ==================== SUPPLIER PAYMENTS ==================== -->
-  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2.5rem;">Supplier Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(USD, from scheduled Payment Due dates)</span></h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2.5rem;">
+    <h2 style="font-size: 16px; font-weight: 600; margin: 0;">Supplier Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(USD, from scheduled Payment Due dates)</span></h2>
+    <button (click)="onExportSupplier()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Export to Excel</button>
+  </div>
 
-  <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center;">
+  <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center;">
     <button (click)="setSupplierView('Monthly')" [style.background]="supplierView === 'Monthly' ? '#0a3d62' : '#eee'" [style.color]="supplierView === 'Monthly' ? 'white' : '#333'" style="padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Monthly</button>
     <button (click)="setSupplierView('Next8Weeks')" [style.background]="supplierView === 'Next8Weeks' ? '#0a3d62' : '#eee'" [style.color]="supplierView === 'Next8Weeks' ? 'white' : '#333'" style="padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Next 8 Weeks</button>
     <button (click)="setSupplierView('All')" [style.background]="supplierView === 'All' ? '#0a3d62' : '#eee'" [style.color]="supplierView === 'All' ? 'white' : '#333'" style="padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">All</button>
-    <input [(ngModel)]="supplierSearch" placeholder="Search by BU, supplier, or BL" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; flex: 1; min-width: 200px;" />
   </div>
 
   <p *ngIf="loadingSupplier" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
@@ -108,12 +158,20 @@
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th (click)="sortSupplier('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU {{ supplierSortColumn === 'businessUnit' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortSupplier('supplierName')" style="padding: 8px 6px; cursor: pointer;">Supplier Name {{ supplierSortColumn === 'supplierName' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortSupplier('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL {{ supplierSortColumn === 'blAwbNo' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortSupplier('label')" style="padding: 8px 6px; cursor: pointer;">Label {{ supplierSortColumn === 'label' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortSupplier('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date {{ supplierSortColumn === 'dueDate' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
-          <th (click)="sortSupplier('amountUsd')" style="padding: 8px 6px; cursor: pointer;">Amount (USD) {{ supplierSortColumn === 'amountUsd' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
+          <th
+            *ngFor="let col of supplierColumns; let i = index"
+            draggable="true"
+            (dragstart)="onSupplierDragStart(i)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onSupplierDrop(i)"
+            [style.background]="isSupplierColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+            style="padding: 8px 6px; cursor: grab; user-select: none;"
+          >
+            <span (click)="sortSupplier(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+            <span (mousedown)="$event.stopPropagation()">
+              <app-excel-header-filter [options]="supplierOptionsFor(col.key)" [selected]="supplierFilters[col.key]" (selectedChange)="onSupplierFilterChange(col.key, $event)" />
+            </span>
+          </th>
         </tr>
       </thead>
       <tbody>
