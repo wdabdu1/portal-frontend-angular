@@ -1,7 +1,10 @@
-<div *ngIf="auth.isLoggedIn()">
-  <div
-    style="padding: 10px 20px; background: #0a3d62; color: white; font-family: sans-serif; display: flex; justify-content: space-between; align-items: center;"
-  >
+<div *ngIf="!auth.isLoggedIn()">
+  <router-outlet />
+</div>
+
+<div *ngIf="auth.isLoggedIn()" style="font-family: sans-serif;">
+  <!-- Top bar -->
+  <div style="padding: 10px 20px; background: #0a3d62; color: white; display: flex; justify-content: space-between; align-items: center;">
     <strong>CTC Group Supply Chain Portal</strong>
     <div style="display: flex; align-items: center; gap: 12px; font-size: 13px;">
       <span>{{ auth.getDisplayName() }}</span>
@@ -14,44 +17,58 @@
     </div>
   </div>
 
-  <div style="padding: 8px 20px; background: #f7f7f7; border-bottom: 1px solid #ddd; font-family: sans-serif; display: flex; gap: 8px; flex-wrap: wrap;">
-    <a *ngIf="auth.canSeeOrders()" routerLink="/orders" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Orders
-    </a>
-    <a *ngIf="auth.canSeeShipments()" routerLink="/shipments" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Shipments
-    </a>
-    <a routerLink="/clearance" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Clearance
-    </a>
-    <a routerLink="/fz-inventory" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      FZ Inventory
-    </a>
-    <a routerLink="/logistics" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Logistics
-    </a>
-    <a routerLink="/logistics/truck-loads" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Truck Loads
-    </a>
-    <a *ngIf="auth.hasRole('CorpFinance') || auth.hasRole('Manager') || auth.hasRole('SuperUser')" routerLink="/transfer-pricing" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Transfer Pricing
-    </a>
-    <a *ngIf="auth.canSeeSupplierDues()" routerLink="/supplier-dues" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Supplier Dues
-    </a>
-    <a *ngIf="auth.canSeeBankDues()" routerLink="/bank-dues" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Bank Dues
-    </a>
-    <a *ngIf="auth.canSeeSettings()" routerLink="/settings" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Settings
-    </a>
-    <a *ngIf="auth.hasRole('SuperUser')" routerLink="/users" style="padding: 6px 12px; background: white; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; border: 1px solid #ddd;">
-      Users
-    </a>
-    <a *ngIf="auth.canCreateOrders()" routerLink="/orders/new" style="padding: 6px 12px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px; margin-left: auto;">
+  <!-- Menu bar -->
+  <div style="padding: 8px 20px; background: #f7f7f7; border-bottom: 1px solid #ddd; display: flex; gap: 4px; position: relative; z-index: 30;">
+    <div *ngFor="let group of menuGroups" style="position: relative;">
+      <button
+        (click)="toggleMenu(group.label, $event)"
+        [style.background]="openMenu === group.label ? '#0a3d62' : 'white'"
+        [style.color]="openMenu === group.label ? 'white' : '#333'"
+        style="padding: 7px 14px; border-radius: 4px; border: 1px solid #ddd; font-size: 13px; cursor: pointer;"
+      >
+        {{ group.label }} ▾
+      </button>
+
+      <div
+        *ngIf="openMenu === group.label"
+        (click)="$event.stopPropagation()"
+        style="position: absolute; top: 100%; left: 0; margin-top: 4px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); min-width: 200px; overflow: hidden;"
+      >
+        
+          *ngFor="let item of group.items"
+          (click)="navigate(item)"
+          [style.color]="item.canAccess(auth) ? '#333' : '#bbb'"
+          [style.cursor]="item.canAccess(auth) ? 'pointer' : 'not-allowed'"
+          style="display: block; padding: 9px 14px; font-size: 13px; text-decoration: none; border-bottom: 1px solid #f0f0f0;"
+        >
+          {{ item.label }}
+        </a>
+      </div>
+    </div>
+
+    <a *ngIf="auth.canCreateOrders()" routerLink="/orders/new" style="padding: 7px 14px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px; margin-left: auto;">
       + New Supplier Order
     </a>
   </div>
-</div>
 
-<router-outlet />
+  <!-- Shell: sidebar + main content -->
+  <div style="display: flex; align-items: flex-start;">
+    <div style="width: 200px; flex-shrink: 0; padding: 16px; border-right: 1px solid #eee; min-height: calc(100vh - 90px);">
+      <p style="font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px;">Quick Access</p>
+      <p style="font-size: 12px; color: #bbb;">No favorites yet.</p>
+
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee;">
+        <a *ngIf="auth.canSeeSettings()" routerLink="/settings" style="display: block; padding: 6px 0; font-size: 13px; color: #333; text-decoration: none;">
+          Settings
+        </a>
+        <span *ngIf="!auth.canSeeSettings()" style="display: block; padding: 6px 0; font-size: 13px; color: #bbb;">
+          Settings
+        </span>
+      </div>
+    </div>
+
+    <div style="flex: 1; min-width: 0;">
+      <router-outlet />
+    </div>
+  </div>
+</div>
