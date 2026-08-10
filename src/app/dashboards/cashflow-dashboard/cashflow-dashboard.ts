@@ -20,9 +20,9 @@ interface MonthlyAccumulation {
 // Local Bank rows extended with a display-friendly Due Amount field
 // (native value shown with its currency) so it works with the same
 // generic getValue/columnOptions helpers as everything else.
-interface BankRowWithDueAmount extends BankDueRow {
-  dueAmountDisplay: string;
-}
+// BankDueRow already carries value/currency as separate fields — no
+// extension needed anymore, kept as a type alias for minimal diff below.
+type BankRowWithDueAmount = BankDueRow;
 
 const CUSTOMS_COLUMNS: ColumnDef[] = [
   { key: 'businessUnit', label: 'BU' },
@@ -39,7 +39,8 @@ const BANK_COLUMNS: ColumnDef[] = [
   { key: 'imFormNo', label: 'IM Form No.' },
   { key: 'blAwbNo', label: 'BL' },
   { key: 'dueDate', label: 'Due Date' },
-  { key: 'dueAmountDisplay', label: 'Due Amount' }
+  { key: 'value', label: 'Due Amount' },
+  { key: 'currency', label: 'Currency' }
 ];
 
 const SUPPLIER_COLUMNS: ColumnDef[] = [
@@ -107,11 +108,7 @@ export class CashflowDashboard implements OnInit {
       error: () => { this.loadingCustoms = false; this.cdr.markForCheck(); }
     });
     this.bankDuesService.getOpen().subscribe({
-      next: (r) => {
-        this.allBankRows = r.map((row) => ({ ...row, dueAmountDisplay: row.value !== null ? `${row.value} ${row.currency ?? ''}`.trim() : '—' }));
-        this.loadingBank = false;
-        this.cdr.markForCheck();
-      },
+      next: (r) => { this.allBankRows = r; this.loadingBank = false; this.cdr.markForCheck(); },
       error: () => { this.loadingBank = false; this.cdr.markForCheck(); }
     });
     this.cashflowService.getSupplierPayments().subscribe({
