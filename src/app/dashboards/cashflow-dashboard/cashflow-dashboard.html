@@ -1,0 +1,137 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Cashflow Dashboard</h1>
+  <p style="color: #888; font-size: 13px;">Local payments (Customs & Clearance, Bank) in SDG, and scheduled Supplier payments in USD.</p>
+
+  <!-- ==================== CUSTOMS & CLEARANCE PAYMENTS ==================== -->
+  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2rem;">Customs & Clearance Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(SDG, from Cost Estimates)</span></h2>
+
+  <input [(ngModel)]="customsSearch" placeholder="Search by BU, charge type, or BL" style="width: 100%; max-width: 400px; padding: 8px; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+
+  <p *ngIf="loadingCustoms" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <div *ngIf="!loadingCustoms" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th (click)="sortCustoms('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU {{ customsSortColumn === 'businessUnit' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortCustoms('chargeType')" style="padding: 8px 6px; cursor: pointer;">Charge Type {{ customsSortColumn === 'chargeType' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortCustoms('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL/AWB No. {{ customsSortColumn === 'blAwbNo' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortCustoms('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date {{ customsSortColumn === 'dueDate' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortCustoms('valueSdg')" style="padding: 8px 6px; cursor: pointer;">Value (SDG) {{ customsSortColumn === 'valueSdg' ? (customsSortAsc ? '▲' : '▼') : '' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of customsRows" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">{{ r.businessUnit }}</td>
+          <td style="padding: 6px;">{{ r.chargeType }}</td>
+          <td style="padding: 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
+          <td style="padding: 6px; color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</td>
+          <td style="padding: 6px;">{{ r.valueSdg | number: '1.2-2' }}</td>
+        </tr>
+      </tbody>
+      <tfoot *ngIf="customsRows.length > 0">
+        <tr style="font-weight: 600; border-top: 2px solid #ccc;">
+          <td colspan="4" style="padding: 6px; text-align: right;">Total (SDG):</td>
+          <td style="padding: 6px;">{{ customsTotalSdg | number: '1.2-2' }}</td>
+        </tr>
+      </tfoot>
+    </table>
+    <p *ngIf="customsRows.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">No estimated charges found.</p>
+  </div>
+
+  <!-- ==================== LOCAL BANK PAYMENTS ==================== -->
+  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2.5rem;">Local Bank Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(open balances only)</span></h2>
+
+  <input [(ngModel)]="bankSearch" placeholder="Search by BU, consignee, bank, or BL" style="width: 100%; max-width: 400px; padding: 8px; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+
+  <p *ngIf="loadingBank" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <div *ngIf="!loadingBank" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th (click)="sortBank('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU {{ bankSortColumn === 'businessUnit' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortBank('consignee')" style="padding: 8px 6px; cursor: pointer;">Consignee {{ bankSortColumn === 'consignee' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortBank('receiverBank')" style="padding: 8px 6px; cursor: pointer;">Bank {{ bankSortColumn === 'receiverBank' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortBank('imFormNo')" style="padding: 8px 6px; cursor: pointer;">IM Form No. {{ bankSortColumn === 'imFormNo' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortBank('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL {{ bankSortColumn === 'blAwbNo' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortBank('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date {{ bankSortColumn === 'dueDate' ? (bankSortAsc ? '▲' : '▼') : '' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of bankRows" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">{{ r.businessUnit }}</td>
+          <td style="padding: 6px;">{{ r.consignee }}</td>
+          <td style="padding: 6px;">{{ r.receiverBank || '—' }}</td>
+          <td style="padding: 6px;">{{ r.imFormNo || '—' }}</td>
+          <td style="padding: 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
+          <td style="padding: 6px; color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="bankRows.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">No open bank dues.</p>
+  </div>
+
+  <!-- ==================== SUPPLIER PAYMENTS ==================== -->
+  <h2 style="font-size: 16px; font-weight: 600; margin-top: 2.5rem;">Supplier Payments <span style="font-weight: normal; color: #888; font-size: 13px;">(USD, from scheduled Payment Due dates)</span></h2>
+
+  <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center;">
+    <button (click)="setSupplierView('Monthly')" [style.background]="supplierView === 'Monthly' ? '#0a3d62' : '#eee'" [style.color]="supplierView === 'Monthly' ? 'white' : '#333'" style="padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Monthly</button>
+    <button (click)="setSupplierView('Next8Weeks')" [style.background]="supplierView === 'Next8Weeks' ? '#0a3d62' : '#eee'" [style.color]="supplierView === 'Next8Weeks' ? 'white' : '#333'" style="padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Next 8 Weeks</button>
+    <button (click)="setSupplierView('All')" [style.background]="supplierView === 'All' ? '#0a3d62' : '#eee'" [style.color]="supplierView === 'All' ? 'white' : '#333'" style="padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">All</button>
+    <input [(ngModel)]="supplierSearch" placeholder="Search by BU, supplier, or BL" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; flex: 1; min-width: 200px;" />
+  </div>
+
+  <p *ngIf="loadingSupplier" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <div *ngIf="!loadingSupplier && supplierView === 'Monthly'" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th style="padding: 8px 6px;">BU</th>
+          <th style="padding: 8px 6px;">Month</th>
+          <th style="padding: 8px 6px;">Total Due (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of supplierMonthlyAccumulation" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">{{ m.businessUnit }}</td>
+          <td style="padding: 6px;">{{ m.month }}</td>
+          <td style="padding: 6px;">{{ m.totalUsd | number: '1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="supplierMonthlyAccumulation.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">No scheduled payments.</p>
+  </div>
+
+  <div *ngIf="!loadingSupplier && supplierView !== 'Monthly'" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th (click)="sortSupplier('businessUnit')" style="padding: 8px 6px; cursor: pointer;">BU {{ supplierSortColumn === 'businessUnit' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortSupplier('supplierName')" style="padding: 8px 6px; cursor: pointer;">Supplier Name {{ supplierSortColumn === 'supplierName' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortSupplier('blAwbNo')" style="padding: 8px 6px; cursor: pointer;">BL {{ supplierSortColumn === 'blAwbNo' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortSupplier('label')" style="padding: 8px 6px; cursor: pointer;">Label {{ supplierSortColumn === 'label' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortSupplier('dueDate')" style="padding: 8px 6px; cursor: pointer;">Due Date {{ supplierSortColumn === 'dueDate' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
+          <th (click)="sortSupplier('amountUsd')" style="padding: 8px 6px; cursor: pointer;">Amount (USD) {{ supplierSortColumn === 'amountUsd' ? (supplierSortAsc ? '▲' : '▼') : '' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of (supplierView === 'All' ? supplierRowsAll : supplierRowsNext8Weeks)" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">{{ r.businessUnit }}</td>
+          <td style="padding: 6px;">{{ r.supplierName }}</td>
+          <td style="padding: 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
+          <td style="padding: 6px;">{{ r.label }}</td>
+          <td style="padding: 6px; color: #888;">{{ r.dueDate | date: 'MMM d, y' }}</td>
+          <td style="padding: 6px;">{{ r.amountUsd | number: '1.2-2' }}</td>
+        </tr>
+      </tbody>
+      <tfoot *ngIf="(supplierView === 'All' ? supplierRowsAll : supplierRowsNext8Weeks).length > 0">
+        <tr style="font-weight: 600; border-top: 2px solid #ccc;">
+          <td colspan="5" style="padding: 6px; text-align: right;">Total (USD):</td>
+          <td style="padding: 6px;">{{ supplierTotalUsd | number: '1.2-2' }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
