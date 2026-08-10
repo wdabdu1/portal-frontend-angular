@@ -123,6 +123,10 @@ export class App implements OnInit {
     this.router.navigate([fav.route]);
   }
 
+  get isBareRoute(): boolean {
+    return this.router.url.startsWith('/mobile/');
+  }
+
   removeFavorite(fav: Favorite): void {
     this.favoritesService.remove(fav.id).subscribe({ next: () => this.loadFavorites() });
   }
