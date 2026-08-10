@@ -113,10 +113,19 @@
           <td style="padding: 6px;">{{ r.imFormNo || '—' }}</td>
           <td style="padding: 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
           <td style="padding: 6px; color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</td>
-          <td style="padding: 6px;">{{ r.value !== null ? (r.value | number: '1.2-2') : '—' }}</td>
-          <td style="padding: 6px;">{{ r.currency || '—' }}</td>
+          <td style="padding: 6px;">{{ r.valueAed | number: '1.2-2' }}</td>
+          <td style="padding: 6px; color: #1e7e34;">{{ r.paidAed | number: '1.2-2' }}</td>
+          <td style="padding: 6px; font-weight: 600;">{{ r.balanceAed | number: '1.2-2' }}</td>
         </tr>
       </tbody>
+      <tfoot *ngIf="bankRows.length > 0">
+        <tr style="font-weight: 600; border-top: 2px solid #ccc;">
+          <td colspan="6" style="padding: 6px; text-align: right;">Total (AED):</td>
+          <td style="padding: 6px;">{{ bankTotalDueAed | number: '1.2-2' }}</td>
+          <td style="padding: 6px; color: #1e7e34;">{{ bankTotalPaidAed | number: '1.2-2' }}</td>
+          <td style="padding: 6px;">{{ bankTotalBalanceAed | number: '1.2-2' }}</td>
+        </tr>
+      </tfoot>
     </table>
     <p *ngIf="bankRows.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">No open bank dues.</p>
   </div>
