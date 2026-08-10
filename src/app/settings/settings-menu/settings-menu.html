@@ -8,4 +8,19 @@
       <a *ngFor="let link of group.links" [routerLink]="link.path" style="padding: 6px 12px; background: #f0f0f0; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px;">{{ link.label }}</a>
     </div>
   </div>
+
+  <div style="margin-top: 1.5rem;">
+    <h3 style="font-size: 14px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 4px;">Administration</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+      
+        (click)="goToUsers()"
+        [style.background]="auth.hasRole('SuperUser') ? '#f0f0f0' : '#f7f7f7'"
+        [style.color]="auth.hasRole('SuperUser') ? '#333' : '#bbb'"
+        [style.cursor]="auth.hasRole('SuperUser') ? 'pointer' : 'not-allowed'"
+        style="padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px;"
+      >
+        Users
+      </a>
+    </div>
+  </div>
 </div>
