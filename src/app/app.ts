@@ -22,7 +22,8 @@ const MENU_GROUPS: MenuGroup[] = [
   {
     label: 'Dashboard',
     items: [
-      { label: 'Clearance Readiness', route: '/dashboards/clearance-readiness', canAccess: (a) => a.canSeeShipments() }
+      { label: 'Shipment Pipeline Health', route: '/dashboards/clearance-readiness', canAccess: (a) => a.canSeeShipments() },
+      { label: 'Cashflow', route: '/dashboards/cashflow', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Treasury') || a.hasRole('Manager') || a.hasRole('SuperUser') }
     ]
   },
   {
