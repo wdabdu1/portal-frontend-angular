@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from './auth/auth.service';
 import { Favorite, FavoritesService } from './favorites.service';
 
@@ -81,8 +82,23 @@ export class App implements OnInit {
 
   constructor(public auth: AuthService, private router: Router, private favoritesService: FavoritesService) {}
 
+  private favoritesLoadedForUser = false;
+
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) this.loadFavorites();
+
+    // App bootstraps once, before login — this catches the actual login
+    // event (and logout, resetting for the next user) via navigation,
+    // rather than only checking auth state a single time at startup.
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
+      if (this.auth.isLoggedIn() && !this.favoritesLoadedForUser) {
+        this.favoritesLoadedForUser = true;
+        this.loadFavorites();
+      } else if (!this.auth.isLoggedIn()) {
+        this.favoritesLoadedForUser = false;
+        this.favorites = [];
+      }
+    });
   }
 
   loadFavorites(): void {
@@ -105,6 +121,10 @@ export class App implements OnInit {
 
   navigateFavorite(fav: Favorite): void {
     this.router.navigate([fav.route]);
+  }
+
+  removeFavorite(fav: Favorite): void {
+    this.favoritesService.remove(fav.id).subscribe({ next: () => this.loadFavorites() });
   }
 
   toggleMenu(label: string, event: MouseEvent): void {
