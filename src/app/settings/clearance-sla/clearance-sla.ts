@@ -26,8 +26,16 @@ const DIVISION_LABELS: Record<string, string> = {
   ClearanceGeneral: 'Clearance General',
   Route1: 'Route 1 — Clear at Port',
   Route2: 'Route 2 — FZ Deposit',
-  Route3: 'Route 3 — Clear from FZ'
+  Route3: 'Route 3 — Clear from FZ',
+  PreClearanceDocs: 'Pre-Clearance — Document Chain (backward from ETA)',
+  PreClearanceMot: 'Pre-Clearance — MOT Approval (backward from ETA)',
+  PreClearanceSsmo: 'Pre-Clearance — SSMO Approval (backward from ETA)'
 };
+
+// Divisions that combine with General's total to form a route's real
+// duration. Pre-clearance tracks are standalone — measured backward from
+// ETA, nothing to do with the forward clearance cascade at all.
+const ROUTE_DIVISIONS = ['Route1', 'Route2', 'Route3'];
 
 @Component({
   selector: 'app-clearance-sla',
@@ -65,7 +73,7 @@ export class ClearanceSla implements OnInit {
         this.groups = Array.from(byDivision.entries()).map(([division, groupRows]) => ({
           division,
           label: DIVISION_LABELS[division] ?? division,
-          isRoute: division !== 'ClearanceGeneral',
+          isRoute: ROUTE_DIVISIONS.includes(division),
           rows: groupRows.sort((a, b) => a.sequenceOrder - b.sequenceOrder)
         }));
         this.loading = false;
