@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { exportToExcel } from '../../shared/excel-export.util';
 import { DashboardsService, ShipmentReadiness } from '../dashboards.service';
 
 @Component({
@@ -63,5 +64,39 @@ export class ClearanceReadiness implements OnInit {
     if (light === 'Red') return '#fdeaea';
     if (light === 'Amber') return '#fff4e5';
     return '#e6f4ea';
+  }
+
+  private countLight(s: ShipmentReadiness, light: string): number {
+    return s.tracks.flatMap((t) => t.items).filter((i) => i.light === light).length;
+  }
+
+  // Flattened one-row-per-shipment summary — the full per-track detail
+  // doesn't fit a spreadsheet row, so this exports what's already
+  // visible in the table (plus the classification and flag counts).
+  onExportClick(): void {
+    const rows = this.allShipments.map((s) => ({
+      classification: s.classification,
+      businessUnit: s.businessUnit,
+      category: s.category,
+      blAwbNo: s.blAwbNo,
+      fcl: `${s.fcl20Count}x20' ${s.fcl40Count}x40'`,
+      etd: s.etd,
+      eta: s.eta,
+      redCount: this.countLight(s, 'Red'),
+      amberCount: this.countLight(s, 'Amber'),
+      greenCount: this.countLight(s, 'Green')
+    }));
+    exportToExcel('Shipment Pipeline Health', [
+      { key: 'classification', label: 'Classification' },
+      { key: 'businessUnit', label: 'BU' },
+      { key: 'category', label: 'Cat' },
+      { key: 'blAwbNo', label: 'BL/AWB No.' },
+      { key: 'fcl', label: 'FCL' },
+      { key: 'etd', label: 'ETD' },
+      { key: 'eta', label: 'ETA' },
+      { key: 'redCount', label: 'Red Flags' },
+      { key: 'amberCount', label: 'Amber Flags' },
+      { key: 'greenCount', label: 'Green Flags' }
+    ], rows);
   }
 }
