@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 interface MenuGroup {
   title: string;
@@ -13,6 +14,12 @@ interface MenuGroup {
   templateUrl: './settings-menu.html'
 })
 export class SettingsMenu {
+  constructor(public auth: AuthService, private router: Router) {}
+
+  goToUsers(): void {
+    if (!this.auth.hasRole('SuperUser')) return;
+    this.router.navigate(['/users']);
+  }
   groups: MenuGroup[] = [
     {
       title: 'Organization',
