@@ -27,9 +27,10 @@ const DIVISION_LABELS: Record<string, string> = {
   Route1: 'Route 1 — Clear at Port',
   Route2: 'Route 2 — FZ Deposit',
   Route3: 'Route 3 — Clear from FZ',
-  PreClearanceDocs: 'Pre-Clearance — Document Chain (backward from ETA)',
+  PreClearanceDocs: 'Pre-Clearance — Document Chain (backward from ETA / forward from ETD)',
   PreClearanceMot: 'Pre-Clearance — MOT Approval (backward from ETA)',
-  PreClearanceSsmo: 'Pre-Clearance — SSMO Approval (backward from ETA)'
+  PreClearanceSsmo: 'Pre-Clearance — SSMO Approval (backward from ETA)',
+  PreClearanceDo: 'Pre-Clearance — DO Received (forward from Vessel Arrival)'
 };
 
 // Divisions that combine with General's total to form a route's real
