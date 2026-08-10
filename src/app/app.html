@@ -35,7 +35,7 @@
         style="position: absolute; top: 100%; left: 0; margin-top: 4px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); min-width: 200px; overflow: hidden;"
       >
         
-          *ngFor="let item of group.items"
+         <a *ngFor="let item of group.items"
           (click)="navigate(item)"
           [style.color]="item.canAccess(auth) ? '#333' : '#bbb'"
           [style.cursor]="item.canAccess(auth) ? 'pointer' : 'not-allowed'"
