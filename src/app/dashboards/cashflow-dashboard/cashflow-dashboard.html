@@ -113,7 +113,8 @@
           <td style="padding: 6px;">{{ r.imFormNo || '—' }}</td>
           <td style="padding: 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
           <td style="padding: 6px; color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</td>
-          <td style="padding: 6px;">{{ r.dueAmountDisplay }}</td>
+          <td style="padding: 6px;">{{ r.value !== null ? (r.value | number: '1.2-2') : '—' }}</td>
+          <td style="padding: 6px;">{{ r.currency || '—' }}</td>
         </tr>
       </tbody>
     </table>
