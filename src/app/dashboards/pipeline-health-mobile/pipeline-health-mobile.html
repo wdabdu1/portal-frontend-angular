@@ -1,0 +1,46 @@
+<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 12px; background: #fafafa; min-height: 100vh; box-sizing: border-box;">
+  <h1 style="font-size: 17px; font-weight: 600; margin: 4px 0 12px;">Pipeline Health</h1>
+
+  <p *ngIf="loading" style="color: #888; font-size: 14px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 14px;">{{ error }}</p>
+
+  <ng-container *ngIf="!loading">
+    <!-- RED -->
+    <div style="margin-bottom: 16px;">
+      <p style="font-size: 13px; font-weight: 600; color: #c0392b; margin: 0 0 6px;">🔴 Red — {{ redShipments.length }}</p>
+      <div *ngFor="let s of redShipments" style="background: white; border-left: 4px solid #c0392b; border-radius: 4px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.06);">
+        <div style="font-weight: 600; font-size: 14px; font-family: monospace;">{{ s.blAwbNo }}</div>
+        <div style="font-size: 12px; color: #666; margin-top: 2px;">{{ s.businessUnit }} — {{ s.category }}</div>
+        <div style="font-size: 12px; color: #888; margin-top: 4px;">
+          ETD: {{ s.etd ? (s.etd | date: 'MMM d') : '—' }} &nbsp;•&nbsp; ETA: {{ s.eta ? (s.eta | date: 'MMM d') : '—' }}
+        </div>
+      </div>
+      <p *ngIf="redShipments.length === 0" style="color: #bbb; font-size: 13px;">Nothing red.</p>
+    </div>
+
+    <!-- YELLOW -->
+    <div style="margin-bottom: 16px;">
+      <p style="font-size: 13px; font-weight: 600; color: #a66a00; margin: 0 0 6px;">🟡 Yellow — {{ yellowShipments.length }}</p>
+      <div *ngFor="let s of yellowShipments" style="background: white; border-left: 4px solid #f0a500; border-radius: 4px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.06);">
+        <div style="font-weight: 600; font-size: 14px; font-family: monospace;">{{ s.blAwbNo }}</div>
+        <div style="font-size: 12px; color: #666; margin-top: 2px;">{{ s.businessUnit }} — {{ s.category }}</div>
+        <div style="font-size: 12px; color: #888; margin-top: 4px;">
+          ETD: {{ s.etd ? (s.etd | date: 'MMM d') : '—' }} &nbsp;•&nbsp; ETA: {{ s.eta ? (s.eta | date: 'MMM d') : '—' }}
+        </div>
+      </div>
+      <p *ngIf="yellowShipments.length === 0" style="color: #bbb; font-size: 13px;">Nothing trending late.</p>
+    </div>
+
+    <!-- GREEN -->
+    <div>
+      <p style="font-size: 13px; font-weight: 600; color: #1e7e34; margin: 0 0 6px;">🟢 Green — {{ greenShipments.length }}</p>
+      <div *ngFor="let s of greenShipments" style="background: white; border-left: 4px solid #1e7e34; border-radius: 4px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.06);">
+        <div style="font-weight: 600; font-size: 14px; font-family: monospace;">{{ s.blAwbNo }}</div>
+        <div style="font-size: 12px; color: #666; margin-top: 2px;">{{ s.businessUnit }} — {{ s.category }}</div>
+        <div style="font-size: 12px; color: #888; margin-top: 4px;">
+          ETD: {{ s.etd ? (s.etd | date: 'MMM d') : '—' }} &nbsp;•&nbsp; ETA: {{ s.eta ? (s.eta | date: 'MMM d') : '—' }}
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
