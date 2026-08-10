@@ -1,5 +1,8 @@
 <div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
-  <h1 style="font-size: 20px; font-weight: 500;">Shipment Pipeline Health</h1>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500; margin: 0;">Shipment Pipeline Health</h1>
+    <button (click)="onExportClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Export to Excel</button>
+  </div>
   <p style="color: #888; font-size: 13px;">
     End-to-end pre-clearance readiness — Document Chain, MOT/SSMO Approval, Vessel Arrival, and DO Received.
     Red = unrecoverable or already blocking. Yellow = behind, but still recoverable. Green = on track.
