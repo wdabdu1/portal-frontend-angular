@@ -30,25 +30,16 @@ export class ClearanceReadiness implements OnInit {
     });
   }
 
-  // Worst-first: most Red flags at the top, ties broken by most Amber.
-  get shipments(): ShipmentReadiness[] {
-    return [...this.allShipments].sort((a, b) => this.redCount(b) - this.redCount(a) || this.amberCount(b) - this.amberCount(a));
+  get redShipments(): ShipmentReadiness[] {
+    return this.allShipments.filter((s) => s.classification === 'Red').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
   }
 
-  private allItems(s: ShipmentReadiness) {
-    return s.tracks.flatMap((t) => t.items);
+  get yellowShipments(): ShipmentReadiness[] {
+    return this.allShipments.filter((s) => s.classification === 'Yellow').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
   }
 
-  redCount(s: ShipmentReadiness): number {
-    return this.allItems(s).filter((i) => i.light === 'Red').length;
-  }
-
-  amberCount(s: ShipmentReadiness): number {
-    return this.allItems(s).filter((i) => i.light === 'Amber').length;
-  }
-
-  greenCount(s: ShipmentReadiness): number {
-    return this.allItems(s).filter((i) => i.light === 'Green').length;
+  get greenShipments(): ShipmentReadiness[] {
+    return this.allShipments.filter((s) => s.classification === 'Green').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
   }
 
   toggle(shipmentId: number): void {
