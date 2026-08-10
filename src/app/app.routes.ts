@@ -32,6 +32,7 @@ import { TransferPricingDetailComponent } from './transfer-pricing/transfer-pric
 import { TransferPricingList } from './transfer-pricing/transfer-pricing-list/transfer-pricing-list';
 import { TransferPricingAccumulated } from './transfer-pricing/transfer-pricing-accumulated/transfer-pricing-accumulated';
 import { ClearanceReadiness } from './dashboards/clearance-readiness/clearance-readiness';
+import { CashflowDashboard } from './dashboards/cashflow-dashboard/cashflow-dashboard';
 
 
 export const routes: Routes = [
@@ -71,6 +72,7 @@ export const routes: Routes = [
   { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard] },
   { path: 'clearance', component: ClearanceList, canActivate: [authGuard] },
   { path: 'dashboards/clearance-readiness', component: ClearanceReadiness, canActivate: [authGuard] },
+  { path: 'dashboards/cashflow', component: CashflowDashboard, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
