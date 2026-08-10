@@ -1,8 +1,8 @@
-<div *ngIf="!auth.isLoggedIn()">
+<div *ngIf="!auth.isLoggedIn() || (auth.isLoggedIn() && isBareRoute)">
   <router-outlet />
 </div>
 
-<div *ngIf="auth.isLoggedIn()" style="font-family: sans-serif;">
+<div *ngIf="auth.isLoggedIn() && !isBareRoute" style="font-family: sans-serif;">
   <!-- Top bar -->
   <div style="padding: 10px 20px; background: #0a3d62; color: white; display: flex; justify-content: space-between; align-items: center;">
     <strong>CTC Group Supply Chain Portal</strong>
