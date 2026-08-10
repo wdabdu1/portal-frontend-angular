@@ -39,8 +39,9 @@ const BANK_COLUMNS: ColumnDef[] = [
   { key: 'imFormNo', label: 'IM Form No.' },
   { key: 'blAwbNo', label: 'BL' },
   { key: 'dueDate', label: 'Due Date' },
-  { key: 'value', label: 'Due Amount' },
-  { key: 'currency', label: 'Currency' }
+  { key: 'valueAed', label: 'Due (AED)' },
+  { key: 'paidAed', label: 'Paid (AED)' },
+  { key: 'balanceAed', label: 'Balance (AED)' }
 ];
 
 const SUPPLIER_COLUMNS: ColumnDef[] = [
@@ -228,6 +229,9 @@ export class CashflowDashboard implements OnInit {
     this.dragFrom = null;
     this.tablePrefs.saveColumnOrder('cashflow-bank', cols.map((c) => c.key)).subscribe();
   }
+  get bankTotalDueAed(): number { return this.bankRows.reduce((sum, r) => sum + r.valueAed, 0); }
+  get bankTotalPaidAed(): number { return this.bankRows.reduce((sum, r) => sum + r.paidAed, 0); }
+  get bankTotalBalanceAed(): number { return this.bankRows.reduce((sum, r) => sum + r.balanceAed, 0); }
   onExportBank(): void { exportToExcel('Local Bank Payments', this.bankColumns, this.bankRows); }
 
   // --- Supplier Payments ---
