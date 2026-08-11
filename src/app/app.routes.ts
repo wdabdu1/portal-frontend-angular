@@ -36,6 +36,7 @@ import { ClearanceReadiness } from './dashboards/clearance-readiness/clearance-r
 import { PipelineHealthMobile } from './dashboards/pipeline-health-mobile/pipeline-health-mobile';
 import { CashflowDashboard } from './dashboards/cashflow-dashboard/cashflow-dashboard';
 import { PoDashboard } from './dashboards/po-dashboard/po-dashboard';
+import { FzDashboard } from './dashboards/fz-dashboard/fz-dashboard';
 
 
 export const routes: Routes = [
@@ -79,6 +80,7 @@ export const routes: Routes = [
   { path: 'mobile/pipeline-health', component: PipelineHealthMobile, canActivate: [authGuard] },
   { path: 'dashboards/cashflow', component: CashflowDashboard, canActivate: [authGuard] },
   { path: 'dashboards/purchase-orders', component: PoDashboard, canActivate: [authGuard] },
+  { path: 'dashboards/fz', component: FzDashboard, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
