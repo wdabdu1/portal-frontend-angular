@@ -45,7 +45,7 @@
             <td *ngFor="let col of columns" style="padding: 6px;" [ngSwitch]="col.key">
               <span *ngSwitchCase="'createdAt'" style="color: #888;">{{ po.createdAt | date: 'MMM d, y' }}</span>
               <span *ngSwitchCase="'orderValueUsd'">{{ po.orderValueUsd | number: '1.2-2' }}</span>
-              <span *ngSwitchDefault>{{ (po as any)[col.key] }}</span>
+              <span *ngSwitchDefault>{{ getValue(po, col.key) }}</span>
             </td>
             <td style="padding: 6px; color: #0a3d62;">{{ expandedPoId === po.id ? '▲' : '▼' }}</td>
           </tr>
