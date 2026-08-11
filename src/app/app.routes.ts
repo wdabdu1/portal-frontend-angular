@@ -84,6 +84,7 @@ export const routes: Routes = [
   { path: 'dashboards/purchase-orders', component: PoDashboard, canActivate: [authGuard] },
   { path: 'dashboards/fz', component: FzDashboard, canActivate: [authGuard] },
   { path: 'dashboards/shipments', component: ShipmentDashboard, canActivate: [authGuard] },
+  { path: 'dashboards/under-clearance', component: UnderClearanceDashboard, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
