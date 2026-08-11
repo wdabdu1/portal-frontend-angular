@@ -5,7 +5,13 @@
       Export to Excel
     </button>
   </div>
-  <p style="color: #888; font-size: 13px;">Open shipments with an outstanding supplier balance. Drag a column header to reorder it. Click the ▼ arrow to filter. Click a row to view and record payments.</p>
+  <p style="color: #888; font-size: 13px;">Drag a column header to reorder it. Click the ▼ arrow to filter. Click a row to view and record payments.</p>
+
+  <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; margin-top: 8px; font-size: 13px;">
+    <option value="Pending">Pending</option>
+    <option value="Closed">Closed</option>
+    <option value="All">All</option>
+  </select>
 
   <input
     [(ngModel)]="searchText"
