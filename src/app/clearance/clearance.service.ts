@@ -272,8 +272,6 @@ export class ClearanceService {
   }
 
   getRoute3(shipmentId: number) {
-  
-  getRoute3(shipmentId: number) {
     return this.http.get<ClearanceRoute3Details | null>(`${API_URL}/clearance/${shipmentId}/route3`);
   }
   saveRoute3(shipmentId: number, req: Partial<ClearanceRoute3Details>) {
