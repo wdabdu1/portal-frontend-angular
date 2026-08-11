@@ -140,6 +140,8 @@ export interface ClearanceDetail {
   fclCount: number;
   withdrawalRequestDate: string | null;
   withdrawalRequestRefNo: string | null;
+  lastOffshoreInvoiceNo: string | null;
+  lastOffshoreCompanyName: string | null;
 }
 
 export interface ScheduleItem {
