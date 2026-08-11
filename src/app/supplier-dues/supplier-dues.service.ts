@@ -51,8 +51,8 @@ export interface PaymentDue {
 export class SupplierDuesService {
   constructor(private http: HttpClient) {}
 
-  getOpen() {
-    return this.http.get<SupplierDueRow[]>(`${API_URL}/supplier-dues`);
+  getOpen(status: 'Pending' | 'Closed' | 'All' = 'Pending') {
+    return this.http.get<SupplierDueRow[]>(`${API_URL}/supplier-dues?status=${status}`);
   }
 
   getInvoiceSummary(shipmentId: number) {
