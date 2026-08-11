@@ -402,7 +402,10 @@
             <div><label style="display:block; font-size:12px; color:#555;">Deposit Request Date</label><input type="date" [(ngModel)]="route2Form.depositRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Request Approval Date</label><input type="date" [(ngModel)]="route2Form.requestApprovalDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Deposit Ref. No.</label><input [(ngModel)]="route2Form.depositRefNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">FZ Invoice No.</label><input [(ngModel)]="route2Form.fzInvoiceNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div>
+              <label style="display:block; font-size:12px; color:#555;">FZ Invoice No. <span style="font-weight:normal; color:#888;">(from {{ detail?.lastOffshoreCompanyName || 'Last Offshore' }})</span></label>
+              <input [value]="route2Form.fzInvoiceNo || '—'" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5;" />
+            </div>
             <div>
               <label style="display:block; font-size:12px; color:#555;">Free Zone Destination</label>
               <select [(ngModel)]="route2Form.destinationId" style="width:100%; padding:6px;">
