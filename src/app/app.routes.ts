@@ -39,6 +39,7 @@ import { PoDashboard } from './dashboards/po-dashboard/po-dashboard';
 import { FzDashboard } from './dashboards/fz-dashboard/fz-dashboard';
 import { ShipmentDashboard } from './dashboards/shipment-dashboard/shipment-dashboard';
 import { UnderClearanceDashboard } from './dashboards/under-clearance-dashboard/under-clearance-dashboard';
+import { GoodsInTransitDashboard } from './dashboards/goods-in-transit-dashboard/goods-in-transit-dashboard';
 
 
 export const routes: Routes = [
@@ -85,6 +86,7 @@ export const routes: Routes = [
   { path: 'dashboards/fz', component: FzDashboard, canActivate: [authGuard] },
   { path: 'dashboards/shipments', component: ShipmentDashboard, canActivate: [authGuard] },
   { path: 'dashboards/under-clearance', component: UnderClearanceDashboard, canActivate: [authGuard] },
+  { path: 'dashboards/goods-in-transit', component: GoodsInTransitDashboard, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
