@@ -120,9 +120,16 @@ export class PoDashboard implements OnInit {
   }
 
   onExportClick(): void {
-    const flattened = this.rows.flatMap((po) =>
+    interface FlatRow {
+      poNumber: string; businessUnit: string; supplier: string; consignee: string; status: string;
+      createdAt: string; orderValueUsd: number; blAwbNo: string; category: string; modelProduct: string;
+      qty: number | null; unitPrice: number | null; currency: string; total: number | null;
+      eta: string | null; etd: string | null; expectedClearanceCompletion: string | null;
+    }
+
+    const flattened: FlatRow[] = this.rows.flatMap((po): FlatRow[] =>
       po.shipments.length > 0
-        ? po.shipments.map((s) => ({
+        ? po.shipments.map((s): FlatRow => ({
             poNumber: po.poNumber, businessUnit: po.businessUnit, supplier: po.supplier, consignee: po.consignee,
             status: po.status, createdAt: po.createdAt, orderValueUsd: po.orderValueUsd,
             blAwbNo: s.blAwbNo, category: s.category, modelProduct: s.modelProduct, qty: s.qty,
@@ -154,6 +161,6 @@ export class PoDashboard implements OnInit {
       { key: 'eta', label: 'ETA' },
       { key: 'etd', label: 'ETD' },
       { key: 'expectedClearanceCompletion', label: 'Expected Clearance Completion' }
-    ], flattened as any);
+    ], flattened);
   }
 }
