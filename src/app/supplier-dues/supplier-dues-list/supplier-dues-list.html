@@ -86,7 +86,7 @@
         — Balance: {{ summary.balanceUsd | number: '1.2-2' }} USD
       </p>
 
-      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Payment Due Schedule</h4>
+      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Payment Due Schedule (Planned)</h4>
       <p *ngIf="loadingDues" style="color:#888; font-size:12px;">Loading...</p>
       <table *ngIf="!loadingDues && paymentDues.length > 0" style="width:100%; border-collapse:collapse; font-size:13px;">
         <thead>
@@ -126,7 +126,7 @@
         No due schedule entered yet — add one in this shipment's Update Shipment page.
       </p>
 
-      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Payments Made</h4>
+      <h4 style="font-size: 13px; margin: 16px 0 8px; color: #333;">Payments Made (Actual)</h4>
       <table style="width:100%; border-collapse:collapse; font-size:13px;">
         <thead>
           <tr style="text-align:left; border-bottom:1px solid #ddd;">
