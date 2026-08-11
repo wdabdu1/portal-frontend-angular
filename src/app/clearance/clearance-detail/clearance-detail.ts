@@ -268,7 +268,15 @@ export class ClearanceDetailComponent implements OnInit {
       this.service.getRoute1(this.shipmentId).subscribe({ next: (r) => { if (r) this.route1Form = r; this.cdr.markForCheck(); } });
       this.loadActualCharges();
     } else if (this.selectedRoute === 2) {
-      this.service.getRoute2(this.shipmentId).subscribe({ next: (r) => { if (r) this.route2Form = r; this.cdr.markForCheck(); } });
+      this.service.getRoute2(this.shipmentId).subscribe({
+        next: (r) => {
+          if (r) this.route2Form = r;
+          // Read-only, sourced from Last Offshore — keeps the stored
+          // value in sync even though the field itself isn't editable.
+          this.route2Form.fzInvoiceNo = this.detail?.lastOffshoreInvoiceNo ?? null;
+          this.cdr.markForCheck();
+        }
+      });
       this.loadActualCharges();
     } else if (this.selectedRoute === 3) {
       this.service.getRoute3(this.shipmentId).subscribe({ next: (r) => { if (r) { this.route3Form = r; this.onDepositSelected(); } this.cdr.markForCheck(); } });
