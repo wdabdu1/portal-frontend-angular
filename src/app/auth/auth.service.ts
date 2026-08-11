@@ -15,7 +15,22 @@ const ROLES_KEY = 'shipping_portal_roles';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  isLoggedIn = signal<boolean>(!!localStorage.getItem(TOKEN_KEY));
+  isLoggedIn = signal<boolean>(AuthService.hasValidToken());
+
+  // Checks the token actually exists AND hasn't expired — a stale but
+  // present token (e.g. on a bookmarked page reopened days later)
+  // otherwise passes the guard, only to fail on the first real request.
+  private static hasValidToken(): boolean {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (!payload.exp) return true;
+      return payload.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  }
 
   constructor(private http: HttpClient) {}
 
