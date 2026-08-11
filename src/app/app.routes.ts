@@ -4,6 +4,7 @@ import { Login } from './auth/login/login';
 import { ShippingLines } from './settings/shipping-lines/shipping-lines';
 import { ShipmentDetails } from './shipments/shipment-details/shipment-details';
 import { Users } from './users/users';
+import { Profile } from './profile/profile';
 import { OrderDetails } from './purchase-orders/order-details/order-details';
 import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
@@ -53,6 +54,7 @@ export const routes: Routes = [
     data: { title: 'Clearance Charge Types', resource: 'clearance-charge-types', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   { path: 'settings', component: SettingsMenu, canActivate: [authGuard] },
+  { path: 'profile', component: Profile, canActivate: [authGuard] },
   { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard] },
   { path: 'settings/divisions', component: Divisions, canActivate: [authGuard] },
   { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard] },
