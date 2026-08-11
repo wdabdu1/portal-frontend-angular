@@ -8,7 +8,7 @@ import { SectionLockInfo, SectionLockService } from '../../section-lock/section-
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
 import {
-  ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
+  ActualCharges, ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
   ClearanceDetail, ClearanceRoute1Details, ClearanceRoute2Details, ClearanceRoute3Details,
   ClearanceService, DemurrageStorageResult, FzBalanceLine, FzDepositOption, ScheduleItem
 } from '../clearance.service';
@@ -61,6 +61,9 @@ export class ClearanceDetailComponent implements OnInit {
   route1Form: ClearanceRoute1Details = this.emptyRoute1();
   route2Form: ClearanceRoute2Details = this.emptyRoute2();
   route3Form: ClearanceRoute3Details = this.emptyRoute3();
+  actualChargesForm: ActualCharges = this.emptyActualCharges();
+  savingActualCharges = false;
+  recalculatingForecast = false;
 
   freeZoneDestinations: LookupEntity[] = [];
   fzDepositOptions: FzDepositOption[] = [];
@@ -76,13 +79,15 @@ export class ClearanceDetailComponent implements OnInit {
     { key: 'SSMO Examination', label: 'SSMO Examination' },
     { key: 'Customs Evaluation', label: 'Customs Evaluation' },
     { key: 'SPC Bill', label: 'SPC Bill' },
-    { key: 'Truck & Containers', label: 'Truck & Containers' }
+    { key: 'Truck & Containers', label: 'Truck & Containers' },
+    { key: 'Actual Charges', label: 'Actual Charges' }
   ];
   route2Groups: GroupItemDef[] = [
     { key: 'FZ Deposit Request', label: 'FZ Deposit Request' },
     { key: 'Customs Inspection', label: 'Customs Inspection' },
     { key: 'SPC Bill', label: 'SPC Bill' },
-    { key: 'Truck & Containers', label: 'Truck & Containers' }
+    { key: 'Truck & Containers', label: 'Truck & Containers' },
+    { key: 'Actual Charges', label: 'Actual Charges' }
   ];
   route3Groups: GroupItemDef[] = [
     { key: 'Customs Certificate Entry', label: 'Customs Certificate Entry' },
@@ -165,8 +170,7 @@ export class ClearanceDetailComponent implements OnInit {
       ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
       custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
       spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null,
-      truckPortEntryPermitDate: null, containersReturnedDate: null,
-      shippingLineDepositReturnDate: null, depositValue: null, clearanceActualCompletedDate: null
+      truckPortEntryPermitDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
     };
   }
 
@@ -177,7 +181,15 @@ export class ClearanceDetailComponent implements OnInit {
       inspectionDate: null,
       spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, policeSecurityAppointedDate: null,
       truckPortEntryPermitDate: null, containersReceivedAtFzDate: null, containersReturnedDate: null,
-      shippingLineDepositReturnDate: null, depositValue: null, clearanceActualCompletedDate: null
+      clearanceActualCompletedDate: null
+    };
+  }
+
+  emptyActualCharges(): ActualCharges {
+    return {
+      forecastDemurrageSdg: null, forecastStorageSdg: null, forecastCapturedAt: null,
+      actualDemurragePaidSdg: null, actualStoragePaidSdg: null,
+      shippingLineDepositReturnDate: null, amountReturnedFromDeposit: null
     };
   }
 
@@ -254,8 +266,10 @@ export class ClearanceDetailComponent implements OnInit {
   loadRouteDetail(): void {
     if (this.selectedRoute === 1) {
       this.service.getRoute1(this.shipmentId).subscribe({ next: (r) => { if (r) this.route1Form = r; this.cdr.markForCheck(); } });
+      this.loadActualCharges();
     } else if (this.selectedRoute === 2) {
       this.service.getRoute2(this.shipmentId).subscribe({ next: (r) => { if (r) this.route2Form = r; this.cdr.markForCheck(); } });
+      this.loadActualCharges();
     } else if (this.selectedRoute === 3) {
       this.service.getRoute3(this.shipmentId).subscribe({ next: (r) => { if (r) { this.route3Form = r; this.onDepositSelected(); } this.cdr.markForCheck(); } });
     }
@@ -368,6 +382,30 @@ export class ClearanceDetailComponent implements OnInit {
       error: () => { this.savingCertificateEntry = false; this.error = 'Could not save Certificate Entry.'; this.cdr.markForCheck(); }
     });
   }
+
+  loadActualCharges(): void {
+    this.service.getActualCharges(this.shipmentId).subscribe({
+      next: (r) => { this.actualChargesForm = r ?? this.emptyActualCharges(); this.cdr.markForCheck(); }
+    });
+  }
+
+  saveActualChargesClick(): void {
+    this.savingActualCharges = true;
+    this.service.saveActualCharges(this.shipmentId, this.actualChargesForm).subscribe({
+      next: () => { this.savingActualCharges = false; this.cdr.markForCheck(); },
+      error: () => { this.savingActualCharges = false; this.error = 'Could not save Actual Charges.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  recalculateForecastClick(): void {
+    this.recalculatingForecast = true;
+    this.service.recalculateForecast(this.shipmentId).subscribe({
+      next: (r) => { this.actualChargesForm = r; this.recalculatingForecast = false; this.cdr.markForCheck(); },
+      error: () => { this.recalculatingForecast = false; this.error = 'Could not recalculate forecast.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveRouteDetail(andNext: boolean, nextGroupKey: string | null): void {
 
   saveRouteDetail(andNext: boolean, nextGroupKey: string | null): void {
     this.savingRouteDetail = true;
