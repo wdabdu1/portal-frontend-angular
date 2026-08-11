@@ -60,6 +60,10 @@ export class AuthService {
     return localStorage.getItem(DISPLAY_NAME_KEY);
   }
 
+  setDisplayName(name: string): void {
+    localStorage.setItem(DISPLAY_NAME_KEY, name);
+  }
+
   getRoles(): string[] {
     const raw = localStorage.getItem(ROLES_KEY);
     return raw ? JSON.parse(raw) : [];
