@@ -1,0 +1,79 @@
+<div style="max-width: 1400px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Under Clearance Dashboard</h1>
+    <button (click)="onExportClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Export to Excel</button>
+  </div>
+  <p style="color: #888; font-size: 13px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column. A blank Clearance From means a Route 2 destination or Route 1 warehouse assignment is still missing.</p>
+
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
+    <select [(ngModel)]="buFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="All">All BUs</option>
+      <option *ngFor="let bu of uniqueBu" [value]="bu">{{ bu }}</option>
+    </select>
+    <select [(ngModel)]="statusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Under Process">Under Process</option>
+      <option value="Completed">Completed</option>
+      <option value="All">All</option>
+    </select>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+    <table style="width: 100%; min-width: 1300px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th
+            *ngFor="let col of columns; let i = index"
+            draggable="true"
+            (dragstart)="onDragStart(i)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onDrop(i)"
+            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; max-width: 130px; word-wrap: break-word; white-space: normal; vertical-align: top;"
+          >
+            <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+            <span (mousedown)="$event.stopPropagation()">
+              <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee;">
+          <td *ngFor="let col of columns" style="padding: 6px;" [ngSwitch]="col.key">
+            <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</span>
+            <span *ngSwitchCase="'clearanceProgressPercent'">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
+                  <div [style.width.%]="r.clearanceProgressPercent > 100 ? 100 : r.clearanceProgressPercent" [style.background]="r.clearanceProgressPercent >= 100 ? '#1e7e34' : (r.clearanceProgressPercent >= 80 ? '#c0392b' : '#0a3d62')" style="height:100%;"></div>
+                </div>
+                <span style="font-size:12px; color:#666;">{{ r.clearanceProgressPercent | number: '1.0-0' }}%</span>
+              </div>
+            </span>
+            <span *ngSwitchCase="'qty'">{{ r.qty | number: '1.0-2' }}</span>
+            <span *ngSwitchCase="'eta'" style="color: #888;">{{ r.eta ? (r.eta | date: 'MMM d, y') : '—' }}</span>
+            <span *ngSwitchCase="'clearanceCompletionDate'" style="color: #888;">{{ r.clearanceCompletionDate ? (r.clearanceCompletionDate | date: 'MMM d, y') : '—' }}</span>
+            <span *ngSwitchCase="'daysRemaining'">
+              <span *ngIf="r.daysRemaining !== null" [style.color]="r.daysRemaining < 0 ? '#c0392b' : '#333'" [style.fontWeight]="r.daysRemaining < 0 ? '600' : 'normal'">
+                {{ r.daysRemaining < 0 ? (-r.daysRemaining + ' overdue') : r.daysRemaining }}
+              </span>
+              <span *ngIf="r.daysRemaining === null">—</span>
+            </span>
+            <span *ngSwitchCase="'clearanceFrom'">
+              <span *ngIf="!r.clearanceFrom" style="color: #c0392b; font-style: italic;">Not set</span>
+              <span *ngIf="r.clearanceFrom">{{ r.clearanceFrom }}</span>
+            </span>
+            <span *ngSwitchCase="'status'">
+              <span [style.background]="r.status === 'Completed' ? '#e6f4ea' : '#fff4e5'" [style.color]="r.status === 'Completed' ? '#1e7e34' : '#a66a00'" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+                {{ r.status }}
+              </span>
+            </span>
+            <span *ngSwitchDefault>{{ getValue(r, col.key) }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">No shipments found.</p>
+  </div>
+</div>
