@@ -414,8 +414,6 @@ export class ClearanceDetailComponent implements OnInit {
   }
 
   saveRouteDetail(andNext: boolean, nextGroupKey: string | null): void {
-
-  saveRouteDetail(andNext: boolean, nextGroupKey: string | null): void {
     this.savingRouteDetail = true;
 
     if (this.selectedRoute === 3) {
