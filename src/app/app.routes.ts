@@ -35,6 +35,7 @@ import { TransferPricingAccumulated } from './transfer-pricing/transfer-pricing-
 import { ClearanceReadiness } from './dashboards/clearance-readiness/clearance-readiness';
 import { PipelineHealthMobile } from './dashboards/pipeline-health-mobile/pipeline-health-mobile';
 import { CashflowDashboard } from './dashboards/cashflow-dashboard/cashflow-dashboard';
+import { PoDashboard } from './dashboards/po-dashboard/po-dashboard';
 
 
 export const routes: Routes = [
@@ -77,6 +78,7 @@ export const routes: Routes = [
   { path: 'dashboards/clearance-readiness', component: ClearanceReadiness, canActivate: [authGuard] },
   { path: 'mobile/pipeline-health', component: PipelineHealthMobile, canActivate: [authGuard] },
   { path: 'dashboards/cashflow', component: CashflowDashboard, canActivate: [authGuard] },
+  { path: 'dashboards/purchase-orders', component: PoDashboard, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
