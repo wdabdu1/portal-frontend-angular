@@ -10,8 +10,7 @@ export interface ClearanceRoute1Details {
   ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null;
   custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null;
   spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null;
-  truckPortEntryPermitDate: string | null; containersReturnedDate: string | null;
-  shippingLineDepositReturnDate: string | null; depositValue: number | null; clearanceActualCompletedDate: string | null;
+  truckPortEntryPermitDate: string | null; containersReturnedDate: string | null; clearanceActualCompletedDate: string | null;
 }
 
 export interface ClearanceRoute2Details {
@@ -20,7 +19,13 @@ export interface ClearanceRoute2Details {
   inspectionDate: string | null;
   spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null; policeSecurityAppointedDate: string | null;
   truckPortEntryPermitDate: string | null; containersReceivedAtFzDate: string | null; containersReturnedDate: string | null;
-  shippingLineDepositReturnDate: string | null; depositValue: number | null; clearanceActualCompletedDate: string | null;
+  clearanceActualCompletedDate: string | null;
+}
+
+export interface ActualCharges {
+  forecastDemurrageSdg: number | null; forecastStorageSdg: number | null; forecastCapturedAt: string | null;
+  actualDemurragePaidSdg: number | null; actualStoragePaidSdg: number | null;
+  shippingLineDepositReturnDate: string | null; amountReturnedFromDeposit: number | null;
 }
 
 export interface WithdrawalLineInput {
@@ -254,6 +259,18 @@ export class ClearanceService {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/route2`, req);
   }
 
+  getActualCharges(shipmentId: number) {
+    return this.http.get<ActualCharges | null>(`${API_URL}/clearance/${shipmentId}/actual-charges`);
+  }
+  saveActualCharges(shipmentId: number, req: Partial<ActualCharges>) {
+    return this.http.put(`${API_URL}/clearance/${shipmentId}/actual-charges`, req);
+  }
+  recalculateForecast(shipmentId: number) {
+    return this.http.post<ActualCharges>(`${API_URL}/clearance/${shipmentId}/actual-charges/recalculate-forecast`, {});
+  }
+
+  getRoute3(shipmentId: number) {
+  
   getRoute3(shipmentId: number) {
     return this.http.get<ClearanceRoute3Details | null>(`${API_URL}/clearance/${shipmentId}/route3`);
   }
