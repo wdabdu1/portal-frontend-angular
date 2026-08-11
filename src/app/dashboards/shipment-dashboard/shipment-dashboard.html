@@ -30,7 +30,7 @@
             (dragover)="$event.preventDefault()"
             (drop)="onDrop(i)"
             [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+            style="padding: 8px 6px; cursor: grab; user-select: none; max-width: 130px; word-wrap: break-word; white-space: normal; vertical-align: top;"
           >
             <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
             <span (mousedown)="$event.stopPropagation()">
@@ -65,10 +65,11 @@
       </tbody>
       <tfoot *ngIf="rows.length > 0">
         <tr style="font-weight: 600; border-top: 2px solid #ccc;">
-          <td [attr.colspan]="columns.length" style="padding: 6px;">
-            Totals — Total: {{ totalUsd | number: '1.2-2' }} (native currencies, not summable) &nbsp;•&nbsp;
-            Paid: {{ totalPaidUsd | number: '1.2-2' }} USD &nbsp;•&nbsp;
-            Balance: {{ totalBalanceUsd | number: '1.2-2' }} USD
+          <td *ngFor="let col of columns; let i = index" style="padding: 6px;">
+            <span *ngIf="i === 0">Totals</span>
+            <span *ngIf="col.key === 'total'" title="Native currencies — not a meaningful sum if mixed">{{ totalUsd | number: '1.2-2' }}</span>
+            <span *ngIf="col.key === 'paidUsd'">{{ totalPaidUsd | number: '1.2-2' }}</span>
+            <span *ngIf="col.key === 'balanceUnpaidUsd'">{{ totalBalanceUsd | number: '1.2-2' }}</span>
           </td>
         </tr>
       </tfoot>
