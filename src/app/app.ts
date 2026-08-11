@@ -29,7 +29,8 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'PO Dashboard', route: '/dashboards/purchase-orders', canAccess: (a) => a.canSeeOrders() },
       { label: 'Free Zones', route: '/dashboards/fz', canAccess: () => true },
       { label: 'Shipment Dashboard', route: '/dashboards/shipments', canAccess: (a) => a.canSeeShipments() },
-      { label: 'Under Clearance', route: '/dashboards/under-clearance', canAccess: () => true }
+      { label: 'Under Clearance', route: '/dashboards/under-clearance', canAccess: () => true },
+      { label: 'Goods in Transit', route: '/dashboards/goods-in-transit', canAccess: () => true }
     ]
   },
   {
