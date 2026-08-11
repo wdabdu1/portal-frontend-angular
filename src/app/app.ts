@@ -25,7 +25,9 @@ const MENU_GROUPS: MenuGroup[] = [
     label: 'Dashboard',
     items: [
       { label: 'Shipment Pipeline Health', route: '/dashboards/clearance-readiness', canAccess: (a) => a.canSeeShipments() },
-      { label: 'Cashflow', route: '/dashboards/cashflow', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Treasury') || a.hasRole('Manager') || a.hasRole('SuperUser') }
+      { label: 'Cashflow', route: '/dashboards/cashflow', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Treasury') || a.hasRole('Manager') || a.hasRole('SuperUser') },
+      { label: 'PO Dashboard', route: '/dashboards/purchase-orders', canAccess: (a) => a.canSeeOrders() },
+      { label: 'Free Zones', route: '/fz-inventory', canAccess: () => true }
     ]
   },
   {
