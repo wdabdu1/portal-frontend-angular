@@ -1,0 +1,46 @@
+<div style="max-width: 480px; margin: 3rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">User Profile</h1>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <div *ngIf="!loading">
+    <!-- Display Name -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 12px;">Display Name</h3>
+
+      <label style="display:block; font-size:12px; color:#555;">Email</label>
+      <input [value]="email" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5; margin-bottom:12px;" />
+
+      <label style="display:block; font-size:12px; color:#555;">Display Name</label>
+      <input [(ngModel)]="displayNameForm" style="width:100%; padding:6px; box-sizing:border-box;" />
+
+      <p *ngIf="nameError" style="color:#c0392b; font-size:12px; margin-top:8px;">{{ nameError }}</p>
+      <p *ngIf="nameSaved" style="color:#1e7e34; font-size:12px; margin-top:8px;">✓ Saved</p>
+
+      <button (click)="saveName()" [disabled]="savingName" style="margin-top:12px; padding:8px 16px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer; font-size:13px;">
+        {{ savingName ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+
+    <!-- Change Password -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 12px;">Change Password</h3>
+
+      <label style="display:block; font-size:12px; color:#555;">Current Password</label>
+      <input type="password" [(ngModel)]="currentPassword" style="width:100%; padding:6px; box-sizing:border-box; margin-bottom:12px;" />
+
+      <label style="display:block; font-size:12px; color:#555;">New Password</label>
+      <input type="password" [(ngModel)]="newPassword" style="width:100%; padding:6px; box-sizing:border-box; margin-bottom:12px;" />
+
+      <label style="display:block; font-size:12px; color:#555;">Confirm New Password</label>
+      <input type="password" [(ngModel)]="confirmPassword" style="width:100%; padding:6px; box-sizing:border-box;" />
+
+      <p *ngIf="passwordError" style="color:#c0392b; font-size:12px; margin-top:8px;">{{ passwordError }}</p>
+      <p *ngIf="passwordSaved" style="color:#1e7e34; font-size:12px; margin-top:8px;">✓ Password changed</p>
+
+      <button (click)="savePassword()" [disabled]="savingPassword" style="margin-top:12px; padding:8px 16px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer; font-size:13px;">
+        {{ savingPassword ? 'Saving...' : 'Change Password' }}
+      </button>
+    </div>
+  </div>
+</div>
