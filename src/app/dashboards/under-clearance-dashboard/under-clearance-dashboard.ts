@@ -79,6 +79,18 @@ export class UnderClearanceDashboard implements OnInit {
     return String(row[col] ?? '');
   }
 
+  routeLabel(route: string): string {
+    if (route === 'Route1ClearAtPort') return 'At Port';
+    if (route === 'Route2FzDeposit') return 'FZ Deposit';
+    if (route === 'Route3ClearFromFz') return 'Clear from FZ';
+    return route;
+  }
+
+  isEtaPast(eta: string | null): boolean {
+    if (!eta) return false;
+    return new Date(eta) < new Date(new Date().toDateString());
+  }
+
   optionsFor(col: string): string[] {
     if (!this.filters[col]) this.filters[col] = new Set();
     return columnOptions(this.allRows, this.filters, col, (r, c) => this.getValue(r, c));
