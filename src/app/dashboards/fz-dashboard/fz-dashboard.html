@@ -1,0 +1,88 @@
+<div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Free Zones Dashboard</h1>
+    <button (click)="onExportClick()" style="padding: 8px 16px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      Export to Excel
+    </button>
+  </div>
+  <p style="color: #888; font-size: 13px;">Current stock levels, grouped by Free Zone location. View only. Click a column filter arrow to narrow results; click a header to sort.</p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading">
+    <div *ngFor="let destination of destinations" style="margin-top: 2rem;">
+      <h2 style="font-size: 16px; font-weight: 600; color: #0a3d62; border-bottom: 2px solid #0a3d62; padding-bottom: 6px;">
+        {{ destination }}
+      </h2>
+
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; min-width: 1300px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
+            <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('businessUnit')">
+                BU{{ sortIndicator('businessUnit') }} <app-excel-header-filter [options]="optionsFor('businessUnit')" [selected]="filters.businessUnit" (selectedChange)="onFilterChange('businessUnit', $event)" />
+              </th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('category')">
+                Cat{{ sortIndicator('category') }} <app-excel-header-filter [options]="optionsFor('category')" [selected]="filters.category" (selectedChange)="onFilterChange('category', $event)" />
+              </th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('modelProduct')">
+                Product/Model{{ sortIndicator('modelProduct') }} <app-excel-header-filter [options]="optionsFor('modelProduct')" [selected]="filters.modelProduct" (selectedChange)="onFilterChange('modelProduct', $event)" />
+              </th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('dateOfDeposit')">Date of Deposit{{ sortIndicator('dateOfDeposit') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('depositRefNo')">
+                Deposit Ref. No{{ sortIndicator('depositRefNo') }} <app-excel-header-filter [options]="optionsFor('depositRefNo')" [selected]="filters.depositRefNo" (selectedChange)="onFilterChange('depositRefNo', $event)" />
+              </th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('blAwbNo')">
+                BL No.{{ sortIndicator('blAwbNo') }} <app-excel-header-filter [options]="optionsFor('blAwbNo')" [selected]="filters.blAwbNo" (selectedChange)="onFilterChange('blAwbNo', $event)" />
+              </th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyDeposited')">Qty Deposited{{ sortIndicator('qtyDeposited') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyWithdrawn')">Withdrawn Qty{{ sortIndicator('qtyWithdrawn') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('qtyUnderClearance')">Under Clearance{{ sortIndicator('qtyUnderClearance') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('currentStock')">Current Stock{{ sortIndicator('currentStock') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('availableStock')">Available Stock{{ sortIndicator('availableStock') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('inventoryDays')">No. Inventory Days{{ sortIndicator('inventoryDays') }}</th>
+              <th style="padding: 8px 6px; cursor: pointer; white-space: nowrap;" (click)="sortBy('percentWithdrawn')">% Withdrawn{{ sortIndicator('percentWithdrawn') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of rowsFor(destination)" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 8px 6px;">{{ r.businessUnit }}</td>
+              <td style="padding: 8px 6px;">{{ r.category }}</td>
+              <td style="padding: 8px 6px;">{{ r.modelProduct }}</td>
+              <td style="padding: 8px 6px; color: #888;">{{ r.dateOfDeposit ? (r.dateOfDeposit | date: 'MMM d, y') : '—' }}</td>
+              <td style="padding: 8px 6px;">{{ r.depositRefNo || '—' }}</td>
+              <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
+              <td style="padding: 8px 6px;">{{ r.qtyDeposited | number: '1.0-2' }}</td>
+              <td style="padding: 8px 6px;">{{ r.qtyWithdrawn | number: '1.0-2' }}</td>
+              <td style="padding: 8px 6px; color: #a66a00;">{{ r.qtyUnderClearance | number: '1.0-2' }}</td>
+              <td style="padding: 8px 6px; font-weight: 600;" [style.color]="r.currentStock > 0 ? '#0a3d62' : '#888'">{{ r.currentStock | number: '1.0-2' }}</td>
+              <td style="padding: 8px 6px; font-weight: 600;" [style.color]="r.availableStock > 0 ? '#1e7e34' : '#888'">{{ r.availableStock | number: '1.0-2' }}</td>
+              <td style="padding: 8px 6px;">{{ r.inventoryDays }}</td>
+              <td style="padding: 8px 6px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
+                    <div [style.width.%]="r.percentWithdrawn" [style.background]="r.percentWithdrawn >= 100 ? '#1e7e34' : '#0a3d62'" style="height:100%;"></div>
+                  </div>
+                  <span style="font-size:12px; color:#666;">{{ r.percentWithdrawn | number: '1.0-0' }}%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+              <td colspan="6" style="padding: 8px 6px; text-align: right;">Totals:</td>
+              <td style="padding: 8px 6px;">{{ totalsFor(destination).deposited | number: '1.0-2' }}</td>
+              <td style="padding: 8px 6px;">{{ totalsFor(destination).withdrawn | number: '1.0-2' }}</td>
+              <td colspan="4"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <p *ngIf="destinations.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+      No FZ deposits recorded yet.
+    </p>
+  </div>
+</div>
