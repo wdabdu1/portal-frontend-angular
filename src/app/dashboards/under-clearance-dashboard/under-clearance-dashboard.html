@@ -52,7 +52,7 @@
               </div>
             </span>
             <span *ngSwitchCase="'qty'">{{ r.qty | number: '1.0-2' }}</span>
-            <span *ngSwitchCase="'eta'" style="color: #888;">{{ r.eta ? (r.eta | date: 'MMM d, y') : '—' }}</span>
+           <span *ngSwitchCase="'eta'" [style.color]="!r.eta ? '#888' : (isEtaPast(r.eta) ? '#c0392b' : '#1e7e34')" [style.fontWeight]="r.eta ? '600' : 'normal'">{{ r.eta ? (r.eta | date: 'MMM d, y') : '—' }}</span>
             <span *ngSwitchCase="'clearanceCompletionDate'" style="color: #888;">{{ r.clearanceCompletionDate ? (r.clearanceCompletionDate | date: 'MMM d, y') : '—' }}</span>
             <span *ngSwitchCase="'daysRemaining'">
               <span *ngIf="r.daysRemaining !== null" [style.color]="r.daysRemaining < 0 ? '#c0392b' : '#333'" [style.fontWeight]="r.daysRemaining < 0 ? '600' : 'normal'">
@@ -69,6 +69,7 @@
                 {{ r.status }}
               </span>
             </span>
+            <span *ngSwitchCase="'route'">{{ routeLabel(r.route) }}</span>
             <span *ngSwitchDefault>{{ getValue(r, col.key) }}</span>
           </td>
         </tr>
