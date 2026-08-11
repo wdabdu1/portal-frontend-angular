@@ -118,12 +118,18 @@ export class SupplierDuesList implements OnInit {
     this.tablePrefs.saveColumnOrder('supplierDues', cols.map((c) => c.key)).subscribe();
   }
 
+  statusFilter: 'Pending' | 'Closed' | 'All' = 'Pending';
+
   load(): void {
     this.loading = true;
-    this.service.getOpen().subscribe({
+    this.service.getOpen(this.statusFilter).subscribe({
       next: (r) => { this.allRows = r; this.loading = false; this.cdr.markForCheck(); },
       error: () => { this.error = 'Could not load supplier dues.'; this.loading = false; this.cdr.markForCheck(); }
     });
+  }
+
+  onStatusFilterChange(): void {
+    this.load();
   }
 
   private ensureFilterKey(key: string): void {
