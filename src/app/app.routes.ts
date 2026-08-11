@@ -38,6 +38,7 @@ import { CashflowDashboard } from './dashboards/cashflow-dashboard/cashflow-dash
 import { PoDashboard } from './dashboards/po-dashboard/po-dashboard';
 import { FzDashboard } from './dashboards/fz-dashboard/fz-dashboard';
 import { ShipmentDashboard } from './dashboards/shipment-dashboard/shipment-dashboard';
+import { UnderClearanceDashboard } from './dashboards/under-clearance-dashboard/under-clearance-dashboard';
 
 
 export const routes: Routes = [
