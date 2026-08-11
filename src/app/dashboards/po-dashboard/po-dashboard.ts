@@ -69,7 +69,7 @@ export class PoDashboard implements OnInit {
     return ordered;
   }
 
-  private getValue(row: any, col: string): string {
+  getValue(row: any, col: string): string {
     return String(row[col] ?? '');
   }
 
