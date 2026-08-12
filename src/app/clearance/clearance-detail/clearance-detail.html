@@ -467,7 +467,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SPC Bill')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SPC Bill</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','SPC Bill')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','SPC Bill')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route2SpcBill" [lockInfo]="locks['route2SpcBill']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'SPC Bill'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -477,8 +480,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Police Security Appointed Date</label><input type="date" [(ngModel)]="route2Form.policeSecurityAppointedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('SPC Bill'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route2SpcBill')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SPC Bill'))" [disabled]="savingRouteDetail || isLocked('route2SpcBill')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Truck & Containers')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -487,7 +490,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Truck & Containers</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Truck & Containers')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route2','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route2','Truck & Containers')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route2TruckContainers" [lockInfo]="locks['route2TruckContainers']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
        <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -497,8 +503,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route2Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, 'Actual Charges')" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route2TruckContainers')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, 'Actual Charges')" [disabled]="savingRouteDetail || isLocked('route2TruckContainers')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Actual Charges')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -507,6 +513,7 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Actual Charges')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Actual Charges</strong>
+          <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route2ActualCharges" [lockInfo]="locks['route2ActualCharges']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
         </div>
         <div *ngIf="expanded === 'Actual Charges'" style="padding: 16px;">
           <p style="color:#888; font-size:12px; margin-top:0;">Forecast figures are captured automatically, once, the moment Truck & Containers' Actual Completed Date is first saved — using the SLA-projected date at that instant. They never change afterward, so they stay a fair "planned" baseline to compare against Actual Paid.</p>
@@ -520,10 +527,10 @@
               <label style="display:block; font-size:12px; color:#555;">Forecast Storage (SDG)</label>
               <input [value]="actualChargesForm.forecastStorageSdg !== null ? (actualChargesForm.forecastStorageSdg | number: '1.2-2') : '—'" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5;" />
             </div>
-            <div><label style="display:block; font-size:12px; color:#555;">Actual Demurrage Paid (SDG)</label><input type="text" appThousands [(ngModel)]="actualChargesForm.actualDemurragePaidSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Actual Storage Paid (SDG)</label><input type="text" appThousands [(ngModel)]="actualChargesForm.actualStoragePaidSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Shipping Line Deposit Return Date</label><input type="date" [(ngModel)]="actualChargesForm.shippingLineDepositReturnDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Amount Returned from Deposit</label><input type="text" appThousands [(ngModel)]="actualChargesForm.amountReturnedFromDeposit" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Actual Demurrage Paid (SDG)</label><input type="text" appThousands [(ngModel)]="actualChargesForm.actualDemurragePaidSdg" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Actual Storage Paid (SDG)</label><input type="text" appThousands [(ngModel)]="actualChargesForm.actualStoragePaidSdg" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Shipping Line Deposit Return Date</label><input type="date" [(ngModel)]="actualChargesForm.shippingLineDepositReturnDate" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Amount Returned from Deposit</label><input type="text" appThousands [(ngModel)]="actualChargesForm.amountReturnedFromDeposit" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
 
           <p *ngIf="!actualChargesForm.forecastCapturedAt" style="color:#a66a00; font-size:12px; background:#fff4e5; padding:8px; border-radius:4px;">
@@ -531,10 +538,10 @@
           </p>
 
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveActualChargesClick()" [disabled]="savingActualCharges" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+            <button (click)="saveActualChargesClick()" [disabled]="savingActualCharges || isLocked('route2ActualCharges')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
               {{ savingActualCharges ? 'Saving...' : 'Save' }}
             </button>
-            <button (click)="recalculateForecastClick()" [disabled]="recalculatingForecast" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">
+            <button (click)="recalculateForecastClick()" [disabled]="recalculatingForecast || isLocked('route2ActualCharges')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">
               {{ recalculatingForecast ? 'Recalculating...' : 'Recalculate Forecast' }}
             </button>
           </div>
@@ -622,7 +629,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Examination (Form 48)')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Examination (Form 48)</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Examination (Form 48)')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Examination (Form 48)')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route3CustomsExamination" [lockInfo]="locks['route3CustomsExamination']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Customs Examination (Form 48)'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -630,8 +640,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route3Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Examination (Form 48)'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3CustomsExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Examination (Form 48)'))" [disabled]="savingRouteDetail || isLocked('route3CustomsExamination')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Customs Lab')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -640,7 +650,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Lab')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Lab</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Lab')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Lab')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route3CustomsLab" [lockInfo]="locks['route3CustomsLab']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -650,8 +663,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route3Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Lab'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3CustomsLab')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Lab'))" [disabled]="savingRouteDetail || isLocked('route3CustomsLab')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('SSMO Examination')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -660,7 +673,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SSMO Examination')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SSMO Examination</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO Examination')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','SSMO Examination')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route3SsmoExamination" [lockInfo]="locks['route3SsmoExamination']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'SSMO Examination'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -668,8 +684,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route3Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO Examination'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3SsmoExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO Examination'))" [disabled]="savingRouteDetail || isLocked('route3SsmoExamination')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Customs Evaluation')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -678,7 +694,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Evaluation')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Evaluation</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Evaluation')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Customs Evaluation')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route3CustomsEvaluation" [lockInfo]="locks['route3CustomsEvaluation']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Customs Evaluation'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -688,8 +707,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route3Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Evaluation'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3CustomsEvaluation')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Evaluation'))" [disabled]="savingRouteDetail || isLocked('route3CustomsEvaluation')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Truck & Containers')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -698,7 +717,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Truck & Containers')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Truck & Containers</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Truck & Containers')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route3','Truck & Containers')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route3','Truck & Containers')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route3TruckContainers" [lockInfo]="locks['route3TruckContainers']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Truck & Containers'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -706,7 +728,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route3Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3TruckContainers')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
           </div>
         </div>
       </div>
