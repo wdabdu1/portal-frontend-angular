@@ -192,14 +192,13 @@
 
    <!-- Route 1 Group Items -->
     <ng-container *ngIf="detail.route === 1">
-      <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden; padding: 12px 16px; background: #f7f7f7; display: flex; justify-content: space-between; align-items: center;">
-        <strong style="font-size: 14px;">Route 1 Processing</strong>
-        <app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1" [lockInfo]="locks['route1']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
-      </div>
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 0.5rem; overflow: hidden;">
         <div (click)="toggle('Containers Move Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Containers Move Process</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Containers Move Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Containers Move Process')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Containers Move Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Containers Move Process')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1" [lockInfo]="locks['route1']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Containers Move Process'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -208,8 +207,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.billSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('Containers Move Process'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Containers Move Process'))" [disabled]="savingRouteDetail || isLocked('route1')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('SSMO File Process')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -218,7 +217,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SSMO File Process')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SSMO File Process</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO File Process')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SSMO File Process')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO File Process')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1SsmoFileProcess" [lockInfo]="locks['route1SsmoFileProcess']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'SSMO File Process'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -227,8 +229,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="route1Form.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO File Process'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1SsmoFileProcess')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO File Process'))" [disabled]="savingRouteDetail || isLocked('route1SsmoFileProcess')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Customs Examination (Form 48)')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
