@@ -1,0 +1,116 @@
+<div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Department Performance</h1>
+  <p style="color: #888; font-size: 13px;">Based on shipments with an ETA in the selected period.</p>
+
+  <!-- Filters -->
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center; background: #f7f7f7; padding: 12px; border-radius: 6px;">
+    <select [(ngModel)]="periodType" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Monthly">Monthly</option>
+      <option value="Quarterly">Quarterly</option>
+      <option value="Annual">Annual</option>
+    </select>
+
+    <select *ngIf="periodType === 'Monthly'" [(ngModel)]="selectedMonth" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+    </select>
+    <select *ngIf="periodType === 'Quarterly'" [(ngModel)]="selectedQuarter" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option *ngFor="let q of quarters" [value]="q">Q{{ q }}</option>
+    </select>
+    <select [(ngModel)]="selectedYear" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+
+    <select [(ngModel)]="businessUnitId" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All BUs</option>
+      <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
+    </select>
+    <select [(ngModel)]="consigneeId" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Consignees</option>
+      <option *ngFor="let c of consignees" [ngValue]="c.id">{{ c['name'] }}</option>
+    </select>
+    <select [(ngModel)]="shippingLineId" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Shipping Lines</option>
+      <option *ngFor="let s of shippingLines" [ngValue]="s.id">{{ s['name'] }}</option>
+    </select>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <ng-container *ngIf="!loading && data">
+    <!-- Orders -->
+    <div style="display: flex; gap: 16px; margin-top: 1.5rem; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 220px; background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 4px; text-transform: uppercase;">Orders</p>
+        <p style="font-size: 24px; font-weight: 600; margin: 0;">{{ data.orderCount }}</p>
+        <p style="font-size: 13px; color: #555; margin: 4px 0 0;">{{ data.orderValueUsd | number: '1.0-0' }} USD</p>
+        <p style="font-size: 13px; margin: 4px 0 0;">
+          <span [style.color]="data.executionPercent >= 80 ? '#1e7e34' : (data.executionPercent >= 50 ? '#a66a00' : '#c0392b')" style="font-weight: 600;">
+            {{ data.executionPercent | number: '1.0-1' }}%
+          </span> executed
+        </p>
+      </div>
+
+      <div style="flex: 1; min-width: 220px; background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 4px; text-transform: uppercase;">Free Zone Activity</p>
+        <p style="font-size: 13px; margin: 4px 0;">Deposits: <strong>{{ data.depositCount }}</strong></p>
+        <p style="font-size: 13px; margin: 4px 0;">Withdrawals: <strong>{{ data.withdrawalCount }}</strong></p>
+      </div>
+
+      <div style="flex: 1; min-width: 220px; background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 4px; text-transform: uppercase;">Demurrage & Storage Impact</p>
+        <p style="font-size: 13px; margin: 4px 0;">Shipments hit: <strong>{{ data.shipmentsHitCount }}</strong></p>
+        <p style="font-size: 13px; margin: 4px 0;">Total: <strong>{{ data.totalDemurrageStorageUsd | number: '1.0-0' }} USD</strong></p>
+        <p style="font-size: 13px; margin: 4px 0;">
+          Overall magnitude:
+          <span [style.color]="data.overallMagnitudePercent > 2 ? '#c0392b' : '#1e7e34'" style="font-weight: 600;">
+            {{ data.overallMagnitudePercent | number: '1.0-2' }}%
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Shipments by status -->
+    <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+      <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Shipments by Status</p>
+      <div *ngFor="let bar of statusBars" style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px;">
+          <span>{{ bar.label }}</span>
+          <span style="color: #666;">{{ bar.count }} shipment(s) — {{ bar.valueUsd | number: '1.0-0' }} USD</span>
+        </div>
+        <div style="background: #f0f0f0; border-radius: 4px; height: 14px; overflow: hidden;">
+          <div [style.width.%]="(bar.count / maxStatusCount) * 100" [style.background]="bar.color" style="height: 100%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demurrage/Storage hit detail -->
+    <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+      <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Shipments Hit by Demurrage/Storage</p>
+      <table *ngIf="data.hitDetails.length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+            <th style="padding: 6px;">BL/AWB No.</th>
+            <th style="padding: 6px;">BU</th>
+            <th style="padding: 6px;">Demurrage + Storage (USD)</th>
+            <th style="padding: 6px;">Shipment Value (USD)</th>
+            <th style="padding: 6px;">Magnitude</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let h of data.hitDetails" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px; font-family: monospace; color: #0a3d62;">{{ h.blAwbNo }}</td>
+            <td style="padding: 6px;">{{ h.businessUnit }}</td>
+            <td style="padding: 6px;">{{ h.demurrageStorageUsd | number: '1.0-0' }}</td>
+            <td style="padding: 6px;">{{ h.shipmentValueUsd | number: '1.0-0' }}</td>
+            <td style="padding: 6px;">
+              <span [style.color]="h.magnitudePercent > 5 ? '#c0392b' : (h.magnitudePercent > 2 ? '#a66a00' : '#1e7e34')" style="font-weight: 600;">
+                {{ h.magnitudePercent | number: '1.0-1' }}%
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="data.hitDetails.length === 0" style="color: #888; font-size: 13px;">No demurrage or storage hits in this period.</p>
+    </div>
+  </ng-container>
+</div>
