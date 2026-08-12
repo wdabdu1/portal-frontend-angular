@@ -239,7 +239,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Examination (Form 48)')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Examination (Form 48)</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Examination (Form 48)')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Examination (Form 48)')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Examination (Form 48)')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1CustomsExamination" [lockInfo]="locks['route1CustomsExamination']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Customs Examination (Form 48)'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -247,8 +250,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route1Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Examination (Form 48)'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1CustomsExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Examination (Form 48)'))" [disabled]="savingRouteDetail || isLocked('route1CustomsExamination')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Customs Lab')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -257,7 +260,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Lab')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Lab</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Lab')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Lab')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Lab')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1CustomsLab" [lockInfo]="locks['route1CustomsLab']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -267,8 +273,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route1Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Lab'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1CustomsLab')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Lab'))" [disabled]="savingRouteDetail || isLocked('route1CustomsLab')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('SSMO Examination')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -277,7 +283,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SSMO Examination')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SSMO Examination</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO Examination')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SSMO Examination')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SSMO Examination')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1SsmoExamination" [lockInfo]="locks['route1SsmoExamination']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'SSMO Examination'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -285,8 +294,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route1Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO Examination'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1SsmoExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SSMO Examination'))" [disabled]="savingRouteDetail || isLocked('route1SsmoExamination')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Customs Evaluation')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -295,7 +304,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('Customs Evaluation')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">Customs Evaluation</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Evaluation')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','Customs Evaluation')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','Customs Evaluation')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1CustomsEvaluation" [lockInfo]="locks['route1CustomsEvaluation']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'Customs Evaluation'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -305,8 +317,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route1Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Evaluation'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1CustomsEvaluation')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('Customs Evaluation'))" [disabled]="savingRouteDetail || isLocked('route1CustomsEvaluation')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('SPC Bill')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
@@ -315,7 +327,10 @@
       <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
         <div (click)="toggle('SPC Bill')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
           <strong style="font-size: 14px;">SPC Bill</strong>
-          <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SPC Bill')?.status }}</span></span>
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span [style.background]="lightColor(scheduleFor('Route1','SPC Bill')?.light)" style="display:inline-block; width:10px; height:10px; border-radius:50%;"></span><span style="font-size:11px; color:#666;">{{ scheduleFor('Route1','SPC Bill')?.status }}</span></span>
+            <span (click)="$event.stopPropagation()"><app-section-lock-badge entityType="Clearance" [entityId]="shipmentId" sectionKey="route1SpcBill" [lockInfo]="locks['route1SpcBill']" (locked)="loadLocks()" (unlocked)="loadLocks()" /></span>
+          </span>
         </div>
         <div *ngIf="expanded === 'SPC Bill'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
@@ -324,8 +339,8 @@
             <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.spcBillSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
-            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
-            <button (click)="saveRouteDetail(true, nextGroupKey('SPC Bill'))" [disabled]="savingRouteDetail || isLocked(activeRouteLockKey)" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
+            <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1SpcBill')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+            <button (click)="saveRouteDetail(true, nextGroupKey('SPC Bill'))" [disabled]="savingRouteDetail || isLocked('route1SpcBill')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Truck & Containers')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
         </div>
