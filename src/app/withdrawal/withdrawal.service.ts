@@ -19,6 +19,7 @@ export interface WithdrawalDetail {
   withdrawalRequestRefNo: string | null;
   certificateEntryDate: string | null;
   scudaDeclarationNo: string | null;
+  motApprovalDate: string | null;
   ssmoFileRequestDate: string | null;
   ssmoInspectionAmountSdg: number | null;
   ssmoFeesSettlementDate: string | null;
