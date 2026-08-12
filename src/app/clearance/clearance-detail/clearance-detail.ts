@@ -487,14 +487,24 @@ export class ClearanceDetailComponent implements OnInit {
     }
   }
 
+  // Route-specific actual completion — the SAME field the demurrage/
+  // storage forecast snapshot triggers off, not the general Clearance
+  // completion date (a separate, unrelated concept).
+  get routeActualCompletionDate(): string | null {
+    if (this.selectedRoute === 1) return this.route1Form.clearanceActualCompletedDate;
+    if (this.selectedRoute === 2) return this.route2Form.clearanceActualCompletedDate;
+    if (this.selectedRoute === 3) return this.route3Form.clearanceActualCompletedDate;
+    return null;
+  }
+
   get plannedVsCurrentText(): string | null {
-    if (!this.estimatedCompletionDate) return null;
-    const current = this.detail?.clearanceCompleteDate ?? this.estimatedCompletionDate;
-    if (current === this.estimatedCompletionDate) return null; // no actual completion recorded yet, nothing to compare
-    const plannedMs = new Date(this.estimatedCompletionDate).getTime();
-    const currentMs = new Date(current).getTime();
-    const diffDays = Math.round((currentMs - plannedMs) / 86400000);
+    const planned = this.actualChargesForm.plannedCompletionDate;
+    const actual = this.routeActualCompletionDate;
+    if (!planned || !actual) return null;
+    const plannedMs = new Date(planned).getTime();
+    const actualMs = new Date(actual).getTime();
+    const diffDays = Math.round((actualMs - plannedMs) / 86400000);
     if (diffDays === 0) return 'On plan';
-    return diffDays > 0 ? `Behind by ${diffDays} day(s)` : `Ahead by ${-diffDays} day(s)`;
+    return diffDays > 0 ? `${diffDays} day(s) behind plan` : `${-diffDays} day(s) ahead of plan`;
   }
 }
