@@ -151,6 +151,9 @@ export interface ShipmentDetail {
   offshorePoNo: string | null;
   fcl20Count: number;
   fcl40Count: number;
+  receivedSignedPiDate: string | null;
+  orderExecutionDate: string | null;
+  latestShippingDate: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
