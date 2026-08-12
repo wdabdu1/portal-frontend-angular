@@ -353,6 +353,25 @@ export class ClearanceDetailComponent implements OnInit {
     });
   }
 
+  printingEstimate = false;
+
+  printEstimateClick(): void {
+    this.printingEstimate = true;
+    this.service.printEstimate(this.shipmentId).subscribe({
+      next: (blob) => {
+        this.printingEstimate = false;
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.printingEstimate = false;
+        this.error = 'Could not generate the estimate PDF.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   saveCostEstimate(andNext: boolean): void {
     this.savingCostEstimate = true;
     this.service.saveCostEstimate(this.shipmentId, this.costEstimateForm).subscribe({
