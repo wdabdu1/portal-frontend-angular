@@ -248,6 +248,10 @@ export class ClearanceService {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/certificate-entry`, req);
   }
 
+  printEstimate(shipmentId: number) {
+    return this.http.get(`${API_URL}/clearance/${shipmentId}/print-estimate`, { responseType: 'blob' });
+  }
+
   getRoute1(shipmentId: number) {
     return this.http.get<ClearanceRoute1Details | null>(`${API_URL}/clearance/${shipmentId}/route1`);
   }
