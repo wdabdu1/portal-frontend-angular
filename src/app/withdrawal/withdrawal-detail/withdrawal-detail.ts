@@ -48,6 +48,7 @@ export class WithdrawalDetailComponent implements OnInit {
 
   processingForm = {
     certificateEntryDate: '', scudaDeclarationNo: '',
+    motApprovalDate: '',
     ssmoFileRequestDate: '', ssmoInspectionAmountSdg: null as number | null, ssmoFeesSettlementDate: '',
     custExamStartDate: '', custExamCompletedDate: '',
     customsLabRequired: false, customsLabFeesSdg: null as number | null, labFeesPaymentDate: '', labResultIssuanceDate: '',
@@ -59,6 +60,7 @@ export class WithdrawalDetailComponent implements OnInit {
 
   groups: GroupItemDef[] = [
     { key: 'certificateEntry', label: 'Customs Certificate Entry' },
+    { key: 'mot', label: 'MOT' },
     { key: 'ssmoFile', label: 'SSMO File Process' },
     { key: 'customsExam', label: 'Customs Examination (Form 48)' },
     { key: 'customsLab', label: 'Customs Lab' },
@@ -86,6 +88,7 @@ export class WithdrawalDetailComponent implements OnInit {
         this.generalInfoForm = { withdrawalRequestDate: d.withdrawalRequestDate ?? '', withdrawalRequestRefNo: d.withdrawalRequestRefNo ?? '' };
         this.processingForm = {
           certificateEntryDate: d.certificateEntryDate ?? '', scudaDeclarationNo: d.scudaDeclarationNo ?? '',
+          motApprovalDate: d.motApprovalDate ?? '',
           ssmoFileRequestDate: d.ssmoFileRequestDate ?? '', ssmoInspectionAmountSdg: d.ssmoInspectionAmountSdg, ssmoFeesSettlementDate: d.ssmoFeesSettlementDate ?? '',
           custExamStartDate: d.custExamStartDate ?? '', custExamCompletedDate: d.custExamCompletedDate ?? '',
           customsLabRequired: d.customsLabRequired, customsLabFeesSdg: d.customsLabFeesSdg, labFeesPaymentDate: d.labFeesPaymentDate ?? '', labResultIssuanceDate: d.labResultIssuanceDate ?? '',
