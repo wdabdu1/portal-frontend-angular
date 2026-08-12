@@ -21,6 +21,7 @@
           <span>Consignee:</span><span style="color:#222;">{{ detail.consignee }}</span>
           <span>Category:</span><span style="color:#222;">{{ detail.category }}</span>
           <span>Status:</span><span style="color:#222;">{{ detail.status }}</span>
+          <span *ngIf="detail.shippingLine">Shipping Line:</span><span *ngIf="detail.shippingLine" style="color:#222;">{{ detail.shippingLine }}</span>
           <span *ngIf="detail.vesselName">Vessel:</span><span *ngIf="detail.vesselName" style="color:#222;">{{ detail.vesselName }}</span>
           <span>Containers:</span><span style="color:#222;">{{ detail.fcl20Count }}× 20' + {{ detail.fcl40Count }}× 40'</span>
           <span *ngIf="detail.etd">ETD:</span><span *ngIf="detail.etd" style="color:#222;">{{ detail.etd | date: 'MMM d, y' }}</span>
