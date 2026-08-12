@@ -30,7 +30,8 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Free Zones', route: '/dashboards/fz', canAccess: () => true },
       { label: 'Shipment Dashboard', route: '/dashboards/shipments', canAccess: (a) => a.canSeeShipments() },
       { label: 'Under Clearance', route: '/dashboards/under-clearance', canAccess: () => true },
-      { label: 'Goods in Transit', route: '/dashboards/goods-in-transit', canAccess: () => true }
+      { label: 'Goods in Transit', route: '/dashboards/goods-in-transit', canAccess: () => true },
+      { label: 'Department Performance', route: '/dashboards/department-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') }
     ]
   },
   {
