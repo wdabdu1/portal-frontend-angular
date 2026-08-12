@@ -30,6 +30,7 @@ export interface ShipmentFullDetail {
   supplier: string | null;
   consignee: string;
   category: string;
+  shippingLine: string | null;
   vesselName: string | null;
   fcl20Count: number;
   fcl40Count: number;
