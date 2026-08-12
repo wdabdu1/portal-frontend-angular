@@ -15,6 +15,29 @@
     </p>
 
     <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; overflow: hidden;">
+      <div (click)="toggleSection('orderExecution')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Order Execution</strong>
+      </div>
+      <div *ngIf="expandedSection === 'orderExecution'" style="padding: 16px;">
+        <p style="color:#888; font-size:12px; margin-top:0;">Read-only — from this order's own record. Edit via New Supplier Order / Orders.</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Order Confirmed by BU <span style="font-weight:normal; color:#888;">(Received Signed PI)</span></label>
+            <input [value]="detail.receivedSignedPiDate ? (detail.receivedSignedPiDate | date: 'MMM d, y') : '—'" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Order Execution Date</label>
+            <input [value]="detail.orderExecutionDate ? (detail.orderExecutionDate | date: 'MMM d, y') : '—'" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Latest Shipping Date</label>
+            <input [value]="detail.latestShippingDate ? (detail.latestShippingDate | date: 'MMM d, y') : '—'" disabled style="width:100%; padding:6px; box-sizing:border-box; background:#f5f5f5;" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
       <div (click)="toggleSection('shipOnBoard')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
         <strong style="font-size: 14px;">Ship on Board</strong>
         <span [style.background]="sectionStatus('shipOnBoard') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('shipOnBoard') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('shipOnBoard') }}</span>
