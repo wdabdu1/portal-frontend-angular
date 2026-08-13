@@ -41,6 +41,7 @@ import { ShipmentDashboard } from './dashboards/shipment-dashboard/shipment-dash
 import { UnderClearanceDashboard } from './dashboards/under-clearance-dashboard/under-clearance-dashboard';
 import { GoodsInTransitDashboard } from './dashboards/goods-in-transit-dashboard/goods-in-transit-dashboard';
 import { DepartmentPerformance } from './dashboards/department-performance/department-performance';
+import { DemurrageAnalysis } from './dashboards/demurrage-analysis/demurrage-analysis';
 
 
 export const routes: Routes = [
@@ -89,6 +90,7 @@ export const routes: Routes = [
   { path: 'dashboards/under-clearance', component: UnderClearanceDashboard, canActivate: [authGuard] },
   { path: 'dashboards/goods-in-transit', component: GoodsInTransitDashboard, canActivate: [authGuard] },
   { path: 'dashboards/department-performance', component: DepartmentPerformance, canActivate: [authGuard] },
+  { path: 'dashboards/demurrage-analysis', component: DemurrageAnalysis, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
