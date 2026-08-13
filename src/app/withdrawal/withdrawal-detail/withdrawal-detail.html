@@ -145,6 +145,49 @@
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveProcessing(true, 'ssmoGeneral')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SSMO (general approval — COC required/available) -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggle('ssmoGeneral')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">SSMO</strong>
+      </div>
+      <div *ngIf="expanded === 'ssmoGeneral'" style="padding: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Is COC Required?</label>
+            <select [(ngModel)]="processingForm.ssmoCocRequired" style="width:100%; padding:6px; box-sizing:border-box;">
+              <option [ngValue]="null">-- select --</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+          <div *ngIf="processingForm.ssmoCocRequired === true">
+            <label style="display:block; font-size:12px; color:#555;">Is COC Available?</label>
+            <select [(ngModel)]="processingForm.ssmoCocAvailable" style="width:100%; padding:6px; box-sizing:border-box;">
+              <option [ngValue]="null">-- select --</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+        </div>
+
+        <p *ngIf="processingForm.ssmoCocRequired === true && processingForm.ssmoCocAvailable !== true" style="color:#a66a00; font-size:12px; background:#fff4e5; padding:8px; border-radius:4px; margin-top:10px;">
+          COC is required but not yet available — this will block SSMO File Process until it's ready.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
+          <div><label style="display:block; font-size:12px; color:#555;">Application Date</label><input type="date" [(ngModel)]="processingForm.ssmoApplicationDate" [disabled]="processingForm.ssmoCocRequired === true && processingForm.ssmoCocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Cost</label><input type="text" appThousands [(ngModel)]="processingForm.ssmoCost" [disabled]="processingForm.ssmoCocRequired === true && processingForm.ssmoCocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Cost Settled Date</label><input type="date" [(ngModel)]="processingForm.ssmoCostSettledDate" [disabled]="processingForm.ssmoCocRequired === true && processingForm.ssmoCocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">Reference Number</label><input [(ngModel)]="processingForm.ssmoRefNumber" [disabled]="processingForm.ssmoCocRequired === true && processingForm.ssmoCocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div><label style="display:block; font-size:12px; color:#555;">SSMO Approval Date</label><input type="date" [(ngModel)]="processingForm.ssmoApprovalDate" [disabled]="processingForm.ssmoCocRequired === true && processingForm.ssmoCocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveProcessing(false, null)" [disabled]="savingProcessing" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
           <button (click)="saveProcessing(true, 'mot')" [disabled]="savingProcessing" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingProcessing ? 'Saving...' : 'Save & Next' }}</button>
         </div>
       </div>
