@@ -32,7 +32,8 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Under Clearance', route: '/dashboards/under-clearance', canAccess: () => true },
       { label: 'Goods in Transit', route: '/dashboards/goods-in-transit', canAccess: () => true },
       { label: 'Department Performance', route: '/dashboards/department-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') },
-      { label: 'Demurrage Analysis', route: '/dashboards/demurrage-analysis', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('CorpFinance') }
+      { label: 'Demurrage Analysis', route: '/dashboards/demurrage-analysis', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('CorpFinance') },
+      { label: 'Supplier Delay Watch', route: '/dashboards/supplier-delay', canAccess: () => true }
     ]
   },
   {
