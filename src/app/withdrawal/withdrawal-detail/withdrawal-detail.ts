@@ -48,6 +48,8 @@ export class WithdrawalDetailComponent implements OnInit {
 
   processingForm = {
     certificateEntryDate: '', scudaDeclarationNo: '',
+    ssmoCocRequired: null as boolean | null, ssmoCocAvailable: null as boolean | null,
+    ssmoApplicationDate: '', ssmoCost: null as number | null, ssmoCostSettledDate: '', ssmoRefNumber: '', ssmoApprovalDate: '',
     motApprovalDate: '',
     ssmoFileRequestDate: '', ssmoInspectionAmountSdg: null as number | null, ssmoFeesSettlementDate: '',
     custExamStartDate: '', custExamCompletedDate: '',
@@ -60,6 +62,7 @@ export class WithdrawalDetailComponent implements OnInit {
 
   groups: GroupItemDef[] = [
     { key: 'certificateEntry', label: 'Customs Certificate Entry' },
+    { key: 'ssmoGeneral', label: 'SSMO' },
     { key: 'mot', label: 'MOT' },
     { key: 'ssmoFile', label: 'SSMO File Process' },
     { key: 'customsExam', label: 'Customs Examination (Form 48)' },
@@ -88,6 +91,9 @@ export class WithdrawalDetailComponent implements OnInit {
         this.generalInfoForm = { withdrawalRequestDate: d.withdrawalRequestDate ?? '', withdrawalRequestRefNo: d.withdrawalRequestRefNo ?? '' };
         this.processingForm = {
           certificateEntryDate: d.certificateEntryDate ?? '', scudaDeclarationNo: d.scudaDeclarationNo ?? '',
+          ssmoCocRequired: d.ssmoCocRequired ?? null, ssmoCocAvailable: d.ssmoCocAvailable ?? null,
+          ssmoApplicationDate: d.ssmoApplicationDate ?? '', ssmoCost: d.ssmoCost, ssmoCostSettledDate: d.ssmoCostSettledDate ?? '',
+          ssmoRefNumber: d.ssmoRefNumber ?? '', ssmoApprovalDate: d.ssmoApprovalDate ?? '',
           motApprovalDate: d.motApprovalDate ?? '',
           ssmoFileRequestDate: d.ssmoFileRequestDate ?? '', ssmoInspectionAmountSdg: d.ssmoInspectionAmountSdg, ssmoFeesSettlementDate: d.ssmoFeesSettlementDate ?? '',
           custExamStartDate: d.custExamStartDate ?? '', custExamCompletedDate: d.custExamCompletedDate ?? '',
