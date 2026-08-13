@@ -271,9 +271,9 @@
         <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="route1Form.customsLabRequired" id="r1lab" /><label for="r1lab" style="font-size:13px;">Customs Lab Required</label></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsLabFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route1Form.labFeesPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route1Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsLabFeesSdg" [disabled]="!route1Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route1Form.labFeesPaymentDate" [disabled]="!route1Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route1Form.labResultIssuanceDate" [disabled]="!route1Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1CustomsLab')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -661,9 +661,9 @@
         <div *ngIf="expanded === 'Customs Lab'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div style="display:flex; align-items:center; gap:6px; padding-top:20px;"><input type="checkbox" [(ngModel)]="route3Form.customsLabRequired" id="r3lab" /><label for="r3lab" style="font-size:13px;">Customs Lab Required</label></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsLabFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route3Form.labFeesPaymentDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route3Form.labResultIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsLabFeesSdg" [disabled]="!route3Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route3Form.labFeesPaymentDate" [disabled]="!route3Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route3Form.labResultIssuanceDate" [disabled]="!route3Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3CustomsLab')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
