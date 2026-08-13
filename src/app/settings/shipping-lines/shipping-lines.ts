@@ -47,9 +47,29 @@ export class ShippingLines implements OnInit {
 
   ngOnInit(): void {
     this.lookups.getAll<LookupEntity>('tariff-groups').subscribe({
-      next: (r) => { this.tariffGroups = r; this.cdr.markForCheck(); }
+      next: (r) => {
+        this.tariffGroups = r;
+        this.backfillMissingTariffGroups();
+        this.cdr.markForCheck();
+      }
     });
     this.load();
+  }
+
+  // If a line's edit form was expanded before the tariff-groups lookup
+  // finished loading, its Free Days table would otherwise stay stuck
+  // with zero rows forever (it's only ever initialized once). This
+  // fills in any tariff group that's missing from an already-cached
+  // line, regardless of how the two loads happened to race.
+  private backfillMissingTariffGroups(): void {
+    for (const lineId of Object.keys(this.editFreeDays).map(Number)) {
+      for (const size of this.sizes) {
+        if (!this.editFreeDays[lineId][size]) this.editFreeDays[lineId][size] = {};
+        for (const g of this.tariffGroups) {
+          if (!(g.id in this.editFreeDays[lineId][size])) this.editFreeDays[lineId][size][g.id] = 0;
+        }
+      }
+    }
   }
 
   load(): void {
