@@ -45,6 +45,8 @@ export interface ShipmentDraftDocuments {
 }
 
 export interface ShipmentSsmo {
+  cocRequired: boolean | null;
+  cocAvailable: boolean | null;
   applicationDate: string | null;
   cost: number | null;
   costSettledDate: string | null;
