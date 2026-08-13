@@ -21,6 +21,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'category', label: 'Category' },
   { key: 'shippingLine', label: 'Shipping Line' },
   { key: 'eta', label: 'ETA' },
+  { key: 'demurrageFreeDaysRemaining', label: 'Line Free Days' },
   { key: 'fclCount', label: 'FCL' },
   { key: 'declarationNo', label: 'Declaration No.' },
   { key: 'product', label: 'Product/Model' },
