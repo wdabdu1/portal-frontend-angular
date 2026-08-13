@@ -120,6 +120,8 @@ export interface ClearanceShipmentSummary {
   shippingLine: string;
   slaPercent: number;
   isCompleted: boolean;
+  etaHasArrived: boolean;
+  demurrageFreeDaysRemaining: number | null;
 }
 
 export interface ClearanceDetail {
