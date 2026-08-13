@@ -192,24 +192,47 @@
         </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
           <div>
+            <label style="display:block; font-size:12px; color:#555;">Is COC Required?</label>
+            <select [(ngModel)]="ssmoForm.cocRequired" style="width:100%; padding:6px; box-sizing:border-box;">
+              <option [ngValue]="null">-- select --</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+          <div *ngIf="ssmoForm.cocRequired === true">
+            <label style="display:block; font-size:12px; color:#555;">Is COC Available?</label>
+            <select [(ngModel)]="ssmoForm.cocAvailable" style="width:100%; padding:6px; box-sizing:border-box;">
+              <option [ngValue]="null">-- select --</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+        </div>
+
+        <p *ngIf="ssmoForm.cocRequired === true && ssmoForm.cocAvailable !== true" style="color:#a66a00; font-size:12px; background:#fff4e5; padding:8px; border-radius:4px; margin-top:10px;">
+          COC is required but not yet available — this will block SSMO File Process until it's ready.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
+          <div>
             <label style="display:block; font-size:12px; color:#555;">Application Date</label>
-            <input type="date" [(ngModel)]="ssmoForm.applicationDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <input type="date" [(ngModel)]="ssmoForm.applicationDate" [disabled]="ssmoForm.cocRequired === true && ssmoForm.cocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
           <div>
             <label style="display:block; font-size:12px; color:#555;">Cost</label>
-            <input type="text" appThousands [(ngModel)]="ssmoForm.cost" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <input type="text" appThousands [(ngModel)]="ssmoForm.cost" [disabled]="ssmoForm.cocRequired === true && ssmoForm.cocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
           <div>
             <label style="display:block; font-size:12px; color:#555;">Cost Settled Date</label>
-            <input type="date" [(ngModel)]="ssmoForm.costSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <input type="date" [(ngModel)]="ssmoForm.costSettledDate" [disabled]="ssmoForm.cocRequired === true && ssmoForm.cocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
           <div>
             <label style="display:block; font-size:12px; color:#555;">Reference Number</label>
-            <input [(ngModel)]="ssmoForm.refNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <input [(ngModel)]="ssmoForm.refNumber" [disabled]="ssmoForm.cocRequired === true && ssmoForm.cocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
           <div>
             <label style="display:block; font-size:12px; color:#555;">SSMO Approval Date</label>
-            <input type="date" [(ngModel)]="ssmoForm.approvalDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+            <input type="date" [(ngModel)]="ssmoForm.approvalDate" [disabled]="ssmoForm.cocRequired === true && ssmoForm.cocAvailable !== true" style="width:100%; padding:6px; box-sizing:border-box;" />
           </div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
