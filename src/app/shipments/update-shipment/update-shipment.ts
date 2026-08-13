@@ -72,7 +72,7 @@ export class UpdateShipment implements OnInit {
   savingLastOffshore = false;
   savingHsCodes = false;
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
-  ssmoForm = { applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '' };
+  ssmoForm = { cocRequired: null as boolean | null, cocAvailable: null as boolean | null, applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '' };
   motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '', offshoreApprovedPiNumber: '' };
   supplierFullSetForm = { supplierInvoiceNo: '', supplierInvoiceDate: '', fsDispatchDate: '', fsDispatchedViaId: null as number | null, fsTrackingNumber: '', fsReceivedDate: '' };
   bankingForm = {
@@ -111,7 +111,7 @@ export class UpdateShipment implements OnInit {
           finalDraftReceivedDate: detail.draftDocuments.finalDraftReceivedDate ?? '',
           finalDraftConfirmedDate: detail.draftDocuments.finalDraftConfirmedDate ?? ''
         };
-        if (detail.ssmo) this.ssmoForm = { applicationDate: detail.ssmo.applicationDate ?? '', cost: detail.ssmo.cost, costSettledDate: detail.ssmo.costSettledDate ?? '', refNumber: detail.ssmo.refNumber ?? '', approvalDate: detail.ssmo.approvalDate ?? '' };
+        if (detail.ssmo) this.ssmoForm = { cocRequired: detail.ssmo.cocRequired ?? null, cocAvailable: detail.ssmo.cocAvailable ?? null, applicationDate: detail.ssmo.applicationDate ?? '', cost: detail.ssmo.cost, costSettledDate: detail.ssmo.costSettledDate ?? '', refNumber: detail.ssmo.refNumber ?? '', approvalDate: detail.ssmo.approvalDate ?? '' };
         if (detail.mot) this.motForm = {
           processDate: detail.mot.processDate ?? '', cost: detail.mot.cost, costSettledDate: detail.mot.costSettledDate ?? '', refNumber: detail.mot.refNumber ?? '',
           approvalDate: detail.mot.approvalDate ?? '', offshoreApprovedPiNumber: detail.mot.offshoreApprovedPiNumber ?? ''
