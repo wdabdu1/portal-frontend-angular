@@ -112,33 +112,6 @@
       <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
         <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Charge Calculations</p>
 
-        <!-- Storage -->
-        <h4 style="font-size: 13px; margin: 0 0 8px;">Storage</h4>
-        <p style="font-size: 13px; color: #555; margin: 0 0 8px;">
-          Free days: <strong>{{ data.storageFreeDays | number: '1.0-1' }}</strong> — Chargeable days: <strong>{{ data.storageChargeableDays | number: '1.0-1' }}</strong>
-        </p>
-        <table *ngIf="data.storageBreakdown.length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px;">
-          <thead>
-            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-              <th style="padding: 5px;">Tier</th>
-              <th style="padding: 5px;">Days</th>
-              <th style="padding: 5px;">Rate</th>
-              <th style="padding: 5px;">Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let t of data.storageBreakdown" style="border-bottom: 1px solid #eee;">
-              <td style="padding: 5px;">{{ t.tierLabel }}</td>
-              <td style="padding: 5px;">{{ t.days }}</td>
-              <td style="padding: 5px;">{{ t.rate | number: '1.2-2' }}</td>
-              <td style="padding: 5px;">{{ t.cost | number: '1.2-2' }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p style="font-size: 13px; margin: 0 0 16px;">
-          Storage Total: <strong>{{ data.storageCostSdg | number: '1.0-0' }} SDG</strong>
-        </p>
-
         <!-- Demurrage -->
         <h4 style="font-size: 13px; margin: 0 0 8px;">Shipping Line Demurrage</h4>
         <p style="font-size: 13px; color: #555; margin: 0 0 8px;">
@@ -163,8 +136,35 @@
             </tr>
           </tbody>
         </table>
-        <p style="font-size: 13px; margin: 0;">
+        <p style="font-size: 13px; margin: 0 0 16px;">
           Demurrage Total: <strong>{{ data.demurrageCostSdg | number: '1.0-0' }} SDG</strong>
+        </p>
+
+        <!-- Storage -->
+        <h4 style="font-size: 13px; margin: 0 0 8px;">Storage</h4>
+        <p style="font-size: 13px; color: #555; margin: 0 0 8px;">
+          Free days: <strong>{{ data.storageFreeDays | number: '1.0-1' }}</strong> — Chargeable days: <strong>{{ data.storageChargeableDays | number: '1.0-1' }}</strong>
+        </p>
+        <table *ngIf="data.storageBreakdown.length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 5px;">Tier</th>
+              <th style="padding: 5px;">Days</th>
+              <th style="padding: 5px;">Rate</th>
+              <th style="padding: 5px;">Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of data.storageBreakdown" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 5px;">{{ t.tierLabel }}</td>
+              <td style="padding: 5px;">{{ t.days }}</td>
+              <td style="padding: 5px;">{{ t.rate | number: '1.2-2' }}</td>
+              <td style="padding: 5px;">{{ t.cost | number: '1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 13px; margin: 0;">
+          Storage Total: <strong>{{ data.storageCostSdg | number: '1.0-0' }} SDG</strong>
         </p>
 
         <div style="margin-top: 16px; padding-top: 12px; border-top: 2px solid #ccc; font-size: 15px;">
