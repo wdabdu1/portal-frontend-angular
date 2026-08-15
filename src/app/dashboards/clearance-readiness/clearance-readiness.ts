@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { exportToExcel } from '../../shared/excel-export.util';
-import { DashboardsService, ShipmentReadiness } from '../dashboards.service';
+import { DashboardsService, ShipmentHighlight } from '../dashboards.service';
+
+type Classification = 'Red' | 'Yellow' | 'Green';
 
 @Component({
   selector: 'app-clearance-readiness',
@@ -12,15 +14,14 @@ import { DashboardsService, ShipmentReadiness } from '../dashboards.service';
 export class ClearanceReadiness implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  allShipments: ShipmentReadiness[] = [];
+  allShipments: ShipmentHighlight[] = [];
   loading = true;
   error = '';
-  expandedShipmentId: number | null = null;
   // Red needs eyes immediately; Yellow/Green start collapsed so a quick
   // glance at the counts is enough when nothing needs attention.
-  expandedSection: 'Red' | 'Yellow' | 'Green' | null = 'Red';
+  expandedSection: Classification | null = 'Red';
 
-  toggleSection(section: 'Red' | 'Yellow' | 'Green'): void {
+  toggleSection(section: Classification): void {
     this.expandedSection = this.expandedSection === section ? null : section;
   }
 
@@ -34,25 +35,29 @@ export class ClearanceReadiness implements OnInit {
     this.loading = true;
     this.service.getPreClearanceReadiness().subscribe({
       next: (r) => { this.allShipments = r; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.error = 'Could not load readiness data.'; this.loading = false; this.cdr.markForCheck(); }
+      error: () => { this.error = 'Could not load pipeline health data.'; this.loading = false; this.cdr.markForCheck(); }
     });
   }
 
-  get redShipments(): ShipmentReadiness[] {
-    return this.allShipments.filter((s) => s.classification === 'Red').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
+  // The single current step's own light already carries most of the
+  // signal; an overdue MOT/SSMO in the background can only ever push
+  // the classification up (never down), since it's a real risk even
+  // while the visible current step still looks fine.
+  classify(s: ShipmentHighlight): Classification {
+    if (s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red') return 'Red';
+    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow') return 'Yellow';
+    return 'Green';
   }
 
-  get yellowShipments(): ShipmentReadiness[] {
-    return this.allShipments.filter((s) => s.classification === 'Yellow').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
+  private byClassification(target: Classification): ShipmentHighlight[] {
+    return this.allShipments
+      .filter((s) => this.classify(s) === target)
+      .sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
   }
 
-  get greenShipments(): ShipmentReadiness[] {
-    return this.allShipments.filter((s) => s.classification === 'Green').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
-  }
-
-  toggle(shipmentId: number): void {
-    this.expandedShipmentId = this.expandedShipmentId === shipmentId ? null : shipmentId;
-  }
+  get redShipments(): ShipmentHighlight[] { return this.byClassification('Red'); }
+  get yellowShipments(): ShipmentHighlight[] { return this.byClassification('Yellow'); }
+  get greenShipments(): ShipmentHighlight[] { return this.byClassification('Green'); }
 
   lightColor(light: string): string {
     if (light === 'Red') return '#c0392b';
@@ -66,25 +71,18 @@ export class ClearanceReadiness implements OnInit {
     return '#e6f4ea';
   }
 
-  private countLight(s: ShipmentReadiness, light: string): number {
-    return s.tracks.flatMap((t) => t.items).filter((i) => i.light === light).length;
-  }
-
-  // Flattened one-row-per-shipment summary — the full per-track detail
-  // doesn't fit a spreadsheet row, so this exports what's already
-  // visible in the table (plus the classification and flag counts).
   onExportClick(): void {
     const rows = this.allShipments.map((s) => ({
-      classification: s.classification,
+      classification: this.classify(s),
       businessUnit: s.businessUnit,
       category: s.category,
       blAwbNo: s.blAwbNo,
       fcl: `${s.fcl20Count}x20' ${s.fcl40Count}x40'`,
-      etd: s.etd,
       eta: s.eta,
-      redCount: this.countLight(s, 'Red'),
-      amberCount: this.countLight(s, 'Amber'),
-      greenCount: this.countLight(s, 'Green')
+      currentStep: s.currentStepName,
+      currentStepTarget: s.currentStepTargetDate,
+      currentStepStatus: s.currentStepStatus,
+      motSsmoAlert: s.motSsmoAlertMessage ?? ''
     }));
     exportToExcel('Shipment Pipeline Health', [
       { key: 'classification', label: 'Classification' },
@@ -92,11 +90,11 @@ export class ClearanceReadiness implements OnInit {
       { key: 'category', label: 'Cat' },
       { key: 'blAwbNo', label: 'BL/AWB No.' },
       { key: 'fcl', label: 'FCL' },
-      { key: 'etd', label: 'ETD' },
       { key: 'eta', label: 'ETA' },
-      { key: 'redCount', label: 'Red Flags' },
-      { key: 'amberCount', label: 'Amber Flags' },
-      { key: 'greenCount', label: 'Green Flags' }
+      { key: 'currentStep', label: 'Current Step' },
+      { key: 'currentStepTarget', label: 'Target Date' },
+      { key: 'currentStepStatus', label: 'Status' },
+      { key: 'motSsmoAlert', label: 'MOT/SSMO Alert' }
     ], rows);
   }
 }
