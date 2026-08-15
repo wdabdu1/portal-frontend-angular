@@ -112,6 +112,27 @@ export class DemurrageAnalysis implements OnInit {
     this.load();
   }
 
+  // Subtotal only counts steps actually reached (actualDaysTaken set) —
+  // matching what the table itself already displays row by row. The
+  // grand total (subtotal + weekends + holidays) should reconcile with
+  // ETA -> Container Return as a sanity check that nothing's double
+  // counted or missing.
+  get stepDaysSubtotal(): number {
+    if (!this.data) return 0;
+    return this.data.stepGaps.reduce((sum, g) => sum + (g.actualDaysTaken ?? 0), 0);
+  }
+  get slaDaysSubtotal(): number {
+    if (!this.data) return 0;
+    return this.data.stepGaps.reduce((sum, g) => sum + g.targetDays, 0);
+  }
+  get gapSubtotal(): number {
+    return this.stepDaysSubtotal - this.slaDaysSubtotal;
+  }
+  get grandTotalDays(): number {
+    if (!this.data) return 0;
+    return this.stepDaysSubtotal + this.data.weekendDays + this.data.holidayDays;
+  }
+
   clearShipmentSelection(): void {
     this.selectedShipmentId = null;
     this.load();
