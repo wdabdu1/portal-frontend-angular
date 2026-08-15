@@ -42,8 +42,11 @@ export class ClearanceReadiness implements OnInit {
   // signal; an overdue MOT/SSMO in the background can only ever push
   // the classification up (never down), since it's a real risk even
   // while the visible current step still looks fine.
+  // Cumulative lateness always wins — a shipment that's genuinely
+  // drifted past its total SLA allowance needs eyes regardless of how
+  // tidy its current local step looks.
   classify(s: ShipmentHighlight): Classification {
-    if (s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red') return 'Red';
+    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red') return 'Red';
     if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow') return 'Yellow';
     return 'Green';
   }
@@ -81,7 +84,9 @@ export class ClearanceReadiness implements OnInit {
       currentStep: s.currentStepName,
       currentStepTarget: s.currentStepTargetDate,
       currentStepStatus: s.currentStepStatus,
-      motSsmoAlert: s.motSsmoAlertMessage ?? ''
+      motSsmoAlert: s.motSsmoAlertMessage ?? '',
+      daysOverAllowance: s.daysOverAllowance ?? '',
+      currentHitSdg: s.currentDemurrageStorageHitSdg
     }));
     exportToExcel('Shipment Pipeline Health', [
       { key: 'classification', label: 'Classification' },
@@ -93,7 +98,9 @@ export class ClearanceReadiness implements OnInit {
       { key: 'currentStep', label: 'Current Step' },
       { key: 'currentStepTarget', label: 'Target Date' },
       { key: 'currentStepStatus', label: 'Status' },
-      { key: 'motSsmoAlert', label: 'MOT/SSMO Alert' }
+      { key: 'motSsmoAlert', label: 'MOT/SSMO Alert' },
+      { key: 'daysOverAllowance', label: 'Days Over Allowance' },
+      { key: 'currentHitSdg', label: 'Current Hit (SDG)' }
     ], rows);
   }
 }
