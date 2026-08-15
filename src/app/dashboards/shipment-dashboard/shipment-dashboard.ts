@@ -92,11 +92,19 @@ export class ShipmentDashboard implements OnInit {
   get uniqueBu(): string[] { return [...new Set(this.allRows.map((r) => r.businessUnit))].sort(); }
   get uniqueStatuses(): string[] { return [...new Set(this.allRows.map((r) => r.currentStatus))].sort(); }
 
+  searchTerm = '';
+
   get rows(): ShipmentDashboardRow[] {
     let filtered = applyFilters(this.allRows, this.filters, (r, col) => this.getValue(r, col));
     if (this.buFilter !== 'All') filtered = filtered.filter((r) => r.businessUnit === this.buFilter);
     if (this.statusFilter === 'Not Delivered') filtered = filtered.filter((r) => r.currentStatus !== 'Delivered');
     else if (this.statusFilter !== 'All') filtered = filtered.filter((r) => r.currentStatus === this.statusFilter);
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.trim().toLowerCase();
+      filtered = filtered.filter((r) =>
+        r.blAwbNo.toLowerCase().includes(term) || r.poNumber.toLowerCase().includes(term)
+      );
+    }
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
       const av = (a as any)[this.sortColumn] ?? '';
