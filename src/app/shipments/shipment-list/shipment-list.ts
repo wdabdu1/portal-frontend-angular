@@ -138,8 +138,16 @@ export class ShipmentList implements OnInit {
     return selected.size < this.optionsFor(col).length;
   }
 
+  searchTerm = '';
+
   get shipments(): ShipmentSummary[] {
-    const filtered = applyFilters(this.allShipments, this.filters, (r, col) => this.getValue(r, col));
+    let filtered = applyFilters(this.allShipments, this.filters, (r, col) => this.getValue(r, col));
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.trim().toLowerCase();
+      filtered = filtered.filter((r) =>
+        r.blAwbNo.toLowerCase().includes(term) || r.poNumber.toLowerCase().includes(term)
+      );
+    }
 
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
