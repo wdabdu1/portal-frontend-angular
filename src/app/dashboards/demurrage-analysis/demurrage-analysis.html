@@ -86,7 +86,7 @@
         <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
           <thead>
             <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-              <th style="padding: 6px;">Clearance Step</th>
+              <th style="padding: 6px;">Clearance Step in Working Days</th>
               <th style="padding: 6px;">{{ data.isSingleShipment ? 'Actual Days' : 'Avg. Actual Days' }}</th>
               <th style="padding: 6px;">SLA Days</th>
               <th style="padding: 6px;">Gap (+/-)</th>
@@ -105,6 +105,31 @@
               </td>
             </tr>
           </tbody>
+          <tfoot>
+            <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+              <td style="padding: 6px;">Subtotal</td>
+              <td style="padding: 6px;">{{ stepDaysSubtotal | number: '1.0-1' }}</td>
+              <td style="padding: 6px;">{{ slaDaysSubtotal | number: '1.0-1' }}</td>
+              <td style="padding: 6px;" [style.color]="gapSubtotal > 0 ? '#c0392b' : (gapSubtotal < 0 ? '#1e7e34' : '#333')">
+                {{ gapSubtotal > 0 ? '+' : '' }}{{ gapSubtotal | number: '1.0-1' }}
+              </td>
+            </tr>
+            <tr style="color: #666;">
+              <td style="padding: 6px;">Weekends</td>
+              <td style="padding: 6px;">{{ data.weekendDays | number: '1.0-1' }}</td>
+              <td style="padding: 6px;" colspan="2"></td>
+            </tr>
+            <tr style="color: #666;">
+              <td style="padding: 6px;">Public Holidays</td>
+              <td style="padding: 6px;">{{ data.holidayDays | number: '1.0-1' }}</td>
+              <td style="padding: 6px;" colspan="2"></td>
+            </tr>
+            <tr style="border-top: 1px solid #ccc; font-weight: 600;">
+              <td style="padding: 6px;">Total (should equal ETA → Container Return)</td>
+              <td style="padding: 6px;">{{ grandTotalDays | number: '1.0-1' }}</td>
+              <td style="padding: 6px;" colspan="2"></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
