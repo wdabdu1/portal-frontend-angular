@@ -413,6 +413,10 @@
           </tfoot>
         </table>
 
+        <p *ngIf="paymentDues.length > 0 && invoiceSummary" style="color:#1e7e34; font-size:13px; font-weight:600; margin-top:8px;">
+          Remaining Amount: {{ (invoiceSummary.invoiceValueUsd - totalDueUsd) | number: '1.2-2' }} USD
+        </p>
+
         <p *ngIf="dueScheduleExceedsShipmentValue" style="color:#c0392b; font-size:12px; background:#fdeaea; padding:8px 10px; border-radius:4px; margin-top:10px;">
           ⚠ Total scheduled ({{ totalDueUsd | number: '1.2-2' }} USD) exceeds the shipment value ({{ invoiceSummary?.invoiceValueUsd | number: '1.2-2' }} USD) — check for a mistake.
         </p>
