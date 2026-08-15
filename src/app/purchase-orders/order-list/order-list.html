@@ -8,6 +8,8 @@
 
   <p style="color: #888; font-size: 12px; margin-top: 1rem;">Drag a column header to reorder it. Click the ▼ arrow to filter that column.</p>
 
+  <input [(ngModel)]="searchTerm" placeholder="Search PO No. or Supplier" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 240px; margin-top: 4px;" />
+
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
 
