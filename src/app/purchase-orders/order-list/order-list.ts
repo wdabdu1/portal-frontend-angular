@@ -155,8 +155,16 @@ export class OrderList implements OnInit {
     return selected.size < total;
   }
 
+  searchTerm = '';
+
   get orders(): PurchaseOrderSummary[] {
-    const filtered = applyFilters(this.allOrders, this.filters, (r, col) => this.getValue(r, col));
+    let filtered = applyFilters(this.allOrders, this.filters, (r, col) => this.getValue(r, col));
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.trim().toLowerCase();
+      filtered = filtered.filter((r) =>
+        r.poNumber.toLowerCase().includes(term) || r.supplier.toLowerCase().includes(term)
+      );
+    }
 
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
