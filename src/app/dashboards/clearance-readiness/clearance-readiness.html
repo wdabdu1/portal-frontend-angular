@@ -31,6 +31,7 @@
               <th style="padding: 8px 6px;">Current Step</th>
               <th style="padding: 8px 6px;">Status</th>
               <th style="padding: 8px 6px;">MOT/SSMO</th>
+              <th style="padding: 8px 6px;">Current Hit (SDG)</th>
             </tr>
           </thead>
           <tbody>
@@ -45,11 +46,17 @@
                 <span [style.background]="lightBg(s.currentStepLight)" [style.color]="lightColor(s.currentStepLight)" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
                   {{ s.currentStepStatus }}
                 </span>
+                <div *ngIf="s.isCumulativelyLate" style="color: #c0392b; font-size: 11px; margin-top: 3px; font-weight: 600;">
+                  ⚠ {{ s.daysOverAllowance }} day(s) over total SLA allowance
+                </div>
               </td>
               <td style="padding: 8px 6px;">
                 <span *ngIf="s.motSsmoAlertLevel" [style.background]="lightBg(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px;">
                   ⚠ {{ s.motSsmoAlertMessage }}
                 </span>
+              </td>
+              <td style="padding: 8px 6px; font-weight: 600;" [style.color]="s.currentDemurrageStorageHitSdg > 0 ? '#c0392b' : '#888'">
+                {{ s.currentDemurrageStorageHitSdg > 0 ? (s.currentDemurrageStorageHitSdg | number: '1.0-0') : '—' }}
               </td>
             </tr>
           </tbody>
@@ -76,6 +83,7 @@
               <th style="padding: 8px 6px;">Current Step</th>
               <th style="padding: 8px 6px;">Status</th>
               <th style="padding: 8px 6px;">MOT/SSMO</th>
+              <th style="padding: 8px 6px;">Current Hit (SDG)</th>
             </tr>
           </thead>
           <tbody>
@@ -95,6 +103,9 @@
                 <span *ngIf="s.motSsmoAlertLevel" [style.background]="lightBg(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px;">
                   ⚠ {{ s.motSsmoAlertMessage }}
                 </span>
+              </td>
+              <td style="padding: 8px 6px; font-weight: 600;" [style.color]="s.currentDemurrageStorageHitSdg > 0 ? '#c0392b' : '#888'">
+                {{ s.currentDemurrageStorageHitSdg > 0 ? (s.currentDemurrageStorageHitSdg | number: '1.0-0') : '—' }}
               </td>
             </tr>
           </tbody>
