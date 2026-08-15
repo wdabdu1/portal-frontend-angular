@@ -42,8 +42,10 @@ export interface ShipmentHighlight {
   currentStepLight: 'Green' | 'Amber' | 'Red';
   motSsmoAlertLevel: 'Yellow' | 'Red' | null;
   motSsmoAlertMessage: string | null;
+  isCumulativelyLate: boolean;
+  daysOverAllowance: number | null;
+  currentDemurrageStorageHitSdg: number;
 }
-
 @Injectable({ providedIn: 'root' })
 export class DashboardsService {
   constructor(private http: HttpClient) {}
