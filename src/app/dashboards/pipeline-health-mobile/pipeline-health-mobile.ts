@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { DashboardsService, ShipmentReadiness } from '../dashboards.service';
+import { DashboardsService, ShipmentHighlight } from '../dashboards.service';
+
+type Classification = 'Red' | 'Yellow' | 'Green';
 
 @Component({
   selector: 'app-pipeline-health-mobile',
@@ -10,7 +12,7 @@ import { DashboardsService, ShipmentReadiness } from '../dashboards.service';
 export class PipelineHealthMobile implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  allShipments: ShipmentReadiness[] = [];
+  allShipments: ShipmentHighlight[] = [];
   loading = true;
   error = '';
 
@@ -28,15 +30,19 @@ export class PipelineHealthMobile implements OnInit {
     });
   }
 
-  get redShipments(): ShipmentReadiness[] {
-    return this.allShipments.filter((s) => s.classification === 'Red').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
+  classify(s: ShipmentHighlight): Classification {
+    if (s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red') return 'Red';
+    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow') return 'Yellow';
+    return 'Green';
   }
 
-  get yellowShipments(): ShipmentReadiness[] {
-    return this.allShipments.filter((s) => s.classification === 'Yellow').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
+  private byClassification(target: Classification): ShipmentHighlight[] {
+    return this.allShipments
+      .filter((s) => this.classify(s) === target)
+      .sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
   }
 
-  get greenShipments(): ShipmentReadiness[] {
-    return this.allShipments.filter((s) => s.classification === 'Green').sort((a, b) => (a.eta ?? '').localeCompare(b.eta ?? ''));
-  }
+  get redShipments(): ShipmentHighlight[] { return this.byClassification('Red'); }
+  get yellowShipments(): ShipmentHighlight[] { return this.byClassification('Yellow'); }
+  get greenShipments(): ShipmentHighlight[] { return this.byClassification('Green'); }
 }
