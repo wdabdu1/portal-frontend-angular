@@ -28,11 +28,27 @@ export interface ShipmentReadiness {
   tracks: TrackResult[];
 }
 
+export interface ShipmentHighlight {
+  shipmentId: number;
+  blAwbNo: string;
+  businessUnit: string;
+  category: string;
+  eta: string | null;
+  fcl20Count: number;
+  fcl40Count: number;
+  currentStepName: string;
+  currentStepTargetDate: string | null;
+  currentStepStatus: string;
+  currentStepLight: 'Green' | 'Amber' | 'Red';
+  motSsmoAlertLevel: 'Yellow' | 'Red' | null;
+  motSsmoAlertMessage: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DashboardsService {
   constructor(private http: HttpClient) {}
 
   getPreClearanceReadiness() {
-    return this.http.get<ShipmentReadiness[]>(`${API_URL}/clearance/pre-clearance-readiness`);
+    return this.http.get<ShipmentHighlight[]>(`${API_URL}/clearance/pre-clearance-readiness`);
   }
 }
