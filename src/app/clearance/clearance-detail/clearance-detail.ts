@@ -190,7 +190,7 @@ export class ClearanceDetailComponent implements OnInit {
       forecastDemurrageSdg: null, forecastStorageSdg: null, forecastCapturedAt: null,
       actualDemurragePaidSdg: null, actualStoragePaidSdg: null,
       shippingLineDepositReturnDate: null, amountReturnedFromDeposit: null,
-      plannedCompletionDate: null
+      plannedCompletionDate: null, depositPaidSdg: null
     };
   }
 
