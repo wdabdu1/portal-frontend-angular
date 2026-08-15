@@ -27,6 +27,7 @@ export interface ActualCharges {
   actualDemurragePaidSdg: number | null; actualStoragePaidSdg: number | null;
   shippingLineDepositReturnDate: string | null; amountReturnedFromDeposit: number | null;
   plannedCompletionDate: string | null;
+  depositPaidSdg: number | null;
 }
 
 export interface WithdrawalLineInput {
