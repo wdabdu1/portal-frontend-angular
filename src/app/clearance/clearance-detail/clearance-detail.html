@@ -396,7 +396,16 @@
             <div><label style="display:block; font-size:12px; color:#555;">Actual Demurrage Paid (SDG)</label><input type="text" appThousands [(ngModel)]="actualChargesForm.actualDemurragePaidSdg" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Actual Storage Paid (SDG)</label><input type="text" appThousands [(ngModel)]="actualChargesForm.actualStoragePaidSdg" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Shipping Line Deposit Return Date</label><input type="date" [(ngModel)]="actualChargesForm.shippingLineDepositReturnDate" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
-            <div><label style="display:block; font-size:12px; color:#555;">Amount Returned from Deposit</label><input type="text" appThousands [(ngModel)]="actualChargesForm.amountReturnedFromDeposit" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div>
+              <label style="display:block; font-size:12px; color:#555;">Amount Returned from Deposit</label>
+              <input type="text" appThousands [(ngModel)]="actualChargesForm.amountReturnedFromDeposit" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box;" />
+              <span *ngIf="actualChargesForm.depositPaidSdg !== null" style="font-size:11px; color:#888;">
+                Deposit paid: {{ actualChargesForm.depositPaidSdg | number: '1.2-2' }} SDG
+                <span *ngIf="actualChargesForm.amountReturnedFromDeposit !== null && (actualChargesForm.depositPaidSdg - actualChargesForm.amountReturnedFromDeposit) !== 0" style="color:#c0392b; font-weight:600;">
+                  (discrepancy: {{ (actualChargesForm.depositPaidSdg - actualChargesForm.amountReturnedFromDeposit) | number: '1.2-2' }} SDG)
+                </span>
+              </span>
+            </div>
           </div>
 
           <p *ngIf="!actualChargesForm.forecastCapturedAt" style="color:#a66a00; font-size:12px; background:#fff4e5; padding:8px; border-radius:4px;">
