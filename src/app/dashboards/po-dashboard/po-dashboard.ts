@@ -87,10 +87,20 @@ export class PoDashboard implements OnInit {
   get uniqueBu(): string[] { return [...new Set(this.allRows.map((r) => r.businessUnit))].sort(); }
   get uniqueSuppliers(): string[] { return [...new Set(this.allRows.map((r) => r.supplier))].sort(); }
 
+  searchTerm = '';
+
   get rows(): (PoDashboardRow & { shipmentCount: number })[] {
     let filtered = applyFilters(this.allRows, this.filters, (r, col) => this.getValue(r, col));
     if (this.buFilter !== 'All') filtered = filtered.filter((r) => r.businessUnit === this.buFilter);
     if (this.supplierFilter !== 'All') filtered = filtered.filter((r) => r.supplier === this.supplierFilter);
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.trim().toLowerCase();
+      filtered = filtered.filter((r) =>
+        r.poNumber.toLowerCase().includes(term) ||
+        r.supplier.toLowerCase().includes(term) ||
+        r.shipments.some((s) => s.blAwbNo.toLowerCase().includes(term))
+      );
+    }
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
       const av = (a as any)[this.sortColumn] ?? '';
