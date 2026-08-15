@@ -14,6 +14,7 @@
       <option value="All">All Suppliers</option>
       <option *ngFor="let s of uniqueSuppliers" [value]="s">{{ s }}</option>
     </select>
+    <input [(ngModel)]="searchTerm" placeholder="Search PO No., Supplier, or BL No." style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 240px;" />
   </div>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
