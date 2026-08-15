@@ -8,7 +8,10 @@
 
   <div *ngIf="!loading && detail">
     <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Clearance — {{ detail.blAwbNo }}</h1>
-    <p style="color: #888; font-size: 13px;">{{ detail.consignee }} — {{ detail.category }} — {{ detail.fclCount }} FCL(s) — ETA: {{ detail.eta ? (detail.eta | date: 'MMM d, y') : '—' }}</p>
+    <p style="color: #888; font-size: 13px;">
+      {{ detail.consignee }} — {{ detail.category }} — {{ detail.fclCount }} FCL(s) — ETA: {{ detail.eta ? (detail.eta | date: 'MMM d, y') : '—' }}
+      <span *ngIf="deliveryOrderForm.actualArrivalDate" style="color: #1e7e34; font-weight: 600;"> — Actual Arrival: {{ deliveryOrderForm.actualArrivalDate | date: 'MMM d, y' }}</span>
+    </p>
 
     <div *ngIf="actualChargesForm.plannedCompletionDate" style="background:#f0f6fb; border-radius:6px; padding:10px 16px; margin-top:12px; font-size:13px;">
       Planned Completion Date: <strong>{{ actualChargesForm.plannedCompletionDate | date: 'MMM d, y' }}</strong>
