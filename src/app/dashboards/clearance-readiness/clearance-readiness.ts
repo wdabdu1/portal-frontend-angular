@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { exportToExcel } from '../../shared/excel-export.util';
 import { DashboardsService, ShipmentHighlight } from '../dashboards.service';
 
@@ -8,7 +7,7 @@ type Classification = 'Red' | 'Yellow' | 'Green';
 
 @Component({
   selector: 'app-clearance-readiness',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './clearance-readiness.html'
 })
 export class ClearanceReadiness implements OnInit {
