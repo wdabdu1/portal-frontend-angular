@@ -22,15 +22,34 @@ interface DivisionGroup {
   rows: ClearanceSlaSetting[];
 }
 
+// A section can span multiple underlying divisions (e.g. Common Task
+// combines General's own steps with the separate PreClearanceDo
+// division) — each row still carries its own true division for
+// save/calculation purposes; this is purely a display grouping
+// reflecting the natural end-to-end flow.
+interface SlaSection {
+  label: string;
+  divisions: string[];
+}
+
+const SECTIONS: SlaSection[] = [
+  { label: 'Pre-Clearance — Document Chain', divisions: ['PreClearanceDocs'] },
+  { label: 'Pre-Clearance — Approvals (backward from ETA)', divisions: ['PreClearanceMot', 'PreClearanceSsmo'] },
+  { label: 'Clearance — Common Task', divisions: ['ClearanceGeneral', 'PreClearanceDo'] },
+  { label: 'Clearance — Route 1: Clear at Port', divisions: ['Route1'] },
+  { label: 'Clearance — Route 2: FZ Deposit', divisions: ['Route2'] },
+  { label: 'Clearance — Route 3: Clear from FZ', divisions: ['Route3'] }
+];
+
 const DIVISION_LABELS: Record<string, string> = {
   ClearanceGeneral: 'Clearance General',
   Route1: 'Route 1 — Clear at Port',
   Route2: 'Route 2 — FZ Deposit',
   Route3: 'Route 3 — Clear from FZ',
   PreClearanceDocs: 'Pre-Clearance — Document Chain (backward from ETA / forward from ETD)',
-  PreClearanceMot: 'Pre-Clearance — MOT Approval (backward from ETA)',
-  PreClearanceSsmo: 'Pre-Clearance — SSMO Approval (backward from ETA)',
-  PreClearanceDo: 'Pre-Clearance — DO Received (forward from Vessel Arrival)'
+  PreClearanceMot: 'MOT Approval (backward from ETA)',
+  PreClearanceSsmo: 'SSMO Approval (backward from ETA)',
+  PreClearanceDo: 'DO Received (forward from Vessel Arrival)'
 };
 
 // Divisions that combine with General's total to form a route's real
