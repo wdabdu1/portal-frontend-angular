@@ -123,7 +123,7 @@ export class DemurrageAnalysis implements OnInit {
   }
   get slaDaysSubtotal(): number {
     if (!this.data) return 0;
-    return this.data.stepGaps.reduce((sum, g) => sum + g.targetDays, 0);
+    return this.data.stepGaps.reduce((sum, g) => sum + (g.targetDays ?? 0), 0);
   }
   get gapSubtotal(): number {
     return this.stepDaysSubtotal - this.slaDaysSubtotal;
