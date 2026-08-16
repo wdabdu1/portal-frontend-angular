@@ -45,9 +45,13 @@ export class ClearanceReadiness implements OnInit {
   // Cumulative lateness always wins — a shipment that's genuinely
   // drifted past its total SLA allowance needs eyes regardless of how
   // tidy its current local step looks.
+  // Already accruing today is the clearest possible signal something's
+  // wrong right now. A non-zero projection (nothing accrued yet, but
+  // heading that way at current pace) is exactly the "still
+  // recoverable, act now" case — Amber, never silently Green.
   classify(s: ShipmentHighlight): Classification {
-    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red') return 'Red';
-    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow') return 'Yellow';
+    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red' || s.currentDemurrageStorageHitSdg > 0) return 'Red';
+    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow' || s.projectedDemurrageStorageHitSdg > 0) return 'Yellow';
     return 'Green';
   }
 
