@@ -50,8 +50,8 @@ export class ClearanceReadiness implements OnInit {
   // heading that way at current pace) is exactly the "still
   // recoverable, act now" case — Amber, never silently Green.
   classify(s: ShipmentHighlight): Classification {
-    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red' || s.currentDemurrageStorageHitSdg > 0) return 'Red';
-    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow' || s.projectedDemurrageStorageHitSdg > 0) return 'Yellow';
+    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red' || s.currentDemurrageStorageHitSdg > 0 || s.insuranceAlertLevel === 'Red') return 'Red';
+    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow' || s.projectedDemurrageStorageHitSdg > 0 || s.insuranceAlertLevel === 'Yellow') return 'Yellow';
     return 'Green';
   }
 
