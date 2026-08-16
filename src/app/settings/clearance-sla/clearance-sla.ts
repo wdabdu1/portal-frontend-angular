@@ -65,7 +65,7 @@ const ROUTE_DIVISIONS = ['Route1', 'Route2', 'Route3'];
 export class ClearanceSla implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  groups: DivisionGroup[] = [];
+  sections: { label: string; groups: DivisionGroup[] }[] = [];
   loading = true;
   error = '';
   savingId: number | null = null;
@@ -90,12 +90,19 @@ export class ClearanceSla implements OnInit {
           if (!byDivision.has(row.division)) byDivision.set(row.division, []);
           byDivision.get(row.division)!.push(row);
         }
-        this.groups = Array.from(byDivision.entries()).map(([division, groupRows]) => ({
-          division,
-          label: DIVISION_LABELS[division] ?? division,
-          isRoute: ROUTE_DIVISIONS.includes(division),
-          rows: groupRows.sort((a, b) => a.sequenceOrder - b.sequenceOrder)
+
+        this.sections = SECTIONS.map((section) => ({
+          label: section.label,
+          groups: section.divisions
+            .filter((division) => byDivision.has(division))
+            .map((division) => ({
+              division,
+              label: DIVISION_LABELS[division] ?? division,
+              isRoute: ROUTE_DIVISIONS.includes(division),
+              rows: byDivision.get(division)!.sort((a, b) => a.sequenceOrder - b.sequenceOrder)
+            }))
         }));
+
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -107,6 +114,10 @@ export class ClearanceSla implements OnInit {
     });
   }
 
+  get allGroups(): DivisionGroup[] {
+    return this.sections.flatMap((s) => s.groups);
+  }
+
   // Sum for this division only.
   groupTotal(group: DivisionGroup): number {
     return group.rows.reduce((sum, r) => sum + (r.targetDays || 0), 0);
@@ -114,7 +125,7 @@ export class ClearanceSla implements OnInit {
 
   // Clearance General's own subtotal, used to add onto each route's total.
   get generalTotal(): number {
-    const general = this.groups.find((g) => g.division === 'ClearanceGeneral');
+    const general = this.allGroups.find((g) => g.division === 'ClearanceGeneral');
     return general ? this.groupTotal(general) : 0;
   }
 
