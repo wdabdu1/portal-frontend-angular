@@ -119,6 +119,13 @@
                 <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg > 0" style="color: #a66a00;">{{ s.projectedDemurrageStorageHitSdg | number: '1.0-0' }} projected</span>
                 <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg === 0" style="color: #888;">—</span>
               </td>
+              <td style="padding: 8px 6px;">
+                <span *ngIf="s.zeroChargeDeadline" [style.color]="(daysUntilDeadline(s.zeroChargeDeadline) ?? 0) < 0 ? '#c0392b' : '#333'" [style.fontWeight]="(daysUntilDeadline(s.zeroChargeDeadline) ?? 0) < 0 ? '600' : 'normal'">
+                  {{ s.zeroChargeDeadline | date: 'MMM d, y' }}
+                  <span style="font-size: 11px; color: #888;">({{ daysUntilDeadline(s.zeroChargeDeadline) }}d)</span>
+                </span>
+                <span *ngIf="!s.zeroChargeDeadline" style="color: #888;">—</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -160,6 +167,7 @@
                 <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg > 0" style="color: #888;">{{ s.projectedDemurrageStorageHitSdg | number: '1.0-0' }} projected</span>
                 <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg === 0" style="color: #888;">—</span>
               </td>
+              <td style="padding: 8px 6px; color: #888;">{{ s.zeroChargeDeadline ? (s.zeroChargeDeadline | date: 'MMM d, y') : '—' }}</td>
             </tr>
           </tbody>
         </table>
