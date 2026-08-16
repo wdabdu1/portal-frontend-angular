@@ -43,6 +43,7 @@ import { GoodsInTransitDashboard } from './dashboards/goods-in-transit-dashboard
 import { DepartmentPerformance } from './dashboards/department-performance/department-performance';
 import { DemurrageAnalysis } from './dashboards/demurrage-analysis/demurrage-analysis';
 import { SupplierDelay } from './dashboards/supplier-delay/supplier-delay';
+import { ProcessPerformance } from './dashboards/process-performance/process-performance';
 
 
 export const routes: Routes = [
@@ -93,6 +94,7 @@ export const routes: Routes = [
   { path: 'dashboards/department-performance', component: DepartmentPerformance, canActivate: [authGuard] },
   { path: 'dashboards/demurrage-analysis', component: DemurrageAnalysis, canActivate: [authGuard] },
   { path: 'dashboards/supplier-delay', component: SupplierDelay, canActivate: [authGuard] },
+  { path: 'dashboards/process-performance', component: ProcessPerformance, canActivate: [authGuard] },
 
   {
     path: 'settings/business-partners',
