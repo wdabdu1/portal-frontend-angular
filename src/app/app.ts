@@ -33,7 +33,8 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Goods in Transit', route: '/dashboards/goods-in-transit', canAccess: () => true },
       { label: 'Department Performance', route: '/dashboards/department-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') },
       { label: 'Demurrage Analysis', route: '/dashboards/demurrage-analysis', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('CorpFinance') },
-      { label: 'Supplier Delay Watch', route: '/dashboards/supplier-delay', canAccess: () => true }
+      { label: 'Supplier Delay Watch', route: '/dashboards/supplier-delay', canAccess: () => true },
+      { label: 'Process Performance', route: '/dashboards/process-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') }
     ]
   },
   {
