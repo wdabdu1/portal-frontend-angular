@@ -51,15 +51,35 @@
       </div>
 
       <div style="flex: 1; min-width: 260px; background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
-        <p style="font-size: 12px; color: #888; margin: 0 0 4px; text-transform: uppercase;">Free Zone Activity</p>
-        <p style="font-size: 13px; margin: 4px 0 10px;">Deposits: <strong>{{ data.depositCount }}</strong> &nbsp;·&nbsp; Withdrawals: <strong>{{ data.withdrawalCount }}</strong></p>
-        <div *ngFor="let fz of data.freeZoneBreakdowns" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; border-top: 1px solid #f0f0f0;">
-          <span style="font-weight: 600;">{{ fz.freeZoneName }}</span>
-          <span style="color: #555;">{{ fz.depositCount }} dep · {{ fz.withdrawalCount }} wd</span>
-          <span [style.color]="fz.daysOfInventory !== null && fz.daysOfInventory > 30 ? '#c0392b' : '#888'">
-            {{ fz.daysOfInventory !== null ? (fz.daysOfInventory | number: '1.0-0') + 'd inv.' : '—' }}
-          </span>
-        </div>
+        <p style="font-size: 12px; color: #888; margin: 0 0 8px; text-transform: uppercase;">Free Zone Activity</p>
+        <table *ngIf="data.freeZoneBreakdowns.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
+              <th style="padding: 4px 0; font-weight: 500;">FZ</th>
+              <th style="padding: 4px 0; font-weight: 500; text-align: right;">Deposits</th>
+              <th style="padding: 4px 0; font-weight: 500; text-align: right;">Withdrawals</th>
+              <th style="padding: 4px 0; font-weight: 500; text-align: right;">Inv. Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fz of data.freeZoneBreakdowns" style="border-bottom: 1px solid #f0f0f0;">
+              <td style="padding: 5px 0; font-weight: 600;">{{ fz.freeZoneName }}</td>
+              <td style="padding: 5px 0; text-align: right;">{{ fz.depositCount }}</td>
+              <td style="padding: 5px 0; text-align: right;">{{ fz.withdrawalCount }}</td>
+              <td style="padding: 5px 0; text-align: right;" [style.color]="fz.daysOfInventory !== null && fz.daysOfInventory > 30 ? '#c0392b' : '#333'">
+                {{ fz.daysOfInventory !== null ? (fz.daysOfInventory | number: '1.0-0') : '—' }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+              <td style="padding: 5px 0;">Total</td>
+              <td style="padding: 5px 0; text-align: right;">{{ fzTotalDeposits }}</td>
+              <td style="padding: 5px 0; text-align: right;">{{ fzTotalWithdrawals }}</td>
+              <td style="padding: 5px 0; text-align: right;">{{ fzAvgInventoryDays !== null ? (fzAvgInventoryDays | number: '1.0-1') : '—' }}</td>
+            </tr>
+          </tfoot>
+        </table>
         <p *ngIf="data.freeZoneBreakdowns.length === 0" style="font-size: 12px; color: #888; margin: 4px 0;">No FZ activity in this period.</p>
       </div>
 
