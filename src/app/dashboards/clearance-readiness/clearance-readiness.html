@@ -31,7 +31,7 @@
               <th style="padding: 8px 6px;">Current Step</th>
               <th style="padding: 8px 6px;">Status</th>
               <th style="padding: 8px 6px;">MOT/SSMO</th>
-              <th style="padding: 8px 6px;">Current Hit (SDG)</th>
+              <th style="padding: 8px 6px;">Current / Projected Hit (SDG)</th>
             </tr>
           </thead>
           <tbody>
@@ -55,8 +55,10 @@
                   ⚠ {{ s.motSsmoAlertMessage }}
                 </span>
               </td>
-              <td style="padding: 8px 6px; font-weight: 600;" [style.color]="s.currentDemurrageStorageHitSdg > 0 ? '#c0392b' : '#888'">
-                {{ s.currentDemurrageStorageHitSdg > 0 ? (s.currentDemurrageStorageHitSdg | number: '1.0-0') : '—' }}
+              <td style="padding: 8px 6px; font-weight: 600;">
+                <span *ngIf="s.currentDemurrageStorageHitSdg > 0" style="color: #c0392b;">{{ s.currentDemurrageStorageHitSdg | number: '1.0-0' }} now</span>
+                <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg > 0" style="color: #a66a00;">{{ s.projectedDemurrageStorageHitSdg | number: '1.0-0' }} projected</span>
+                <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg === 0" style="color: #888;">—</span>
               </td>
             </tr>
           </tbody>
@@ -83,7 +85,7 @@
               <th style="padding: 8px 6px;">Current Step</th>
               <th style="padding: 8px 6px;">Status</th>
               <th style="padding: 8px 6px;">MOT/SSMO</th>
-              <th style="padding: 8px 6px;">Current Hit (SDG)</th>
+              <th style="padding: 8px 6px;">Current / Projected Hit (SDG)</th>
             </tr>
           </thead>
           <tbody>
@@ -104,8 +106,10 @@
                   ⚠ {{ s.motSsmoAlertMessage }}
                 </span>
               </td>
-              <td style="padding: 8px 6px; font-weight: 600;" [style.color]="s.currentDemurrageStorageHitSdg > 0 ? '#c0392b' : '#888'">
-                {{ s.currentDemurrageStorageHitSdg > 0 ? (s.currentDemurrageStorageHitSdg | number: '1.0-0') : '—' }}
+              <td style="padding: 8px 6px; font-weight: 600;">
+                <span *ngIf="s.currentDemurrageStorageHitSdg > 0" style="color: #c0392b;">{{ s.currentDemurrageStorageHitSdg | number: '1.0-0' }} now</span>
+                <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg > 0" style="color: #a66a00;">{{ s.projectedDemurrageStorageHitSdg | number: '1.0-0' }} projected</span>
+                <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg === 0" style="color: #888;">—</span>
               </td>
             </tr>
           </tbody>
@@ -131,7 +135,7 @@
               <th style="padding: 8px 6px;">ETA</th>
               <th style="padding: 8px 6px;">Current Step</th>
               <th style="padding: 8px 6px;">Status</th>
-              <th style="padding: 8px 6px;">Current Hit (SDG)</th>
+              <th style="padding: 8px 6px;">Current / Projected Hit (SDG)</th>
             </tr>
           </thead>
           <tbody>
@@ -143,7 +147,11 @@
               <td style="padding: 8px 6px; color: #888;">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</td>
               <td style="padding: 8px 6px;">{{ s.currentStepName }}</td>
               <td style="padding: 8px 6px; color: #888;">{{ s.currentStepStatus }}</td>
-              <td style="padding: 8px 6px; color: #888;">{{ s.currentDemurrageStorageHitSdg > 0 ? (s.currentDemurrageStorageHitSdg | number: '1.0-0') : '—' }}</td>
+              <td style="padding: 8px 6px;">
+                <span *ngIf="s.currentDemurrageStorageHitSdg > 0" style="color: #888;">{{ s.currentDemurrageStorageHitSdg | number: '1.0-0' }} now</span>
+                <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg > 0" style="color: #888;">{{ s.projectedDemurrageStorageHitSdg | number: '1.0-0' }} projected</span>
+                <span *ngIf="s.currentDemurrageStorageHitSdg === 0 && s.projectedDemurrageStorageHitSdg === 0" style="color: #888;">—</span>
+              </td>
             </tr>
           </tbody>
         </table>
