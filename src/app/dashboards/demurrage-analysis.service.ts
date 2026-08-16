@@ -12,7 +12,7 @@ export interface TierBreakdownLine {
 export interface ClearanceStepGap {
   groupItem: string;
   actualDaysTaken: number | null;
-  targetDays: number;
+  targetDays: number | null;
   gap: number | null;
 }
 
@@ -34,6 +34,7 @@ export interface DemurrageAnalysisResult {
   holidayDays: number;
   eta: string | null;
   originalDocReceived: string | null;
+  vesselArrivalOffsetDays: number | null;
   stepGaps: ClearanceStepGap[];
   storageFreeDays: number;
   storageChargeableDays: number;
