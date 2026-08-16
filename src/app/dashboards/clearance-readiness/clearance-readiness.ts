@@ -77,6 +77,12 @@ export class ClearanceReadiness implements OnInit {
     return '#e6f4ea';
   }
 
+  daysUntilDeadline(deadline: string | null): number | null {
+    if (!deadline) return null;
+    const diffMs = new Date(deadline).getTime() - new Date().setHours(0, 0, 0, 0);
+    return Math.round(diffMs / 86400000);
+  }
+
   onExportClick(): void {
     const rows = this.allShipments.map((s) => ({
       classification: this.classify(s),
