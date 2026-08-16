@@ -47,6 +47,8 @@ export interface ShipmentHighlight {
   currentDemurrageStorageHitSdg: number;
   projectedDemurrageStorageHitSdg: number;
   zeroChargeDeadline: string | null;
+  insuranceAlertLevel: 'Yellow' | 'Red' | null;
+  daysUninsuredPastReference: number | null;
 }
 @Injectable({ providedIn: 'root' })
 export class DashboardsService {
