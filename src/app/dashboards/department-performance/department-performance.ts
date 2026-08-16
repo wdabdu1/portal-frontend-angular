@@ -88,6 +88,18 @@ export class DepartmentPerformance implements OnInit {
     this.load();
   }
 
+  get fzTotalDeposits(): number {
+    return this.data?.freeZoneBreakdowns.reduce((sum, fz) => sum + fz.depositCount, 0) ?? 0;
+  }
+  get fzTotalWithdrawals(): number {
+    return this.data?.freeZoneBreakdowns.reduce((sum, fz) => sum + fz.withdrawalCount, 0) ?? 0;
+  }
+  get fzAvgInventoryDays(): number | null {
+    const withValue = this.data?.freeZoneBreakdowns.filter((fz) => fz.daysOfInventory !== null) ?? [];
+    if (withValue.length === 0) return null;
+    return withValue.reduce((sum, fz) => sum + fz.daysOfInventory!, 0) / withValue.length;
+  }
+
   get statusBars(): { label: string; count: number; valueUsd: number; color: string }[] {
     if (!this.data) return [];
     return [
