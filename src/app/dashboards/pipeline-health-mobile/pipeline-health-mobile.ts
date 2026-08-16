@@ -31,8 +31,8 @@ export class PipelineHealthMobile implements OnInit {
   }
 
   classify(s: ShipmentHighlight): Classification {
-    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red') return 'Red';
-    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow') return 'Yellow';
+    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red' || s.currentDemurrageStorageHitSdg > 0) return 'Red';
+    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow' || s.projectedDemurrageStorageHitSdg > 0) return 'Yellow';
     return 'Green';
   }
 
