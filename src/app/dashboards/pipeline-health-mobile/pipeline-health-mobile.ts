@@ -31,11 +31,10 @@ export class PipelineHealthMobile implements OnInit {
   }
 
   classify(s: ShipmentHighlight): Classification {
-    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red' || s.currentDemurrageStorageHitSdg > 0) return 'Red';
-    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow' || s.projectedDemurrageStorageHitSdg > 0) return 'Yellow';
+    if (s.isCumulativelyLate || s.currentStepLight === 'Red' || s.motSsmoAlertLevel === 'Red' || s.currentDemurrageStorageHitSdg > 0 || s.insuranceAlertLevel === 'Red') return 'Red';
+    if (s.currentStepLight === 'Amber' || s.motSsmoAlertLevel === 'Yellow' || s.projectedDemurrageStorageHitSdg > 0 || s.insuranceAlertLevel === 'Yellow') return 'Yellow';
     return 'Green';
   }
-
   private byClassification(target: Classification): ShipmentHighlight[] {
     return this.allShipments
       .filter((s) => this.classify(s) === target)
