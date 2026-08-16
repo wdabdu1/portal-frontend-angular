@@ -75,8 +75,16 @@
       <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
         <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">General Info</p>
 
+        <div *ngIf="data.vesselArrivalOffsetDays !== null" style="font-size: 13px; margin-bottom: 10px; padding: 8px 10px; background: #f7f7f7; border-radius: 4px;">
+          Vessel Arrival:
+          <strong [style.color]="data.vesselArrivalOffsetDays! > 0 ? '#c0392b' : (data.vesselArrivalOffsetDays! < 0 ? '#1e7e34' : '#333')">
+            {{ data.vesselArrivalOffsetDays! > 0 ? (data.vesselArrivalOffsetDays | number: '1.0-1') + ' day(s) late' : (data.vesselArrivalOffsetDays! < 0 ? (-data.vesselArrivalOffsetDays! | number: '1.0-1') + ' day(s) early' : 'on time') }}
+          </strong>
+          <span style="color: #888;"> vs. ETA — a diagnostic figure only, not counted in any total below.</span>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 13px; margin-bottom: 16px;">
-          <div>ETA → Container Return: <strong>{{ data.totalCalendarDays | number: '1.0-1' }} day(s)</strong></div>
+          <div>Actual Arrival → Container Return: <strong>{{ data.totalCalendarDays | number: '1.0-1' }} day(s)</strong></div>
           <div>Weekends: <strong>{{ data.weekendDays | number: '1.0-1' }} day(s)</strong></div>
           <div>Public Holidays: <strong>{{ data.holidayDays | number: '1.0-1' }} day(s)</strong></div>
           <div *ngIf="data.eta">ETA: <strong>{{ data.eta | date: 'MMM d, y' }}</strong></div>
@@ -96,7 +104,7 @@
             <tr *ngFor="let g of data.stepGaps" style="border-bottom: 1px solid #eee;">
               <td style="padding: 6px;">{{ g.groupItem }}</td>
               <td style="padding: 6px;">{{ g.actualDaysTaken !== null ? (g.actualDaysTaken | number: '1.0-1') : '—' }}</td>
-              <td style="padding: 6px;">{{ g.targetDays | number: '1.0-1' }}</td>
+              <td style="padding: 6px;">{{ g.targetDays !== null ? (g.targetDays | number: '1.0-1') : '—' }}</td>
               <td style="padding: 6px;">
                 <span *ngIf="g.gap !== null" [style.color]="g.gap > 0 ? '#c0392b' : (g.gap < 0 ? '#1e7e34' : '#333')" style="font-weight: 600;">
                   {{ g.gap > 0 ? '+' : '' }}{{ g.gap | number: '1.0-1' }}
@@ -125,7 +133,7 @@
               <td style="padding: 6px;" colspan="2"></td>
             </tr>
             <tr style="border-top: 1px solid #ccc; font-weight: 600;">
-              <td style="padding: 6px;">Total (should equal ETA → Container Return)</td>
+              <td style="padding: 6px;">Total (should equal Actual Arrival → Container Return)</td>
               <td style="padding: 6px;">{{ grandTotalDays | number: '1.0-1' }}</td>
               <td style="padding: 6px;" colspan="2"></td>
             </tr>
