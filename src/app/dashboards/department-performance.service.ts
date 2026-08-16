@@ -10,6 +10,13 @@ export interface DemurrageHitDetail {
   magnitudePercent: number;
 }
 
+export interface FreeZoneBreakdown {
+  freeZoneName: string;
+  depositCount: number;
+  withdrawalCount: number;
+  daysOfInventory: number | null;
+}
+
 export interface DepartmentPerformanceResponse {
   orderCount: number;
   orderValueUsd: number;
@@ -24,6 +31,7 @@ export interface DepartmentPerformanceResponse {
   deliveredValueUsd: number;
   depositCount: number;
   withdrawalCount: number;
+  freeZoneBreakdowns: FreeZoneBreakdown[];
   shipmentsHitCount: number;
   totalDemurrageStorageUsd: number;
   totalShipmentValueUsd: number;
