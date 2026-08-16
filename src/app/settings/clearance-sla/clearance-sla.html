@@ -6,36 +6,40 @@
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
   <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
 
-  <div *ngFor="let group of groups" style="margin-top: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
-      <h3 style="font-size: 14px; color: #333; margin: 0;">{{ group.label }}</h3>
-      <span style="font-size: 12px; color: #666; font-weight: 600;">
-        {{ group.isRoute ? 'Total Duration' : 'Subtotal' }}: {{ (group.isRoute ? combinedRouteTotal(group) : groupTotal(group)) }} days
-      </span>
-    </div>
+  <div *ngFor="let section of sections" style="margin-top: 2.5rem;">
+    <h2 style="font-size: 16px; color: #0a3d62; margin: 0 0 4px; padding-bottom: 6px; border-bottom: 2px solid #0a3d62;">{{ section.label }}</h2>
 
-    <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px;">
-      <tbody>
-        <tr *ngFor="let s of group.rows" style="border-bottom: 1px solid #eee;">
-          <td style="padding: 6px;">{{ s.groupItem }}</td>
-          <td style="padding: 6px; width: 90px;">
-            <input
-              type="number"
-              step="0.25"
-              [(ngModel)]="s.targetDays"
-              [disabled]="!canEdit"
-              style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
-            />
-          </td>
-          <td style="padding: 6px; width: 100px;" *ngIf="canEdit">
-            <button (click)="save(s)" [disabled]="savingId === s.id" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
-              {{ savingId === s.id ? 'Saving...' : 'Save' }}
-            </button>
-            <span *ngIf="savedId === s.id" style="color: #2a7d2a; font-size: 12px; margin-left: 6px;">✓</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div *ngFor="let group of section.groups" style="margin-top: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
+        <h3 style="font-size: 14px; color: #333; margin: 0;">{{ group.label }}</h3>
+        <span style="font-size: 12px; color: #666; font-weight: 600;">
+          {{ group.isRoute ? 'Total Duration' : 'Subtotal' }}: {{ (group.isRoute ? combinedRouteTotal(group) : groupTotal(group)) }} days
+        </span>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px;">
+        <tbody>
+          <tr *ngFor="let s of group.rows" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px;">{{ s.groupItem }}</td>
+            <td style="padding: 6px; width: 90px;">
+              <input
+                type="number"
+                step="0.25"
+                [(ngModel)]="s.targetDays"
+                [disabled]="!canEdit"
+                style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
+              />
+            </td>
+            <td style="padding: 6px; width: 100px;" *ngIf="canEdit">
+              <button (click)="save(s)" [disabled]="savingId === s.id" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                {{ savingId === s.id ? 'Saving...' : 'Save' }}
+              </button>
+              <span *ngIf="savedId === s.id" style="color: #2a7d2a; font-size: 12px; margin-left: 6px;">✓</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <p *ngIf="!canEdit" style="margin-top: 1.5rem; color: #888; font-size: 13px;">
