@@ -1,0 +1,149 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Process Performance</h1>
+  <p style="color: #888; font-size: 13px;">Every step from Supplier to Container Return, with Execution Speed (that step's own pace) and Completion Date delta (how far off the final forecast, even if the step itself ran well) — positive is always better throughout.</p>
+
+  <!-- Filters -->
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center; background: #f7f7f7; padding: 12px; border-radius: 6px;">
+    <select [(ngModel)]="periodType" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Monthly">Monthly</option>
+      <option value="Quarterly">Quarterly</option>
+      <option value="Annual">Annual</option>
+    </select>
+    <select *ngIf="periodType === 'Monthly'" [(ngModel)]="selectedMonth" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+    </select>
+    <select *ngIf="periodType === 'Quarterly'" [(ngModel)]="selectedQuarter" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option *ngFor="let q of quarters" [value]="q">Q{{ q }}</option>
+    </select>
+    <select [(ngModel)]="selectedYear" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+
+    <select [(ngModel)]="businessUnitId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All BUs</option>
+      <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
+    </select>
+    <select [(ngModel)]="categoryId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Categories</option>
+      <option *ngFor="let c of categories" [ngValue]="c.id">{{ c['name'] }}</option>
+    </select>
+    <select [(ngModel)]="consigneeId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Consignees</option>
+      <option *ngFor="let c of consignees" [ngValue]="c.id">{{ c['name'] }}</option>
+    </select>
+    <select [(ngModel)]="supplierId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Suppliers</option>
+      <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s['name'] }}</option>
+    </select>
+    <select [(ngModel)]="shippingLineId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Shipping Lines</option>
+      <option *ngFor="let s of shippingLines" [ngValue]="s.id">{{ s['name'] }}</option>
+    </select>
+    <select [(ngModel)]="senderBankId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Sender Banks</option>
+      <option *ngFor="let b of senderBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+    </select>
+    <select [(ngModel)]="receiverBankId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">All Receiver Banks</option>
+      <option *ngFor="let b of receiverBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+    </select>
+  </div>
+
+  <!-- Single-shipment search -->
+  <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
+    <input [(ngModel)]="shipmentIdText" (ngModelChange)="onFilterChange()" placeholder="Shipment ID (drills into one shipment, overrides filters above)" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 320px;" />
+    <button *ngIf="shipmentIdText" (click)="clearShipmentSearch()" style="padding: 6px 12px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 13px;">Clear</button>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <ng-container *ngIf="!loading && data">
+    <p *ngIf="data.shipmentCount === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">No shipments matched.</p>
+
+    <ng-container *ngIf="data.shipmentCount > 0">
+      <div *ngIf="data.isSingleShipment" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem; font-size: 13px;">
+        <span style="color: #888;">BL/AWB No.:</span> <strong style="font-family: monospace;">{{ data.blAwbNo }}</strong> &nbsp;·&nbsp;
+        <span style="color: #888;">BU:</span> <strong>{{ data.businessUnit }}</strong> &nbsp;·&nbsp;
+        <span style="color: #888;">Consignee:</span> <strong>{{ data.consignee }}</strong>
+      </div>
+      <p *ngIf="!data.isSingleShipment" style="background: #eaf1fb; color: #0a3d62; font-size: 13px; padding: 8px 12px; border-radius: 4px; margin-top: 1rem;">
+        Averaged across {{ data.shipmentCount }} shipment(s) matching the current filters.
+      </p>
+
+      <!-- Step table -->
+      <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 6px;">Step</th>
+              <th style="padding: 6px;">Category</th>
+              <ng-container *ngIf="data.isSingleShipment">
+                <th style="padding: 6px;">Forecast Start</th>
+                <th style="padding: 6px;">Forecast End</th>
+                <th style="padding: 6px;">Actual Start</th>
+                <th style="padding: 6px;">Actual End</th>
+              </ng-container>
+              <th style="padding: 6px;">{{ data.isSingleShipment ? 'Execution Speed' : 'Avg. Execution Speed' }}</th>
+              <th style="padding: 6px;">{{ data.isSingleShipment ? 'Completion Date' : 'Avg. Completion Date' }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of data.steps" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 6px; font-weight: 600;">{{ s.stepName }}</td>
+              <td style="padding: 6px; color: #666;">{{ s.category }}</td>
+              <ng-container *ngIf="data.isSingleShipment">
+                <td style="padding: 6px; color: #888;">{{ s.forecastStart ? (s.forecastStart | date: 'MMM d') : '—' }}</td>
+                <td style="padding: 6px; color: #888;">{{ s.forecastEnd ? (s.forecastEnd | date: 'MMM d') : '—' }}</td>
+                <td style="padding: 6px;">{{ s.actualStart ? (s.actualStart | date: 'MMM d') : '—' }}</td>
+                <td style="padding: 6px;">{{ s.actualEnd ? (s.actualEnd | date: 'MMM d') : '—' }}</td>
+              </ng-container>
+              <td style="padding: 6px;">
+                <span *ngIf="s.executionSpeedDays !== null" [style.color]="lightColor(s.executionSpeedDays)" style="font-weight: 600;">
+                  {{ s.executionSpeedDays! > 0 ? '+' : '' }}{{ s.executionSpeedDays | number: '1.0-1' }}
+                </span>
+                <span *ngIf="s.executionSpeedDays === null" style="color: #ccc;">—</span>
+              </td>
+              <td style="padding: 6px;">
+                <span *ngIf="s.completionDateDeltaDays !== null" [style.color]="lightColor(s.completionDateDeltaDays)" style="font-weight: 600;">
+                  {{ s.completionDateDeltaDays! > 0 ? '+' : '' }}{{ s.completionDateDeltaDays | number: '1.0-1' }}
+                </span>
+                <span *ngIf="s.completionDateDeltaDays === null" style="color: #ccc;">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Category Rollup (group mode only) -->
+      <div *ngIf="!data.isSingleShipment && data.categoryRollups.length > 0" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Category Rollup — who's driving the pattern</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 6px;">Category</th>
+              <th style="padding: 6px;">Avg. Execution Speed</th>
+              <th style="padding: 6px;">Avg. Completion Date Delta</th>
+              <th style="padding: 6px;">Step Instances</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of data.categoryRollups" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 6px; font-weight: 600;">{{ r.category }}</td>
+              <td style="padding: 6px;">
+                <span [style.color]="lightColor(r.avgExecutionSpeedDays)" style="font-weight: 600;">
+                  {{ r.avgExecutionSpeedDays > 0 ? '+' : '' }}{{ r.avgExecutionSpeedDays | number: '1.0-1' }}
+                </span>
+              </td>
+              <td style="padding: 6px;">
+                <span [style.color]="lightColor(r.avgCompletionDateDeltaDays)" style="font-weight: 600;">
+                  {{ r.avgCompletionDateDeltaDays > 0 ? '+' : '' }}{{ r.avgCompletionDateDeltaDays | number: '1.0-1' }}
+                </span>
+              </td>
+              <td style="padding: 6px; color: #888;">{{ r.stepInstanceCount }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
