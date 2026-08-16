@@ -50,10 +50,17 @@
         </p>
       </div>
 
-      <div style="flex: 1; min-width: 220px; background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+      <div style="flex: 1; min-width: 260px; background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
         <p style="font-size: 12px; color: #888; margin: 0 0 4px; text-transform: uppercase;">Free Zone Activity</p>
-        <p style="font-size: 13px; margin: 4px 0;">Deposits: <strong>{{ data.depositCount }}</strong></p>
-        <p style="font-size: 13px; margin: 4px 0;">Withdrawals: <strong>{{ data.withdrawalCount }}</strong></p>
+        <p style="font-size: 13px; margin: 4px 0 10px;">Deposits: <strong>{{ data.depositCount }}</strong> &nbsp;·&nbsp; Withdrawals: <strong>{{ data.withdrawalCount }}</strong></p>
+        <div *ngFor="let fz of data.freeZoneBreakdowns" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; border-top: 1px solid #f0f0f0;">
+          <span style="font-weight: 600;">{{ fz.freeZoneName }}</span>
+          <span style="color: #555;">{{ fz.depositCount }} dep · {{ fz.withdrawalCount }} wd</span>
+          <span [style.color]="fz.daysOfInventory !== null && fz.daysOfInventory > 30 ? '#c0392b' : '#888'">
+            {{ fz.daysOfInventory !== null ? (fz.daysOfInventory | number: '1.0-0') + 'd inv.' : '—' }}
+          </span>
+        </div>
+        <p *ngIf="data.freeZoneBreakdowns.length === 0" style="font-size: 12px; color: #888; margin: 4px 0;">No FZ activity in this period.</p>
       </div>
 
       <div style="flex: 1; min-width: 220px; background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
