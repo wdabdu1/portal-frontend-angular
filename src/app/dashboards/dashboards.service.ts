@@ -45,6 +45,7 @@ export interface ShipmentHighlight {
   isCumulativelyLate: boolean;
   daysOverAllowance: number | null;
   currentDemurrageStorageHitSdg: number;
+  projectedDemurrageStorageHitSdg: number;
 }
 @Injectable({ providedIn: 'root' })
 export class DashboardsService {
