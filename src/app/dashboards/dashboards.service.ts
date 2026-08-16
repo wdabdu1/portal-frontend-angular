@@ -46,6 +46,7 @@ export interface ShipmentHighlight {
   daysOverAllowance: number | null;
   currentDemurrageStorageHitSdg: number;
   projectedDemurrageStorageHitSdg: number;
+  zeroChargeDeadline: string | null;
 }
 @Injectable({ providedIn: 'root' })
 export class DashboardsService {
