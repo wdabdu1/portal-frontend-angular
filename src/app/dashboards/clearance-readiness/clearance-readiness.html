@@ -52,8 +52,11 @@
                 </div>
               </td>
               <td style="padding: 8px 6px;">
-                <span *ngIf="s.motSsmoAlertLevel" [style.background]="lightBg(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px;">
+                <span *ngIf="s.motSsmoAlertLevel" [style.background]="lightBg(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; display: block; margin-bottom: 3px;">
                   ⚠ {{ s.motSsmoAlertMessage }}
+                </span>
+                <span *ngIf="s.insuranceAlertLevel" [style.background]="lightBg(s.insuranceAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.insuranceAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; display: block;">
+                  ⚠ Non-insured, {{ s.daysUninsuredPastReference }}d past SOB/ETA
                 </span>
               </td>
               <td style="padding: 8px 6px; font-weight: 600;">
@@ -110,8 +113,11 @@
                 </span>
               </td>
               <td style="padding: 8px 6px;">
-                <span *ngIf="s.motSsmoAlertLevel" [style.background]="lightBg(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px;">
+                <span *ngIf="s.motSsmoAlertLevel" [style.background]="lightBg(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.motSsmoAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; display: block; margin-bottom: 3px;">
                   ⚠ {{ s.motSsmoAlertMessage }}
+                </span>
+                <span *ngIf="s.insuranceAlertLevel" [style.background]="lightBg(s.insuranceAlertLevel === 'Red' ? 'Red' : 'Amber')" [style.color]="lightColor(s.insuranceAlertLevel === 'Red' ? 'Red' : 'Amber')" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; display: block;">
+                  ⚠ Non-insured, {{ s.daysUninsuredPastReference }}d past SOB/ETA
                 </span>
               </td>
               <td style="padding: 8px 6px; font-weight: 600;">
