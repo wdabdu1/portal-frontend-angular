@@ -515,7 +515,7 @@
                   <th style="padding:5px;">Item</th>
                   <th style="padding:5px;">HS Code</th>
                   <th style="padding:5px;">Description</th>
-                  <th style="padding:5px;">Unit Price</th>
+                  <th style="padding:5px;">CP</th>
                   <th style="padding:5px;">Total</th>
                 </tr>
               </thead>
@@ -548,6 +548,82 @@
 
         <div style="margin-top:20px; display:flex; gap:8px;">
           <button (click)="saveErpColumn(allOffshoreColumns[0].purchaseOrderOffshorePartnerId, true)" *ngIf="allOffshoreColumns.length > 0" [disabled]="saving.erpInfo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">Save & Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banking -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
+      <div (click)="toggleSection('banking')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f7f7f7; cursor: pointer;">
+        <strong style="font-size: 14px;">Banking</strong>
+        <span [style.background]="sectionStatus('banking') === 'Saved' ? '#e6f4ea' : '#f0f0f0'" [style.color]="sectionStatus('banking') === 'Saved' ? '#1e7e34' : '#888'" style="padding: 2px 10px; border-radius: 4px; font-size: 12px;">{{ sectionStatus('banking') }}</span>
+      </div>
+      <div *ngIf="expandedSection === 'banking'" style="padding: 16px;">
+        <div style="margin-bottom:10px;" (click)="$event.stopPropagation()">
+          <app-section-lock-badge entityType="Shipment" [entityId]="shipmentId" sectionKey="banking" [lockInfo]="locks['banking']" (locked)="loadLocks()" (unlocked)="loadLocks()" />
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Sender Bank</label>
+            <select [(ngModel)]="bankingForm.senderBankId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let b of senderBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">OS Doc Dispatch Date</label>
+            <input type="date" [(ngModel)]="bankingForm.osDocDispatchDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Dispatched Via</label>
+            <select [(ngModel)]="bankingForm.osDocDispatchedViaId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of couriers" [ngValue]="c.id">{{ c['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">OS Doc Tracking Number</label>
+            <input [(ngModel)]="bankingForm.osDocTrackingNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Receiving Bank</label>
+            <select [(ngModel)]="bankingForm.receivingBankId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let b of receiverBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+            </select>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
+            <input type="checkbox" [(ngModel)]="bankingForm.necessaryGoodType" id="necgood" />
+            <label for="necgood" style="font-size:13px;">Necessary Good Type</label>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Ref No.</label>
+            <input [(ngModel)]="bankingForm.collectionRefNo" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Value</label>
+            <input type="text" appThousands [(ngModel)]="bankingForm.collectionValue" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Collection Currency</label>
+            <select [(ngModel)]="bankingForm.collectionCurrencyId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Tenor</label>
+            <select [(ngModel)]="bankingForm.tenorId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['days'] }} days</option>
+            </select>
+          </div>
+        </div>
+        <p *ngIf="detail.banking?.senderBankCharges !== null && detail.banking?.senderBankCharges !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG</p>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <button (click)="saveBanking(false)" [disabled]="saving.banking || isLocked('banking')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
+          <button (click)="saveBanking(true)" [disabled]="saving.banking || isLocked('banking')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.banking ? 'Saving...' : 'Save & Next' }}</button>
+          <button (click)="goToNext('banking')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
         </div>
       </div>
     </div>
