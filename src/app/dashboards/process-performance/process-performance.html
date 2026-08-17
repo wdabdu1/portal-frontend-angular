@@ -4,55 +4,70 @@
 
   <!-- Filters -->
   <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center; background: #f7f7f7; padding: 12px; border-radius: 6px;">
-    <select [(ngModel)]="periodType" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="periodType" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option value="Monthly">Monthly</option>
       <option value="Quarterly">Quarterly</option>
       <option value="Annual">Annual</option>
     </select>
-    <select *ngIf="periodType === 'Monthly'" [(ngModel)]="selectedMonth" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select *ngIf="periodType === 'Monthly'" [(ngModel)]="selectedMonth" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
     </select>
-    <select *ngIf="periodType === 'Quarterly'" [(ngModel)]="selectedQuarter" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select *ngIf="periodType === 'Quarterly'" [(ngModel)]="selectedQuarter" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option *ngFor="let q of quarters" [value]="q">Q{{ q }}</option>
     </select>
-    <select [(ngModel)]="selectedYear" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="selectedYear" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option *ngFor="let y of years" [value]="y">{{ y }}</option>
     </select>
 
-    <select [(ngModel)]="businessUnitId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="businessUnitId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All BUs</option>
       <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
     </select>
-    <select [(ngModel)]="categoryId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="categoryId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Categories</option>
       <option *ngFor="let c of categories" [ngValue]="c.id">{{ c['name'] }}</option>
     </select>
-    <select [(ngModel)]="consigneeId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="consigneeId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Consignees</option>
       <option *ngFor="let c of consignees" [ngValue]="c.id">{{ c['name'] }}</option>
     </select>
-    <select [(ngModel)]="supplierId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="supplierId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Suppliers</option>
       <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s['name'] }}</option>
     </select>
-    <select [(ngModel)]="shippingLineId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="shippingLineId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Shipping Lines</option>
       <option *ngFor="let s of shippingLines" [ngValue]="s.id">{{ s['name'] }}</option>
     </select>
-    <select [(ngModel)]="senderBankId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="senderBankId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Sender Banks</option>
       <option *ngFor="let b of senderBanks" [ngValue]="b.id">{{ b['name'] }}</option>
     </select>
-    <select [(ngModel)]="receiverBankId" (ngModelChange)="onFilterChange()" [disabled]="!!shipmentIdText" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    <select [(ngModel)]="receiverBankId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Receiver Banks</option>
       <option *ngFor="let b of receiverBanks" [ngValue]="b.id">{{ b['name'] }}</option>
     </select>
   </div>
 
   <!-- Single-shipment search -->
-  <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
-    <input [(ngModel)]="shipmentIdText" (ngModelChange)="onFilterChange()" placeholder="Shipment ID (drills into one shipment, overrides filters above)" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 320px;" />
-    <button *ngIf="shipmentIdText" (click)="clearShipmentSearch()" style="padding: 6px 12px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 13px;">Clear</button>
+  <div style="position: relative; margin-top: 10px; max-width: 420px;">
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchInput()"
+        (focus)="searchResults.length > 0 && (showSearchResults = true)"
+        placeholder="Search by BL/AWB No., Supplier, or Consignee (drills into one shipment)"
+        style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 320px; flex: 1;"
+      />
+      <button *ngIf="selectedShipmentId" (click)="clearShipmentSearch()" style="padding: 6px 12px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 13px; white-space: nowrap;">Clear</button>
+    </div>
+
+    <div *ngIf="showSearchResults && searchResults.length > 0" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; margin-top: 2px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 10; max-height: 260px; overflow-y: auto;">
+      <div *ngFor="let r of searchResults" (click)="selectSearchResult(r)" style="padding: 8px 10px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f0f0f0;">
+        <span style="font-family: monospace; font-weight: 600; color: #0a3d62;">{{ r.blAwbNo }}</span>
+        <span style="color: #888;"> — {{ r.supplier }} → {{ r.consignee }}</span>
+      </div>
+    </div>
   </div>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
@@ -61,10 +76,16 @@
     <p *ngIf="data.shipmentCount === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">No shipments matched.</p>
 
     <ng-container *ngIf="data.shipmentCount > 0">
-      <div *ngIf="data.isSingleShipment" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem; font-size: 13px;">
-        <span style="color: #888;">BL/AWB No.:</span> <strong style="font-family: monospace;">{{ data.blAwbNo }}</strong> &nbsp;·&nbsp;
-        <span style="color: #888;">BU:</span> <strong>{{ data.businessUnit }}</strong> &nbsp;·&nbsp;
-        <span style="color: #888;">Consignee:</span> <strong>{{ data.consignee }}</strong>
+      <div *ngIf="data.isSingleShipment" style="background: #eaf1fb; border: 1px solid #cddcf0; border-radius: 8px; padding: 16px; margin-top: 1rem; font-size: 13px;">
+        <p style="margin: 0 0 8px; font-size: 12px; color: #0a3d62; text-transform: uppercase;">Confirm this is the right shipment</p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+          <div><span style="color: #888;">BL/AWB No.:</span> <strong style="font-family: monospace;">{{ data.blAwbNo }}</strong></div>
+          <div><span style="color: #888;">BU:</span> <strong>{{ data.businessUnit }}</strong></div>
+          <div><span style="color: #888;">Consignee:</span> <strong>{{ data.consignee }}</strong></div>
+          <div><span style="color: #888;">Supplier:</span> <strong>{{ data.supplier || '—' }}</strong></div>
+          <div><span style="color: #888;">SOB:</span> <strong>{{ data.sobActualDate ? (data.sobActualDate | date: 'MMM d, y') : '—' }}</strong></div>
+          <div><span style="color: #888;">Actual Arrival:</span> <strong>{{ data.actualArrivalDate ? (data.actualArrivalDate | date: 'MMM d, y') : '—' }}</strong></div>
+        </div>
       </div>
       <p *ngIf="!data.isSingleShipment" style="background: #eaf1fb; color: #0a3d62; font-size: 13px; padding: 8px 12px; border-radius: 4px; margin-top: 1rem;">
         Averaged across {{ data.shipmentCount }} shipment(s) matching the current filters.
