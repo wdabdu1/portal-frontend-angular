@@ -1,0 +1,49 @@
+<div style="max-width: 700px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">TP — Default Markups</h1>
+  <p style="color: #888; font-size: 13px;">
+    Sets the markup % and currency that pre-fill automatically the first time each offshore company appears on the Transfer Pricing screen.
+    These are just a starting point — the TP screen's own saved value always wins once someone has entered or edited a figure for a specific shipment.
+  </p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">Offshore Company</th>
+        <th style="padding: 8px 6px; width: 140px;">Default Markup %</th>
+        <th style="padding: 8px 6px; width: 140px;">Default Currency</th>
+        <th style="padding: 8px 6px; width: 100px;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of rows" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px 6px; font-weight: 600;">{{ row.businessPartnerName }}</td>
+        <td style="padding: 8px 6px;">
+          <input
+            type="number"
+            step="0.01"
+            [(ngModel)]="row.defaultMarkupPercent"
+            style="width: 90px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
+          />
+        </td>
+        <td style="padding: 8px 6px;">
+          <select [(ngModel)]="row.defaultCurrencyId" style="width: 110px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] || c['name'] }}</option>
+          </select>
+        </td>
+        <td style="padding: 8px 6px;">
+          <button (click)="save(row)" [disabled]="savingId === row.businessPartnerId" style="padding: 4px 12px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            {{ savingId === row.businessPartnerId ? 'Saving...' : 'Save' }}
+          </button>
+          <span *ngIf="savedId === row.businessPartnerId" style="color: #2a7d2a; font-size: 12px; margin-left: 6px;">✓</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No offshore companies found. Mark a Business Partner as "Offshore Entity" in Settings to have it appear here.
+  </p>
+</div>
