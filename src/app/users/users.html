@@ -8,6 +8,7 @@
   <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 8px 6px;">Username</th>
         <th style="padding: 8px 6px;">Email</th>
         <th style="padding: 8px 6px;">Display Name</th>
         <th style="padding: 8px 6px;">Role</th>
@@ -18,6 +19,18 @@
     </thead>
     <tbody>
       <tr *ngFor="let u of users" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px 6px;">
+          <span *ngIf="editingUsernameId !== u.id" style="display: flex; align-items: center; gap: 6px;">
+            {{ u.username }}
+            <button (click)="startEditUsername(u)" style="padding: 1px 6px; font-size: 11px; background: transparent; color: #0a3d62; border: 1px solid #0a3d62; border-radius: 3px; cursor: pointer;">Edit</button>
+          </span>
+          <span *ngIf="editingUsernameId === u.id">
+            <input [(ngModel)]="usernameDraft" style="width: 130px; padding: 3px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" />
+            <button (click)="saveUsername(u)" style="padding: 2px 8px; font-size: 11px; background: #0a3d62; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 4px;">Save</button>
+            <button (click)="cancelEditUsername()" style="padding: 2px 8px; font-size: 11px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; margin-left: 2px;">✕</button>
+            <div *ngIf="usernameError" style="color: #c0392b; font-size: 11px; margin-top: 2px;">{{ usernameError }}</div>
+          </span>
+        </td>
         <td style="padding: 8px 6px;">{{ u.email }}</td>
         <td style="padding: 8px 6px;">{{ u.displayName }}</td>
         <td style="padding: 8px 6px;">{{ u.role }}</td>
