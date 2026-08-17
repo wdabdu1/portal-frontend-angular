@@ -69,7 +69,8 @@ export class SettingsMenu {
         { label: 'Sender Banks', path: '/settings/sender-banks' },
         { label: 'Receiver Banks', path: '/settings/receiver-banks' },
         { label: 'SPC Storage Tiers', path: '/settings/spc-storage-tiers' },
-        { label: 'ACD Cost Settings', path: '/settings/acd-cost-settings' }
+        { label: 'ACD Cost Settings', path: '/settings/acd-cost-settings' },
+        { label: 'TP — Default Markups', path: '/settings/offshore-markup-defaults' }
       ]
     }
   ];
