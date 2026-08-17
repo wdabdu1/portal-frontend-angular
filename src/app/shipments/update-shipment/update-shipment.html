@@ -618,6 +618,13 @@
               <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['days'] }} days</option>
             </select>
           </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Add. CBOS Allowance</label>
+            <select [(ngModel)]="bankingForm.addCbosAllowanceId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['days'] }} days</option>
+            </select>
+          </div>
         </div>
         <p *ngIf="detail.banking?.senderBankCharges !== null && detail.banking?.senderBankCharges !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG</p>
         <div style="margin-top:16px; display:flex; gap:8px;">
