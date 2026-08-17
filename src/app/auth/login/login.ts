@@ -12,7 +12,7 @@ import { AuthService } from '../auth.service';
 export class Login {
   private cdr = inject(ChangeDetectorRef);
 
-  email = '';
+  username = '';
   password = '';
   error = '';
   loading = false;
@@ -22,16 +22,15 @@ export class Login {
   submit(): void {
     this.error = '';
     this.loading = true;
-    this.auth.login(this.email, this.password).subscribe({
+    this.auth.login(this.username, this.password).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/']);
       },
       error: () => {
         this.loading = false;
-        this.error = 'Invalid email or password.';
+        this.error = 'Invalid username or password.';
         this.cdr.markForCheck();
       }
     });
   }
-}
