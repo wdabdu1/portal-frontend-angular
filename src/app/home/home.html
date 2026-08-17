@@ -1,0 +1,163 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 22px; font-weight: 500; margin: 0;">Home</h1>
+    <span style="color: #888; font-size: 13px;">{{ today | date: 'EEEE, MMM d, y' }}</span>
+  </div>
+  <p style="color: #888; font-size: 13px;">Everything landing within 2 days of today, either way.</p>
+
+  <div *ngIf="data && data.redAlertCount > 0" (click)="goToPipelineHealth()" style="background: #fdeaea; border: 1px solid #f3c6c6; border-radius: 6px; padding: 12px 16px; margin-top: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+    <span style="color: #c0392b; font-weight: 600; font-size: 14px;">⚠ {{ data.redAlertCount }} shipment(s) need attention in Pipeline Health</span>
+    <span style="color: #c0392b; font-size: 13px;">View →</span>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+  <ng-container *ngIf="!loading && data">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; margin-top: 1.5rem;">
+
+      <!-- Recently Added POs -->
+      <div *ngIf="data.showPos" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Recently Added POs ({{ data.recentPos.length }})</p>
+        <table *ngIf="data.recentPos.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>PO No.</th><th>Supplier</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.recentPos" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
+              <td style="font-family: monospace; color: #0a3d62;">{{ r.poNumber }}</td>
+              <td>{{ r.supplier }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.recentPos.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+      <!-- Recently Added Shipments -->
+      <div *ngIf="data.showShipments" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Recently Added Shipments ({{ data.recentShipments.length }})</p>
+        <table *ngIf="data.recentShipments.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>Consignee</th><th>Cat</th><th>BL No.</th><th>PO No.</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.recentShipments" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
+              <td>{{ r.consignee }}</td>
+              <td>{{ r.category }}</td>
+              <td style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</td>
+              <td>{{ r.extra1 }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.recentShipments.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+      <!-- Arrived / Arriving Shipments -->
+      <div *ngIf="data.showArrivals" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Arrived / Arriving Shipments ({{ data.arrivedArrivingShipments.length }})</p>
+        <table *ngIf="data.arrivedArrivingShipments.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>Consignee</th><th>Cat</th><th>BL No.</th><th>Shipping Line</th><th>ETA/Arrival</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.arrivedArrivingShipments" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
+              <td>{{ r.consignee }}</td>
+              <td>{{ r.category }}</td>
+              <td style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</td>
+              <td>{{ r.extra1 }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }} <span style="font-size: 10px; color: #888;">{{ r.isActual ? '(actual)' : '(ETA)' }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.arrivedArrivingShipments.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+      <!-- Cleared / About to Clear -->
+      <div *ngIf="data.showClearance" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Cleared / About to Clear ({{ data.clearedAboutToClear.length }})</p>
+        <table *ngIf="data.clearedAboutToClear.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>Consignee</th><th>Cat</th><th>BL No.</th><th>Route</th><th>Complete</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.clearedAboutToClear" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
+              <td>{{ r.consignee }}</td>
+              <td>{{ r.category }}</td>
+              <td style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</td>
+              <td>{{ r.extra1 }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }} <span style="font-size: 10px; color: #888;">{{ r.isActual ? '(actual)' : '(projected)' }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.clearedAboutToClear.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+      <!-- Recently Deposited to FZ -->
+      <div *ngIf="data.showFz" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Recently Deposited to FZ ({{ data.recentlyDeposited.length }})</p>
+        <table *ngIf="data.recentlyDeposited.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>Consignee</th><th>Cat</th><th>BL No.</th><th>FZ</th><th>Deposit Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.recentlyDeposited" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
+              <td>{{ r.consignee }}</td>
+              <td>{{ r.category }}</td>
+              <td style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</td>
+              <td>{{ r.extra1 }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.recentlyDeposited.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+      <!-- Withdrawn / About to Withdraw -->
+      <div *ngIf="data.showFz" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Withdrawn / About to Withdraw ({{ data.withdrawnAboutToWithdraw.length }})</p>
+        <table *ngIf="data.withdrawnAboutToWithdraw.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>Consignee</th><th>Deposit BL No.</th><th>FZ</th><th>Withdrawal Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.withdrawnAboutToWithdraw" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
+              <td>{{ r.consignee }}</td>
+              <td style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</td>
+              <td>{{ r.extra1 }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.withdrawnAboutToWithdraw.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+      <!-- Allocated Trucks -->
+      <div *ngIf="data.showTrucks" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Allocated Trucks ({{ data.allocatedTrucks.length }})</p>
+        <table *ngIf="data.allocatedTrucks.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">Truck No.</th><th>Driver</th><th>Load Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.allocatedTrucks" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0; font-family: monospace; color: #0a3d62;">{{ r.truckNo }}</td>
+              <td>{{ r.extra1 }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.allocatedTrucks.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+      <!-- Arrived / Arriving Trucks -->
+      <div *ngIf="data.showTrucks" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Arrived / Arriving Trucks ({{ data.arrivedArrivingTrucks.length }})</p>
+        <table *ngIf="data.arrivedArrivingTrucks.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">Truck No.</th><th>Destination</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let r of data.arrivedArrivingTrucks" style="border-bottom: 1px solid #f5f5f5;">
+              <td style="padding: 5px 0; font-family: monospace; color: #0a3d62;">{{ r.truckNo }}</td>
+              <td>{{ r.extra1 }}</td>
+              <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }} <span style="font-size: 10px; color: #888;">{{ r.isActual ? '(actual)' : '(expected)' }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="data.arrivedArrivingTrucks.length === 0" style="color: #bbb; font-size: 12px;">Nothing in this window.</p>
+      </div>
+
+    </div>
+  </ng-container>
+</div>
