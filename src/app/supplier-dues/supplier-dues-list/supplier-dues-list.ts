@@ -25,7 +25,8 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'supplierInvoiceNo', label: 'Sup. Invoice No.' },
   { key: 'blAwbNo', label: 'AWB/BL' },
   { key: 'sob', label: 'SOB' },
-  { key: 'paymentTerm', label: 'Payment Term' },
+  { key: 'nextPaymentDate', label: 'Next Payment Date' },
+  { key: 'nextPaymentValueUsd', label: 'Next Payment $' },
   { key: 'invoiceValue', label: 'Invoice Value' },
   { key: 'invoiceCurrency', label: 'Currency' },
   { key: 'totalValueUsd', label: 'Total Value $' },
@@ -44,7 +45,10 @@ export class SupplierDuesList implements OnInit {
   loading = true;
   error = '';
   searchText = '';
-  sortColumn: SortColumn = 'supplierName';
+  // Nearest payment first by default — sorting by date ascending with
+  // nulls (no schedule entered) pushed to the end matches how the
+  // backend itself orders the list.
+  sortColumn: SortColumn = 'nextPaymentDate';
   sortAsc = true;
 
   currencies: LookupEntity[] = [];
