@@ -10,11 +10,12 @@ export interface SupplierDueRow {
   supplierInvoiceNo: string | null;
   blAwbNo: string;
   sob: string | null;
-  paymentTerm: string;
   invoiceValue: number;
   invoiceCurrency: string;
   totalValueUsd: number;
   totalUnpaidUsd: number;
+  nextPaymentDate: string | null;
+  nextPaymentValueUsd: number | null;
 }
 
 export interface SupplierInvoiceSummary {
