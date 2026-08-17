@@ -33,7 +33,7 @@ export class UpdateShipment implements OnInit {
   receiverBanks: LookupEntity[] = [];
   tenors: LookupEntity[] = [];
 
-  sectionOrder: SectionKey[] = ['orderExecution', 'shipOnBoard', 'forwarder', 'acd', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'paymentDue', 'banking', 'erpInfo', 'lastOffshore'];
+  sectionOrder: SectionKey[] = ['orderExecution', 'shipOnBoard', 'acd', 'forwarder', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'paymentDue', 'erpInfo', 'banking', 'lastOffshore'];
   expandedSection: SectionKey | null = 'shipOnBoard';
   saving: Record<SectionKey, boolean> = {
     orderExecution: false, shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, paymentDue: false, banking: false, erpInfo: false, lastOffshore: false
