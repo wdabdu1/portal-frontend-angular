@@ -26,8 +26,18 @@ export interface ProcessPerformanceResult {
   blAwbNo: string | null;
   businessUnit: string | null;
   consignee: string | null;
+  supplier: string | null;
+  sobActualDate: string | null;
+  actualArrivalDate: string | null;
   steps: ProcessStepDetail[];
   categoryRollups: CategoryRollup[];
+}
+
+export interface ShipmentSearchResult {
+  shipmentId: number;
+  blAwbNo: string;
+  supplier: string;
+  consignee: string;
 }
 
 export interface ProcessPerformanceFilters {
@@ -46,6 +56,10 @@ export interface ProcessPerformanceFilters {
 @Injectable({ providedIn: 'root' })
 export class ProcessPerformanceService {
   constructor(private http: HttpClient) {}
+
+  searchShipments(term: string) {
+    return this.http.get<ShipmentSearchResult[]>(`${API_URL}/dashboards/process-performance/search-shipments?term=${encodeURIComponent(term)}`);
+  }
 
   get(filters: ProcessPerformanceFilters) {
     const parts: string[] = [];
