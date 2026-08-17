@@ -56,6 +56,8 @@
           <span *ngSwitchCase="'invoiceValue'">{{ r.invoiceValue | number: '1.2-2' }}</span>
           <span *ngSwitchCase="'totalValueUsd'">{{ r.totalValueUsd | number: '1.2-2' }}</span>
           <span *ngSwitchCase="'totalUnpaidUsd'" style="font-weight: 600; color: #c0392b;">{{ r.totalUnpaidUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'nextPaymentDate'">{{ r.nextPaymentDate ? (r.nextPaymentDate | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'nextPaymentValueUsd'" style="font-weight: 600;">{{ r.nextPaymentValueUsd !== null ? (r.nextPaymentValueUsd | number: '1.2-2') : '—' }}</span>
           <span *ngSwitchDefault>{{ r[col.key] }}</span>
         </td>
       </tr>
