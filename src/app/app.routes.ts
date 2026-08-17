@@ -23,6 +23,7 @@ import { FxRates } from './settings/fx-rates/fx-rates';
 import { ClearanceList } from './clearance/clearance-list/clearance-list';
 import { ClearanceDetailComponent } from './clearance/clearance-detail/clearance-detail';
 import { ClearanceSla } from './settings/clearance-sla/clearance-sla';
+import { OffshoreMarkupDefaults } from './settings/offshore-markup-defaults/offshore-markup-defaults';
 import { Home } from './home/home';
 import { FzInventoryList } from './fz-inventory/fz-inventory-list/fz-inventory-list';
 import { WithdrawalDetailComponent } from './withdrawal/withdrawal-detail/withdrawal-detail';
@@ -72,6 +73,7 @@ export const routes: Routes = [
   { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard] },
   { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard] },
+  { path: 'settings/offshore-markup-defaults', component: OffshoreMarkupDefaults, canActivate: [authGuard] },
   { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard] },
   { path: 'users', component: Users, canActivate: [authGuard] },
   { path: 'fz-inventory', component: FzInventoryList, canActivate: [authGuard] },
