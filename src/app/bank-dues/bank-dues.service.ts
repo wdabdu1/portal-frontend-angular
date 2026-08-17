@@ -6,12 +6,16 @@ export interface BankDueRow {
   shipmentId: number;
   businessUnit: string;
   consignee: string;
+  category: string;
   receiverBank: string | null;
   blAwbNo: string;
   sob: string | null;
+  blAwbDate: string | null;
+  necessaryGoodType: boolean;
   lastOffshoreInvoiceNo: string | null;
   tenorDays: number | null;
   dueDate: string | null;
+  cbosDueDate: string | null;
   imFormNo: string | null;
   imFormDate: string | null;
   value: number | null;
