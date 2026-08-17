@@ -23,6 +23,7 @@ export interface BuAccessInput {
 }
 
 export interface CreateUserRequest {
+  username: string;
   email: string;
   displayName: string;
   password: string;
