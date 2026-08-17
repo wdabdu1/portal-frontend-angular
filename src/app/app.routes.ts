@@ -23,7 +23,7 @@ import { FxRates } from './settings/fx-rates/fx-rates';
 import { ClearanceList } from './clearance/clearance-list/clearance-list';
 import { ClearanceDetailComponent } from './clearance/clearance-detail/clearance-detail';
 import { ClearanceSla } from './settings/clearance-sla/clearance-sla';
-import { HomeRedirect } from './home-redirect';
+import { Home } from './home/home';
 import { FzInventoryList } from './fz-inventory/fz-inventory-list/fz-inventory-list';
 import { WithdrawalDetailComponent } from './withdrawal/withdrawal-detail/withdrawal-detail';
 import { LogisticsList } from './logistics/logistics-list/logistics-list';
