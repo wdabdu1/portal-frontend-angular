@@ -25,9 +25,7 @@ export class Login {
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
         this.loading = false;
-        // Land on Orders for roles that can see it; everyone else falls
-        // back to Clearance, since every role has at least View there.
-        this.router.navigate([this.auth.canSeeOrders() ? '/orders' : '/clearance']);
+        this.router.navigate(['/']);
       },
       error: () => {
         this.loading = false;
