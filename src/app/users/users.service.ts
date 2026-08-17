@@ -10,6 +10,7 @@ export interface BuAccessRow {
 
 export interface UserSummary {
   id: string;
+  username: string;
   email: string;
   displayName: string;
   role: string;
@@ -45,6 +46,10 @@ export class UsersService {
 
   updateRoles(id: string, role: string, businessUnits: BuAccessInput[]) {
     return this.http.put(`${API_URL}/users/${id}/roles`, { role, businessUnits });
+  }
+
+  updateUsername(id: string, username: string) {
+    return this.http.put(`${API_URL}/users/${id}/username`, { username });
   }
 
   deactivate(id: string) {
