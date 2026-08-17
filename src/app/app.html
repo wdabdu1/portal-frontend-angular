@@ -5,7 +5,7 @@
 <div *ngIf="auth.isLoggedIn() && !isBareRoute" style="font-family: sans-serif;">
   <!-- Top bar -->
   <div style="padding: 10px 20px; background: #0a3d62; color: white; display: flex; justify-content: space-between; align-items: center;">
-    <strong>CTC Group Supply Chain Portal</strong>
+    <strong routerLink="/" style="cursor: pointer;">CTC Group Supply Chain Portal</strong>
     <div style="display: flex; align-items: center; gap: 12px; font-size: 13px;">
       <span>{{ auth.getDisplayName() }}</span>
       <button
@@ -19,6 +19,12 @@
 
   <!-- Menu bar -->
   <div style="padding: 8px 20px; background: #f7f7f7; border-bottom: 1px solid #ddd; display: flex; gap: 4px; position: relative; z-index: 30;">
+    <button
+      routerLink="/"
+      style="padding: 8px 16px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px;"
+    >
+      Home
+    </button>
     <div *ngFor="let group of menuGroups" style="position: relative;">
       <button
         (click)="toggleMenu(group.label, $event)"
