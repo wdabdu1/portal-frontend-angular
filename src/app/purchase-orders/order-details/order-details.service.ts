@@ -35,6 +35,9 @@ export interface PurchaseOrderDetail {
   totalOrderValueUsd: number | null;
   lineItems: PoLineItemDetail[];
   offshorePartners: PoOffshorePartnerDetail[];
+  advancePaymentPercent: number | null;
+  advancePaymentPlannedDate: string | null;
+  advancePaymentExecutedDate: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -43,5 +46,9 @@ export class OrderDetailsService {
 
   get(id: number) {
     return this.http.get<PurchaseOrderDetail>(`${API_URL}/orders/${id}/details`);
+  }
+
+  saveAdvancePayment(id: number, req: { advancePaymentPercent: number | null; advancePaymentPlannedDate: string | null; advancePaymentExecutedDate: string | null }) {
+    return this.http.put(`${API_URL}/purchase-orders/${id}/advance-payment`, req);
   }
 }
