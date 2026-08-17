@@ -33,6 +33,7 @@ export class Users implements OnInit {
   }
 
   showAddForm = false;
+  newUsername = '';
   newEmail = '';
   newDisplayName = '';
   newPassword = '';
@@ -60,6 +61,7 @@ export class Users implements OnInit {
   toggleAddForm(): void {
     this.showAddForm = !this.showAddForm;
     if (this.showAddForm) {
+      this.newUsername = '';
       this.newEmail = '';
       this.newDisplayName = '';
       this.newPassword = '';
@@ -81,7 +83,7 @@ export class Users implements OnInit {
   }
 
   createUser(): void {
-    if (!this.newEmail || !this.newDisplayName || !this.newPassword) return;
+    if (!this.newUsername || !this.newEmail || !this.newDisplayName || !this.newPassword) return;
 
     const businessUnits: BuAccessInput[] = this.newBuRows
       .filter((r) => r.businessUnitId !== null)
@@ -89,7 +91,7 @@ export class Users implements OnInit {
 
     this.creating = true;
     this.service.create({
-      email: this.newEmail, displayName: this.newDisplayName, password: this.newPassword,
+      username: this.newUsername, email: this.newEmail, displayName: this.newDisplayName, password: this.newPassword,
       role: this.newRole, businessUnitAccess: businessUnits
     }).subscribe({
       next: () => {
