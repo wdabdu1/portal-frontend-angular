@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
-import { ProcessPerformanceResult, ProcessPerformanceService } from '../process-performance.service';
+import { ProcessPerformanceResult, ProcessPerformanceService, ShipmentSearchResult } from '../process-performance.service';
 
 type PeriodType = 'Monthly' | 'Quarterly' | 'Annual';
 
@@ -46,7 +48,14 @@ export class ProcessPerformance implements OnInit {
   senderBankId: number | null = null;
   receiverBankId: number | null = null;
 
-  shipmentIdText = '';
+  // Selected shipment drives the actual query; searchTerm is just what's
+  // typed in the box, decoupled so a selection doesn't get wiped out by
+  // the input's own two-way binding.
+  selectedShipmentId: number | null = null;
+  searchTerm = '';
+  searchResults: ShipmentSearchResult[] = [];
+  showSearchResults = false;
+  private searchTerm$ = new Subject<string>();
 
   constructor(private service: ProcessPerformanceService, private lookups: SettingsLookupService) {}
 
@@ -58,6 +67,27 @@ export class ProcessPerformance implements OnInit {
     this.lookups.getAll<LookupEntity>('shipping-lines').subscribe({ next: (r) => { this.shippingLines = r; this.cdr.markForCheck(); } });
     this.lookups.getAll<LookupEntity>('sender-banks').subscribe({ next: (r) => { this.senderBanks = r; this.cdr.markForCheck(); } });
     this.lookups.getAll<LookupEntity>('receiver-banks').subscribe({ next: (r) => { this.receiverBanks = r; this.cdr.markForCheck(); } });
+
+    this.searchTerm$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((term) => term.trim().length >= 3 ? this.service.searchShipments(term.trim()) : [])
+    ).subscribe({
+      next: (results) => { this.searchResults = results; this.showSearchResults = true; this.cdr.markForCheck(); }
+    });
+
+    this.load();
+  }
+
+  onSearchInput(): void {
+    this.selectedShipmentId = null;
+    this.searchTerm$.next(this.searchTerm);
+  }
+
+  selectSearchResult(result: ShipmentSearchResult): void {
+    this.selectedShipmentId = result.shipmentId;
+    this.searchTerm = result.blAwbNo;
+    this.showSearchResults = false;
     this.load();
   }
 
@@ -84,7 +114,7 @@ export class ProcessPerformance implements OnInit {
 
   load(): void {
     this.loading = true;
-    const shipmentIdNum = this.shipmentIdText.trim() ? Number(this.shipmentIdText.trim()) : undefined;
+    const shipmentIdNum = this.selectedShipmentId ?? undefined;
     const range = shipmentIdNum ? { from: undefined, to: undefined } : this.computeRange();
 
     this.service.get({
@@ -108,7 +138,9 @@ export class ProcessPerformance implements OnInit {
   }
 
   clearShipmentSearch(): void {
-    this.shipmentIdText = '';
+    this.selectedShipmentId = null;
+    this.searchTerm = '';
+    this.searchResults = [];
     this.load();
   }
 
