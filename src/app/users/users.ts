@@ -110,6 +110,28 @@ export class Users implements OnInit {
     });
   }
 
+  editingUsernameId: string | null = null;
+  usernameDraft = '';
+  usernameError = '';
+
+  startEditUsername(user: UserSummary): void {
+    this.editingUsernameId = user.id;
+    this.usernameDraft = user.username;
+    this.usernameError = '';
+  }
+
+  cancelEditUsername(): void {
+    this.editingUsernameId = null;
+  }
+
+  saveUsername(user: UserSummary): void {
+    this.usernameError = '';
+    this.service.updateUsername(user.id, this.usernameDraft).subscribe({
+      next: () => { this.editingUsernameId = null; this.load(); },
+      error: (err) => { this.usernameError = err?.error?.message ?? 'Could not update username.'; this.cdr.markForCheck(); }
+    });
+  }
+
   deactivate(user: UserSummary): void {
     this.service.deactivate(user.id).subscribe({
       next: () => this.load(),
