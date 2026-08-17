@@ -46,10 +46,14 @@
         <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
           <span *ngSwitchCase="'receiverBank'">{{ r.receiverBank || '—' }}</span>
           <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ r.blAwbNo }}</span>
+          <span *ngSwitchCase="'category'">{{ r.category || '—' }}</span>
+          <span *ngSwitchCase="'blAwbDate'" style="color: #888;">{{ r.blAwbDate ? (r.blAwbDate | date: 'MMM d, y') : '—' }}</span>
           <span *ngSwitchCase="'sob'" style="color: #888;">{{ r.sob ? (r.sob | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'necessaryGoodType'" [style.color]="r.necessaryGoodType ? '#1e7e34' : '#888'" style="font-weight: 600;">{{ r.necessaryGoodType ? 'Yes' : 'No' }}</span>
           <span *ngSwitchCase="'lastOffshoreInvoiceNo'">{{ r.lastOffshoreInvoiceNo || '—' }}</span>
           <span *ngSwitchCase="'tenorDays'">{{ r.tenorDays ? (r.tenorDays + ' days') : '—' }}</span>
           <span *ngSwitchCase="'dueDate'" style="color: #888;">{{ r.dueDate ? (r.dueDate | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'cbosDueDate'" style="color: #888;">{{ r.cbosDueDate ? (r.cbosDueDate | date: 'MMM d, y') : '—' }}</span>
           <span *ngSwitchCase="'imFormNo'">{{ r.imFormNo || '—' }}</span>
           <span *ngSwitchCase="'imFormDate'" style="color: #888;">{{ r.imFormDate ? (r.imFormDate | date: 'MMM d, y') : '—' }}</span>
           <span *ngSwitchCase="'value'">{{ r.value | number: '1.2-2' }}</span>
