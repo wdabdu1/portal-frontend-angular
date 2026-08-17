@@ -47,7 +47,7 @@ import { ProcessPerformance } from './dashboards/process-performance/process-per
 
 
 export const routes: Routes = [
-  { path: '', component: HomeRedirect, canActivate: [authGuard], pathMatch: 'full' },
+  { path: '', component: Home, canActivate: [authGuard], pathMatch: 'full' },
   { path: 'login', component: Login },
 
   {
