@@ -19,12 +19,13 @@
       <div *ngIf="data.showPos" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
         <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Recently Added POs ({{ data.recentPos.length }})</p>
         <table *ngIf="data.recentPos.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
-          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>PO No.</th><th>Supplier</th><th>Date</th></tr></thead>
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>PO No.</th><th>Supplier</th><th>Cat</th><th>Date</th></tr></thead>
           <tbody>
             <tr *ngFor="let r of data.recentPos" style="border-bottom: 1px solid #f5f5f5;">
               <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
               <td style="font-family: monospace; color: #0a3d62;">{{ r.poNumber }}</td>
               <td>{{ r.supplier }}</td>
+              <td>{{ r.category }}</td>
               <td [style.color]="dateColor(r.targetDate)" style="font-weight: 600;">{{ r.targetDate | date: 'MMM d' }}</td>
             </tr>
           </tbody>
@@ -74,11 +75,10 @@
       <div *ngIf="data.showClearance" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
         <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Cleared / About to Clear ({{ data.clearedAboutToClear.length }})</p>
         <table *ngIf="data.clearedAboutToClear.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
-          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">BU</th><th>Consignee</th><th>Cat</th><th>BL No.</th><th>Route</th><th>Complete</th></tr></thead>
+          <thead><tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;"><th style="padding: 4px 0;">Consignee</th><th>Cat</th><th>BL No.</th><th>Route</th><th>Complete</th></tr></thead>
           <tbody>
             <tr *ngFor="let r of data.clearedAboutToClear" style="border-bottom: 1px solid #f5f5f5;">
-              <td style="padding: 5px 0;">{{ r.businessUnit }}</td>
-              <td>{{ r.consignee }}</td>
+              <td style="padding: 5px 0;">{{ r.consignee }}</td>
               <td>{{ r.category }}</td>
               <td style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</td>
               <td>{{ r.extra1 }}</td>
