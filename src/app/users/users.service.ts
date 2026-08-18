@@ -59,4 +59,16 @@ export class UsersService {
   reactivate(id: string) {
     return this.http.post(`${API_URL}/users/${id}/reactivate`, {});
   }
+
+  updateDisplayName(id: string, displayName: string) {
+    return this.http.put(`${API_URL}/users/${id}/display-name`, { displayName });
+  }
+
+  revokeSessions(id: string) {
+    return this.http.post(`${API_URL}/users/${id}/revoke-sessions`, {});
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${API_URL}/users/${id}`);
+  }
 }
