@@ -1,4 +1,4 @@
-<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <a routerLink="/orders" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back</a>
   <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">User Management</h1>
 
@@ -12,26 +12,15 @@
         <th style="padding: 8px 6px;">Email</th>
         <th style="padding: 8px 6px;">Display Name</th>
         <th style="padding: 8px 6px;">Role</th>
-        <th style="padding: 8px 6px;">Business Units</th>
+        <th style="padding: 8px 6px; min-width: 280px;">Business Units</th>
         <th style="padding: 8px 6px;">Status</th>
-        <th style="padding: 8px 6px;"></th>
+        <th style="padding: 8px 6px; text-align: right;">Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let u of users" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 8px 6px;">
-          <span *ngIf="editingUsernameId !== u.id" style="display: flex; align-items: center; gap: 6px;">
-            {{ u.username }}
-            <button (click)="startEditUsername(u)" style="padding: 1px 6px; font-size: 11px; background: transparent; color: #0a3d62; border: 1px solid #0a3d62; border-radius: 3px; cursor: pointer;">Edit</button>
-          </span>
-          <span *ngIf="editingUsernameId === u.id">
-            <input [(ngModel)]="usernameDraft" style="width: 130px; padding: 3px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" />
-            <button (click)="saveUsername(u)" style="padding: 2px 8px; font-size: 11px; background: #0a3d62; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 4px;">Save</button>
-            <button (click)="cancelEditUsername()" style="padding: 2px 8px; font-size: 11px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; margin-left: 2px;">✕</button>
-            <div *ngIf="usernameError" style="color: #c0392b; font-size: 11px; margin-top: 2px;">{{ usernameError }}</div>
-          </span>
-        </td>
-        <td style="padding: 8px 6px;">{{ u.email }}</td>
+        <td style="padding: 8px 6px; font-weight: 600;">{{ u.username }}</td>
+        <td style="padding: 8px 6px; color: #666;">{{ u.email }}</td>
         <td style="padding: 8px 6px;">{{ u.displayName }}</td>
         <td style="padding: 8px 6px;">{{ u.role }}</td>
         <td style="padding: 8px 6px; font-size: 12px; color: #666;">
@@ -41,12 +30,21 @@
         <td style="padding: 8px 6px;">
           <span [style.color]="u.isActive ? '#1e7e34' : '#c0392b'">{{ u.isActive ? 'Active' : 'Deactivated' }}</span>
         </td>
-        <td style="padding: 8px 6px;">
-          <button *ngIf="u.isActive" (click)="deactivate(u)" style="padding: 4px 10px; font-size: 12px; background: #fff4e5; color: #a66a00; border: none; border-radius: 4px; cursor: pointer;">
+        <td style="padding: 8px 6px; text-align: right; white-space: nowrap;">
+          <button (click)="startEdit(u)" style="padding: 4px 10px; font-size: 12px; background: transparent; color: #0a3d62; border: 1px solid #0a3d62; border-radius: 4px; cursor: pointer; margin-left: 4px;">
+            Edit
+          </button>
+          <button *ngIf="u.isActive" (click)="deactivate(u)" style="padding: 4px 10px; font-size: 12px; background: #fff4e5; color: #a66a00; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">
             Deactivate
           </button>
-          <button *ngIf="!u.isActive" (click)="reactivate(u)" style="padding: 4px 10px; font-size: 12px; background: #e6f4ea; color: #1e7e34; border: none; border-radius: 4px; cursor: pointer;">
+          <button *ngIf="!u.isActive" (click)="reactivate(u)" style="padding: 4px 10px; font-size: 12px; background: #e6f4ea; color: #1e7e34; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">
             Reactivate
+          </button>
+          <button (click)="revokeSessions(u)" [disabled]="revokingId === u.id" style="padding: 4px 10px; font-size: 12px; background: #eaf1fb; color: #0a3d62; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">
+            {{ revokingId === u.id ? '...' : (revokedId === u.id ? 'Revoked ✓' : 'Revoke') }}
+          </button>
+          <button (click)="startDelete(u)" style="padding: 4px 10px; font-size: 12px; background: #fdeaea; color: #c0392b; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">
+            Delete
           </button>
         </td>
       </tr>
@@ -109,6 +107,86 @@
       <button (click)="createUser()" [disabled]="creating || !newUsername || !newEmail || !newDisplayName || !newPassword" style="margin-top: 16px; padding: 8px 18px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
         {{ creating ? 'Creating...' : 'Create User' }}
       </button>
+    </div>
+  </div>
+
+  <!-- Edit modal -->
+  <div *ngIf="editingUser" style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100;">
+    <div style="background: white; border-radius: 8px; padding: 24px; width: 520px; max-width: 90vw; max-height: 85vh; overflow-y: auto;">
+      <h3 style="font-size: 16px; margin: 0 0 16px;">Edit {{ editingUser.username }}</h3>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Username</label>
+          <input type="text" [(ngModel)]="editForm.username" style="width:100%; padding:6px; box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Display Name</label>
+          <input [(ngModel)]="editForm.displayName" style="width:100%; padding:6px; box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Role</label>
+          <select [(ngModel)]="editForm.role" style="width:100%; padding:6px;">
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Status</label>
+          <select [(ngModel)]="editForm.isActive" style="width:100%; padding:6px;">
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Deactivated</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <label style="display:block; font-size:12px; color:#555; margin-bottom: 6px;">
+          Business Unit Access
+          <span *ngIf="editRoleIsBuScoped" style="color:#c0392b;">(required for this role)</span>
+          <span *ngIf="!editRoleIsBuScoped" style="color:#999;">(not needed — sees all BUs regardless)</span>
+        </label>
+        <div *ngFor="let row of editForm.buRows; let i = index" style="display: flex; gap: 8px; margin-bottom: 6px; align-items: center;">
+          <select [(ngModel)]="row.businessUnitId" style="padding: 6px;">
+            <option [ngValue]="null">-- select BU --</option>
+            <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
+          </select>
+          <select [(ngModel)]="row.accessLevel" style="padding: 6px;">
+            <option value="Read">Read</option>
+            <option value="ReadWrite">Read/Write</option>
+          </select>
+          <button (click)="removeEditBuRow(i)" style="color:#c0392b; background:none; border:none; cursor:pointer; font-size:12px;">Remove</button>
+        </div>
+        <button (click)="addEditBuRow()" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">
+          + Add BU
+        </button>
+      </div>
+
+      <p *ngIf="editError" style="color: #c0392b; font-size: 12px; margin-top: 12px;">{{ editError }}</p>
+
+      <div style="margin-top: 20px; display: flex; gap: 8px; justify-content: flex-end;">
+        <button (click)="cancelEdit()" style="padding: 7px 16px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Cancel</button>
+        <button (click)="saveEdit()" [disabled]="savingEdit" style="padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          {{ savingEdit ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div *ngIf="deletingUser" style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100;">
+    <div style="background: white; border-radius: 8px; padding: 24px; width: 420px; max-width: 90vw;">
+      <h3 style="font-size: 16px; margin: 0 0 8px; color: #c0392b;">Delete {{ deletingUser.username }}?</h3>
+      <p style="font-size: 13px; color: #555; margin: 0 0 12px;">
+        This is permanent and cannot be undone. Type <strong>{{ deletingUser.username }}</strong> below to confirm.
+      </p>
+      <input [(ngModel)]="deleteConfirmText" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" />
+      <p *ngIf="deleteError" style="color: #c0392b; font-size: 12px; margin-top: 10px;">{{ deleteError }}</p>
+      <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+        <button (click)="cancelDelete()" style="padding: 7px 16px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Cancel</button>
+        <button (click)="confirmDelete()" [disabled]="deleteConfirmText !== deletingUser.username" style="padding: 7px 16px; background: #c0392b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Delete Permanently
+        </button>
+      </div>
     </div>
   </div>
 </div>
