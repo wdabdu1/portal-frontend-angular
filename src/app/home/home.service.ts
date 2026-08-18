@@ -6,6 +6,7 @@ export interface HomePoRow {
   businessUnit: string;
   poNumber: string;
   supplier: string;
+  category: string;
   targetDate: string;
 }
 
