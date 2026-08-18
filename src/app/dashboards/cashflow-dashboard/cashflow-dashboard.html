@@ -20,6 +20,19 @@
     <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555;">
       <input type="checkbox" [(ngModel)]="customsNextWeekOnly" /> Next Week only
     </label>
+    <select [(ngModel)]="customsStatusFilter" (ngModelChange)="onCustomsStatusFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Unpaid">Unpaid</option>
+      <option value="Paid">Paid</option>
+      <option value="All">All</option>
+    </select>
+    <button
+      *ngIf="customsSelectedIds.size > 0"
+      (click)="markSelectedCustomsPaid()"
+      [disabled]="markingPaid"
+      style="padding: 6px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+    >
+      {{ markingPaid ? 'Marking...' : 'Mark ' + customsSelectedIds.size + ' Selected as Paid' }}
+    </button>
   </div>
 
   <p *ngIf="loadingCustoms" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
@@ -28,6 +41,9 @@
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th style="padding: 8px 6px; width: 30px;">
+            <input type="checkbox" [checked]="customsRows.length > 0 && customsSelectedIds.size === customsRows.length" (change)="toggleCustomsSelectAll()" />
+          </th>
           <th
             *ngFor="let col of customsColumns; let i = index"
             draggable="true"
@@ -46,6 +62,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let r of customsRows" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">
+            <input type="checkbox" [checked]="customsSelectedIds.has(r.id)" (change)="toggleCustomsSelection(r.id)" />
+          </td>
           <td style="padding: 6px;">{{ r.businessUnit }}</td>
           <td style="padding: 6px;">{{ r.chargeType }}</td>
           <td style="padding: 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
@@ -55,7 +74,7 @@
       </tbody>
       <tfoot *ngIf="customsRows.length > 0">
         <tr style="font-weight: 600; border-top: 2px solid #ccc;">
-          <td colspan="4" style="padding: 6px; text-align: right;">Total (SDG):</td>
+          <td colspan="5" style="padding: 6px; text-align: right;">Total (SDG):</td>
           <td style="padding: 6px;">{{ customsTotalSdg | number: '1.2-2' }}</td>
         </tr>
       </tfoot>
