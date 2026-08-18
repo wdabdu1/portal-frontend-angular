@@ -88,6 +88,9 @@ export class CashflowDashboard implements OnInit {
   customsBuFilter = 'All';
   customsChargeTypeFilter = 'All';
   customsNextWeekOnly = false;
+  customsStatusFilter: 'Unpaid' | 'Paid' | 'All' = 'Unpaid';
+  customsSelectedIds = new Set<number>();
+  markingPaid = false;
 
   bankBuFilter = 'All';
   bankBankFilter = 'All';
@@ -104,10 +107,7 @@ export class CashflowDashboard implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cashflowService.getCustomsClearancePayments().subscribe({
-      next: (r) => { this.allCustomsRows = r; this.loadingCustoms = false; this.cdr.markForCheck(); },
-      error: () => { this.loadingCustoms = false; this.cdr.markForCheck(); }
-    });
+    this.loadCustomsRows();
     this.bankDuesService.getOpen().subscribe({
       next: (r) => { this.allBankRows = r; this.loadingBank = false; this.cdr.markForCheck(); },
       error: () => { this.loadingBank = false; this.cdr.markForCheck(); }
@@ -122,6 +122,41 @@ export class CashflowDashboard implements OnInit {
     this.tablePrefs.getColumnOrder('cashflow-supplier').subscribe({ next: (o) => { if (o && o.length > 0) this.supplierColumns = this.applyOrder(SUPPLIER_COLUMNS, o); } });
   }
 
+loadCustomsRows(): void {
+    this.loadingCustoms = true;
+    this.customsSelectedIds.clear();
+    this.cashflowService.getCustomsClearancePayments(this.customsStatusFilter).subscribe({
+      next: (r) => { this.allCustomsRows = r; this.loadingCustoms = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingCustoms = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  onCustomsStatusFilterChange(): void {
+    this.loadCustomsRows();
+  }
+
+  toggleCustomsSelection(id: number): void {
+    if (this.customsSelectedIds.has(id)) this.customsSelectedIds.delete(id);
+    else this.customsSelectedIds.add(id);
+  }
+
+  toggleCustomsSelectAll(): void {
+    if (this.customsSelectedIds.size === this.customsRows.length) {
+      this.customsSelectedIds.clear();
+    } else {
+      this.customsRows.forEach((r) => this.customsSelectedIds.add(r.id));
+    }
+  }
+
+  markSelectedCustomsPaid(): void {
+    if (this.customsSelectedIds.size === 0) return;
+    this.markingPaid = true;
+    this.cashflowService.markCustomsClearancePaymentsPaid([...this.customsSelectedIds]).subscribe({
+      next: () => { this.markingPaid = false; this.loadCustomsRows(); },
+      error: () => { this.markingPaid = false; this.cdr.markForCheck(); }
+    });
+  }
+  
   private applyOrder(defaults: ColumnDef[], savedOrder: string[]): ColumnDef[] {
     const byKey = new Map(defaults.map((c) => [c.key, c]));
     const ordered: ColumnDef[] = [];
