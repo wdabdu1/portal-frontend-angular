@@ -3,11 +3,14 @@ import { Injectable } from '@angular/core';
 import { API_URL } from '../api-config';
 
 export interface CustomsClearancePaymentRow {
+  id: number;
   businessUnit: string;
   chargeType: string;
   valueSdg: number;
   dueDate: string | null;
   blAwbNo: string;
+  isPaid: boolean;
+  paidDate: string | null;
 }
 
 export interface SupplierPaymentRow {
@@ -23,8 +26,12 @@ export interface SupplierPaymentRow {
 export class CashflowService {
   constructor(private http: HttpClient) {}
 
-  getCustomsClearancePayments() {
-    return this.http.get<CustomsClearancePaymentRow[]>(`${API_URL}/dashboards/customs-clearance-payments`);
+  getCustomsClearancePayments(status: 'Paid' | 'Unpaid' | 'All' = 'Unpaid') {
+    return this.http.get<CustomsClearancePaymentRow[]>(`${API_URL}/dashboards/customs-clearance-payments?status=${status}`);
+  }
+
+  markCustomsClearancePaymentsPaid(lineItemIds: number[]) {
+    return this.http.post(`${API_URL}/dashboards/customs-clearance-payments/mark-paid`, { lineItemIds });
   }
 
   getSupplierPayments() {
