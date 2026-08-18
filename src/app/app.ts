@@ -25,16 +25,16 @@ const MENU_GROUPS: MenuGroup[] = [
     label: 'Dashboard',
     items: [
       { label: 'Shipment Pipeline Health', route: '/dashboards/clearance-readiness', canAccess: (a) => a.canSeeShipments() },
-      { label: 'Cashflow', route: '/dashboards/cashflow', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Treasury') || a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IpSupervisor') },
+      { label: 'Cashflow', route: '/dashboards/cashflow', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Treasury') || a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IP_Supervisor') },
       { label: 'PO Dashboard', route: '/dashboards/purchase-orders', canAccess: (a) => a.canSeeOrders() },
       { label: 'Free Zones', route: '/dashboards/fz', canAccess: () => true },
       { label: 'Shipment Dashboard', route: '/dashboards/shipments', canAccess: (a) => a.canSeeShipments() },
       { label: 'Under Clearance', route: '/dashboards/under-clearance', canAccess: () => true },
       { label: 'Goods in Transit', route: '/dashboards/goods-in-transit', canAccess: () => true },
-      { label: 'Department Performance', route: '/dashboards/department-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IpSupervisor') },
-      { label: 'Demurrage Analysis', route: '/dashboards/demurrage-analysis', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('CorpFinance') || a.hasRole('IpSupervisor') },
+      { label: 'Department Performance', route: '/dashboards/department-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IP_Supervisor') },
+      { label: 'Demurrage Analysis', route: '/dashboards/demurrage-analysis', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('CorpFinance') || a.hasRole('IP_Supervisor') },
       { label: 'Supplier Delay Watch', route: '/dashboards/supplier-delay', canAccess: () => true },
-      { label: 'Process Performance', route: '/dashboards/process-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IpSupervisor') }
+      { label: 'Process Performance', route: '/dashboards/process-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IP_Supervisor') }
     ]
   },
   {
