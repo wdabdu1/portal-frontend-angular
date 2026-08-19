@@ -18,7 +18,35 @@ export class DataMigration {
   settingsConfirming = false; // true = showing the "are you sure" warning, not yet submitted
   settingsDone = false;       // true = a file was successfully uploaded; locked until a new file is chosen
 
+  exportingSettings = false;
+  exportError = '';
+
   constructor(private service: DataMigrationService) {}
+
+  exportSettings(): void {
+    this.exportingSettings = true;
+    this.exportError = '';
+    this.service.exportSettings().subscribe({
+      next: (response) => {
+        this.exportingSettings = false;
+        const blob = response.body!;
+        // Filename comes from the server's own timestamped Content-Disposition
+        // header — falls back to a generic name only if that's ever missing.
+        const disposition = response.headers.get('content-disposition') ?? '';
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        const fileName = match ? match[1] : 'CTC_Portal_Settings_Backup.xlsx';
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.cdr.markForCheck();
+      },
+      error: () => { this.exportingSettings = false; this.exportError = 'Export failed.'; this.cdr.markForCheck(); }
+    });
+  }
 
   onSettingsFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
