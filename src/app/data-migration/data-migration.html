@@ -5,6 +5,22 @@
     SuperUser-only tools for bulk-loading existing data into the portal. Use the Settings template first — most records here reference each other by name, so Settings should exist before Data is uploaded.
   </p>
 
+  <!-- Backup / Export -->
+  <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 20px;">
+    <h3 style="font-size: 15px; margin: 0 0 6px;">Backup / Export</h3>
+    <p style="color: #888; font-size: 12px; margin: 0 0 14px;">
+      Downloads all current Settings as an Excel file, in the exact same shape as the Settings Upload Template — including the exact date and time in the filename, so multiple backups stay clearly distinguishable. Genuinely round-trippable: this file can be re-uploaded as-is at any time.
+    </p>
+    <button
+      (click)="exportSettings()"
+      [disabled]="exportingSettings"
+      style="padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+    >
+      {{ exportingSettings ? 'Preparing download...' : 'Download Settings Backup' }}
+    </button>
+    <p *ngIf="exportError" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ exportError }}</p>
+  </div>
+
   <!-- Settings Upload -->
   <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 20px;">
     <h3 style="font-size: 15px; margin: 0 0 6px;">Settings Upload</h3>
@@ -75,9 +91,6 @@
   <!-- Placeholders for the remaining tools, built next -->
   <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1.5rem; padding: 20px; opacity: 0.5;">
     <h3 style="font-size: 15px; margin: 0;">Data Upload — coming next</h3>
-  </div>
-  <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1rem; padding: 20px; opacity: 0.5;">
-    <h3 style="font-size: 15px; margin: 0;">Backup / Export — coming next</h3>
   </div>
   <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1rem; padding: 20px; opacity: 0.5;">
     <h3 style="font-size: 15px; margin: 0;">Complete Delete — coming next</h3>
