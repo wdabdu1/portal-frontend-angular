@@ -26,4 +26,8 @@ export class DataMigrationService {
   exportSettings() {
     return this.http.get(`${API_URL}/data-migration/settings-export`, { responseType: 'blob', observe: 'response' });
   }
+
+  completeDelete(confirmationPhrase: string) {
+    return this.http.post<{ message: string; tables: string[] }>(`${API_URL}/data-migration/complete-delete`, { confirmationPhrase });
+  }
 }
