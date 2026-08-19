@@ -1,0 +1,67 @@
+<div style="max-width: 1000px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/users" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to User Management</a>
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Data Migration</h1>
+  <p style="color: #888; font-size: 13px;">
+    SuperUser-only tools for bulk-loading existing data into the portal. Use the Settings template first — most records here reference each other by name, so Settings should exist before Data is uploaded.
+  </p>
+
+  <!-- Settings Upload -->
+  <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 20px;">
+    <h3 style="font-size: 15px; margin: 0 0 6px;">Settings Upload</h3>
+    <p style="color: #888; font-size: 12px; margin: 0 0 14px;">
+      Upload the "Settings Upload Template" workbook. Every sheet is processed — existing records (matched by name/code) are updated, new ones are created. Nothing is ever deleted by this action.
+    </p>
+
+    <input type="file" accept=".xlsx" (change)="onSettingsFileSelected($event)" style="font-size: 13px;" />
+    <button
+      (click)="uploadSettings()"
+      [disabled]="!settingsFile || uploadingSettings"
+      style="margin-left: 10px; padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+    >
+      {{ uploadingSettings ? 'Uploading...' : 'Upload' }}
+    </button>
+
+    <p *ngIf="settingsError" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ settingsError }}</p>
+
+    <div *ngIf="settingsSummary" style="margin-top: 16px;">
+      <p style="font-size: 13px; font-weight: 600;">
+        {{ totalCreated(settingsSummary) }} created, {{ totalUpdated(settingsSummary) }} updated
+        <span *ngIf="totalErrors(settingsSummary) > 0" style="color: #c0392b;"> — {{ totalErrors(settingsSummary) }} row(s) had errors, see below</span>
+      </p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
+            <th style="padding: 6px 4px;">Sheet</th>
+            <th style="padding: 6px 4px;">Created</th>
+            <th style="padding: 6px 4px;">Updated</th>
+            <th style="padding: 6px 4px;">Errors</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of settingsSummary.results" style="border-bottom: 1px solid #f5f5f5;">
+            <td style="padding: 5px 4px; font-weight: 600;">{{ r.sheet }}</td>
+            <td style="padding: 5px 4px; color: #1e7e34;">{{ r.created }}</td>
+            <td style="padding: 5px 4px; color: #0a3d62;">{{ r.updated }}</td>
+            <td style="padding: 5px 4px;">
+              <span *ngIf="r.errors.length === 0" style="color: #ccc;">—</span>
+              <ul *ngIf="r.errors.length > 0" style="margin: 0; padding-left: 16px; color: #c0392b;">
+                <li *ngFor="let e of r.errors">{{ e }}</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Placeholders for the remaining tools, built next -->
+  <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1.5rem; padding: 20px; opacity: 0.5;">
+    <h3 style="font-size: 15px; margin: 0;">Data Upload — coming next</h3>
+  </div>
+  <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1rem; padding: 20px; opacity: 0.5;">
+    <h3 style="font-size: 15px; margin: 0;">Backup / Export — coming next</h3>
+  </div>
+  <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1rem; padding: 20px; opacity: 0.5;">
+    <h3 style="font-size: 15px; margin: 0;">Complete Delete — coming next</h3>
+  </div>
+</div>
