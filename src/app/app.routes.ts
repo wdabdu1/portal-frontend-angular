@@ -4,6 +4,7 @@ import { Login } from './auth/login/login';
 import { ShippingLines } from './settings/shipping-lines/shipping-lines';
 import { ShipmentDetails } from './shipments/shipment-details/shipment-details';
 import { Users } from './users/users';
+import { DataMigration } from './data-migration/data-migration';
 import { Profile } from './profile/profile';
 import { OrderDetails } from './purchase-orders/order-details/order-details';
 import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
@@ -76,6 +77,7 @@ export const routes: Routes = [
   { path: 'settings/offshore-markup-defaults', component: OffshoreMarkupDefaults, canActivate: [authGuard] },
   { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard] },
   { path: 'users', component: Users, canActivate: [authGuard] },
+  { path: 'data-migration', component: DataMigration, canActivate: [authGuard] },
   { path: 'fz-inventory', component: FzInventoryList, canActivate: [authGuard] },
   { path: 'withdrawals/:id', component: WithdrawalDetailComponent, canActivate: [authGuard] },
   { path: 'logistics', component: LogisticsList, canActivate: [authGuard] },
