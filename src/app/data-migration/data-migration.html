@@ -92,7 +92,36 @@
   <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1.5rem; padding: 20px; opacity: 0.5;">
     <h3 style="font-size: 15px; margin: 0;">Data Upload — coming next</h3>
   </div>
-  <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1rem; padding: 20px; opacity: 0.5;">
-    <h3 style="font-size: 15px; margin: 0;">Complete Delete — coming next</h3>
+
+  <!-- Complete Delete — deliberately the most visually alarming section on this page -->
+  <div style="border: 2px solid #c0392b; border-radius: 6px; margin-top: 1.5rem; padding: 20px; background: #fff5f5;">
+    <h3 style="font-size: 15px; margin: 0 0 6px; color: #c0392b;">⚠ Complete Delete</h3>
+    <p style="color: #6d1f1f; font-size: 12px; margin: 0 0 14px;">
+      Permanently wipes <strong>everything</strong> — every Settings table and every piece of operational data (Purchase Orders, Shipments, Clearance, payments, all of it). This cannot be undone.
+      Only your login and user accounts are protected. Before using this, make sure you have a real backup — the Settings Backup above only covers Settings, not operational data; for full protection use the Database Backup feature in Settings.
+    </p>
+
+    <label style="font-size: 12px; color: #6d1f1f; display: block; margin-bottom: 6px;">
+      Type <strong>DELETE EVERYTHING</strong> exactly to confirm:
+    </label>
+    <input
+      [(ngModel)]="deleteConfirmText"
+      style="width: 260px; padding: 7px; border: 1px solid #c0392b; border-radius: 4px; font-size: 13px;"
+      placeholder="DELETE EVERYTHING"
+    />
+    <button
+      (click)="confirmCompleteDelete()"
+      [disabled]="!deleteConfirmMatches || deletingAll"
+      style="margin-left: 10px; padding: 7px 16px; background: #c0392b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+    >
+      {{ deletingAll ? 'Deleting...' : 'Delete Everything' }}
+    </button>
+
+    <p *ngIf="deleteError" style="color: #c0392b; font-size: 13px; margin-top: 12px; font-weight: 600;">{{ deleteError }}</p>
+
+    <div *ngIf="deleteResult" style="margin-top: 14px; padding: 12px; background: #e6f4ea; border-radius: 4px;">
+      <p style="color: #1e7e34; font-size: 13px; font-weight: 600; margin: 0;">✓ {{ deleteResult.message }}</p>
+      <p style="color: #1e7e34; font-size: 11px; margin: 6px 0 0;">{{ deleteResult.tables.length }} tables cleared.</p>
+    </div>
   </div>
 </div>
