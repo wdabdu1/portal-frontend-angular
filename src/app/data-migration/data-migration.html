@@ -46,6 +46,8 @@
         {{ totalCreated(settingsSummary) }} created, {{ totalUpdated(settingsSummary) }} updated
         <span *ngIf="totalErrors(settingsSummary) > 0" style="color: #c0392b;"> — {{ totalErrors(settingsSummary) }} row(s) had errors, see below</span>
       </p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px;">
+        <thead>
           <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
             <th style="padding: 6px 4px;">Sheet</th>
             <th style="padding: 6px 4px;">Created</th>
