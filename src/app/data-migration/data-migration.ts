@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { DataMigrationService, UploadSummary } from './data-migration.service';
 
 @Component({
   selector: 'app-data-migration',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './data-migration.html'
 })
 export class DataMigration {
