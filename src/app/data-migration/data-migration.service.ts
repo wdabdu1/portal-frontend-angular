@@ -22,4 +22,8 @@ export class DataMigrationService {
     form.append('file', file);
     return this.http.post<UploadSummary>(`${API_URL}/data-migration/settings-upload`, form);
   }
+
+  exportSettings() {
+    return this.http.get(`${API_URL}/data-migration/settings-export`, { responseType: 'blob', observe: 'response' });
+  }
 }
