@@ -14,22 +14,38 @@
 
     <input type="file" accept=".xlsx" (change)="onSettingsFileSelected($event)" style="font-size: 13px;" />
     <button
-      (click)="uploadSettings()"
-      [disabled]="!settingsFile || uploadingSettings"
+      (click)="startSettingsUpload()"
+      [disabled]="!settingsFile || uploadingSettings || settingsDone"
       style="margin-left: 10px; padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
     >
       {{ uploadingSettings ? 'Uploading...' : 'Upload' }}
     </button>
 
+    <!-- Pre-action warning — nothing is submitted until explicitly confirmed here -->
+    <div *ngIf="settingsConfirming" style="margin-top: 14px; padding: 14px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px;">
+      <p style="font-size: 13px; margin: 0 0 10px; color: #6d5300;">
+        This will create new Settings records and <strong>update any existing ones matched by name or code</strong> with whatever is in this file.
+        Nothing is deleted. Are you sure you want to continue?
+      </p>
+      <button (click)="confirmSettingsUpload()" style="padding: 6px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 8px;">
+        Yes, Upload
+      </button>
+      <button (click)="cancelSettingsUpload()" style="padding: 6px 14px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        Cancel
+      </button>
+    </div>
+
     <p *ngIf="settingsError" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ settingsError }}</p>
+
+    <p *ngIf="settingsDone && settingsSummary" style="color: #1e7e34; font-size: 13px; margin-top: 14px; font-weight: 600;">
+      ✓ Upload successful. Choose a new file to upload again.
+    </p>
 
     <div *ngIf="settingsSummary" style="margin-top: 16px;">
       <p style="font-size: 13px; font-weight: 600;">
         {{ totalCreated(settingsSummary) }} created, {{ totalUpdated(settingsSummary) }} updated
         <span *ngIf="totalErrors(settingsSummary) > 0" style="color: #c0392b;"> — {{ totalErrors(settingsSummary) }} row(s) had errors, see below</span>
       </p>
-      <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px;">
-        <thead>
           <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
             <th style="padding: 6px 4px;">Sheet</th>
             <th style="padding: 6px 4px;">Created</th>
