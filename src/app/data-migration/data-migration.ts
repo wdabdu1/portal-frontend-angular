@@ -92,4 +92,31 @@ export class DataMigration {
   totalErrors(summary: UploadSummary): number {
     return summary.results.reduce((sum, r) => sum + r.errors.length, 0);
   }
+
+  // --- Complete Delete — the most destructive action here, so it gets
+  // the strictest safeguard: typing the exact phrase, not just a click.
+  deleteConfirmText = '';
+  deletingAll = false;
+  deleteResult: { message: string; tables: string[] } | null = null;
+  deleteError = '';
+
+  get deleteConfirmMatches(): boolean {
+    return this.deleteConfirmText === 'DELETE EVERYTHING';
+  }
+
+  confirmCompleteDelete(): void {
+    if (!this.deleteConfirmMatches) return;
+    this.deletingAll = true;
+    this.deleteResult = null;
+    this.deleteError = '';
+    this.service.completeDelete(this.deleteConfirmText).subscribe({
+      next: (r) => {
+        this.deletingAll = false;
+        this.deleteResult = r;
+        this.deleteConfirmText = ''; // reset — a fresh confirmation is required for any future use
+        this.cdr.markForCheck();
+      },
+      error: (err) => { this.deletingAll = false; this.deleteError = err?.error?.message ?? 'Delete failed.'; this.cdr.markForCheck(); }
+    });
+  }
 }
