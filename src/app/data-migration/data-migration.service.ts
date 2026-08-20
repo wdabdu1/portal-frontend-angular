@@ -23,8 +23,18 @@ export class DataMigrationService {
     return this.http.post<UploadSummary>(`${API_URL}/data-migration/settings-upload`, form);
   }
 
-  exportSettings() {
+    exportSettings() {
     return this.http.get(`${API_URL}/data-migration/settings-export`, { responseType: 'blob', observe: 'response' });
+  }
+
+  uploadData(file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<UploadSummary>(`${API_URL}/data-migration/data-upload`, form);
+  }
+
+  exportData() {
+    return this.http.get(`${API_URL}/data-migration/data-export`, { responseType: 'blob', observe: 'response' });
   }
 
   completeDelete(confirmationPhrase: string) {
