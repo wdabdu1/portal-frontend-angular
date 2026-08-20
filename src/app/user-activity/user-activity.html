@@ -1,0 +1,45 @@
+<div style="max-width: 1000px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/users" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to User Management</a>
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">User Activity</h1>
+  <p style="color: #888; font-size: 13px;">
+    "Live Now" means activity within the last 5 minutes — an approximation, not true real-time presence. Login Count is a simple proxy for how often an account is actually used.
+  </p>
+
+  <p *ngIf="!loading && !error" style="font-size: 13px; font-weight: 600; margin-top: 1rem;">
+    {{ liveCount() }} live now out of {{ rows.length }} accounts
+  </p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <table *ngIf="!loading && !error" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
+        <th style="padding: 8px 6px;">User</th>
+        <th style="padding: 8px 6px;">Role</th>
+        <th style="padding: 8px 6px;">Status</th>
+        <th style="padding: 8px 6px;">Live Now</th>
+        <th style="padding: 8px 6px;">Last Used</th>
+        <th style="padding: 8px 6px;">Login Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows" style="border-bottom: 1px solid #f5f5f5;">
+        <td style="padding: 7px 6px;">
+          <div style="font-weight: 600;">{{ r.displayName }}</div>
+          <div style="color: #999; font-size: 11px;">{{ r.username }}</div>
+        </td>
+        <td style="padding: 7px 6px;">{{ r.role }}</td>
+        <td style="padding: 7px 6px;">
+          <span [style.color]="r.isActive ? '#1e7e34' : '#c0392b'">{{ r.isActive ? 'Active' : 'Deactivated' }}</span>
+        </td>
+        <td style="padding: 7px 6px;">
+          <span *ngIf="r.isLiveNow" style="background: #e6f4ea; color: #1e7e34; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;">● Live</span>
+          <span *ngIf="!r.isLiveNow" style="color: #ccc;">—</span>
+        </td>
+        <td style="padding: 7px 6px;">{{ formatLastSeen(r.lastActivityAt) }}</td>
+        <td style="padding: 7px 6px;">{{ r.loginCount }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
