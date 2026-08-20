@@ -5,6 +5,7 @@ import { ShippingLines } from './settings/shipping-lines/shipping-lines';
 import { ShipmentDetails } from './shipments/shipment-details/shipment-details';
 import { Users } from './users/users';
 import { DataMigration } from './data-migration/data-migration';
+import { UserActivity } from './user-activity/user-activity';
 import { Profile } from './profile/profile';
 import { OrderDetails } from './purchase-orders/order-details/order-details';
 import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
@@ -78,6 +79,7 @@ export const routes: Routes = [
   { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard] },
   { path: 'users', component: Users, canActivate: [authGuard] },
   { path: 'data-migration', component: DataMigration, canActivate: [authGuard] },
+  { path: 'user-activity', component: UserActivity, canActivate: [authGuard] },
   { path: 'fz-inventory', component: FzInventoryList, canActivate: [authGuard] },
   { path: 'withdrawals/:id', component: WithdrawalDetailComponent, canActivate: [authGuard] },
   { path: 'logistics', component: LogisticsList, canActivate: [authGuard] },
