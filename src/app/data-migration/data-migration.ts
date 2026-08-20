@@ -94,6 +94,74 @@ export class DataMigration {
     return summary.results.reduce((sum, r) => sum + r.errors.length, 0);
   }
 
+    dataFile: File | null = null;
+  uploadingData = false;
+  dataSummary: UploadSummary | null = null;
+  dataError = '';
+  dataConfirming = false;
+  dataDone = false;
+
+  exportingData = false;
+  exportDataError = '';
+
+  exportData(): void {
+    this.exportingData = true;
+    this.exportDataError = '';
+    this.service.exportData().subscribe({
+      next: (response) => {
+        this.exportingData = false;
+        const blob = response.body!;
+        const disposition = response.headers.get('content-disposition') ?? '';
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        const fileName = match ? match[1] : 'CTC_Portal_Data_Backup.xlsx';
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.cdr.markForCheck();
+      },
+      error: () => { this.exportingData = false; this.exportDataError = 'Export failed.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  onDataFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.dataFile = input.files?.[0] ?? null;
+    this.dataSummary = null;
+    this.dataError = '';
+    this.dataConfirming = false;
+    this.dataDone = false;
+  }
+
+  startDataUpload(): void {
+    if (!this.dataFile || this.dataDone) return;
+    this.dataConfirming = true;
+  }
+
+  cancelDataUpload(): void {
+    this.dataConfirming = false;
+  }
+
+  confirmDataUpload(): void {
+    if (!this.dataFile) return;
+    this.dataConfirming = false;
+    this.uploadingData = true;
+    this.dataSummary = null;
+    this.dataError = '';
+    this.service.uploadData(this.dataFile).subscribe({
+      next: (r) => {
+        this.uploadingData = false;
+        this.dataSummary = r;
+        this.dataDone = true;
+        this.cdr.markForCheck();
+      },
+      error: (err) => { this.uploadingData = false; this.dataError = err?.error?.message ?? 'Upload failed.'; this.cdr.markForCheck(); }
+    });
+  }
+
   // --- Complete Delete — the most destructive action here, so it gets
   // the strictest safeguard: typing the exact phrase, not just a click.
   deleteConfirmText = '';
