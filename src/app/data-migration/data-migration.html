@@ -88,9 +88,87 @@
     </div>
   </div>
 
-  <!-- Placeholders for the remaining tools, built next -->
-  <div style="border: 1px solid #eee; border-radius: 6px; margin-top: 1.5rem; padding: 20px; opacity: 0.5;">
-    <h3 style="font-size: 15px; margin: 0;">Data Upload — coming next</h3>
+  
+  <!-- Data Export / Backup -->
+  <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 20px;">
+    <h3 style="font-size: 15px; margin: 0 0 6px;">Data Backup / Export</h3>
+    <p style="color: #888; font-size: 12px; margin: 0 0 14px;">
+      Downloads all current Purchase Orders, Shipments, and Supplier Payments as an Excel file, in the exact same shape as the Migration Workbook — including the exact date and time in the filename. Genuinely round-trippable: this file can be re-uploaded as-is at any time.
+    </p>
+    <button
+      (click)="exportData()"
+      [disabled]="exportingData"
+      style="padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+    >
+      {{ exportingData ? 'Preparing download...' : 'Download Data Backup' }}
+    </button>
+    <p *ngIf="exportDataError" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ exportDataError }}</p>
+  </div>
+
+  <!-- Data Upload -->
+  <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 20px;">
+    <h3 style="font-size: 15px; margin: 0 0 6px;">Data Upload</h3>
+    <p style="color: #888; font-size: 12px; margin: 0 0 14px;">
+      Upload the "Migration Workbook" (Main + Supplier Payment sheets). Existing Purchase Orders, Shipments, and PO Line Items are matched and reused by PO Number / BL-AWB Number / Model — new ones are created. Settings referenced by name (Supplier, Business Unit, Division, etc.) must already exist.
+    </p>
+
+    <input type="file" accept=".xlsx" (change)="onDataFileSelected($event)" style="font-size: 13px;" />
+    <button
+      (click)="startDataUpload()"
+      [disabled]="!dataFile || uploadingData || dataDone"
+      style="margin-left: 10px; padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+    >
+      {{ uploadingData ? 'Uploading...' : 'Upload' }}
+    </button>
+
+    <div *ngIf="dataConfirming" style="margin-top: 14px; padding: 14px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px;">
+      <p style="font-size: 13px; margin: 0 0 10px; color: #6d5300;">
+        This will create new Purchase Orders, Shipments, and Payment records, and <strong>update any existing ones matched by PO Number, BL/AWB Number, or Payment label</strong> with whatever is in this file.
+        Nothing is deleted. Are you sure you want to continue?
+      </p>
+      <button (click)="confirmDataUpload()" style="padding: 6px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 8px;">
+        Yes, Upload
+      </button>
+      <button (click)="cancelDataUpload()" style="padding: 6px 14px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        Cancel
+      </button>
+    </div>
+
+    <p *ngIf="dataError" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ dataError }}</p>
+
+    <p *ngIf="dataDone && dataSummary" style="color: #1e7e34; font-size: 13px; margin-top: 14px; font-weight: 600;">
+      ✓ Upload successful. Choose a new file to upload again.
+    </p>
+
+    <div *ngIf="dataSummary" style="margin-top: 16px;">
+      <p style="font-size: 13px; font-weight: 600;">
+        {{ totalCreated(dataSummary) }} created, {{ totalUpdated(dataSummary) }} updated
+        <span *ngIf="totalErrors(dataSummary) > 0" style="color: #c0392b;"> — {{ totalErrors(dataSummary) }} row(s) had errors, see below</span>
+      </p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
+            <th style="padding: 6px 4px;">Sheet</th>
+            <th style="padding: 6px 4px;">Created</th>
+            <th style="padding: 6px 4px;">Updated</th>
+            <th style="padding: 6px 4px;">Errors</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of dataSummary.results" style="border-bottom: 1px solid #f5f5f5;">
+            <td style="padding: 5px 4px; font-weight: 600;">{{ r.sheet }}</td>
+            <td style="padding: 5px 4px; color: #1e7e34;">{{ r.created }}</td>
+            <td style="padding: 5px 4px; color: #0a3d62;">{{ r.updated }}</td>
+            <td style="padding: 5px 4px;">
+              <span *ngIf="r.errors.length === 0" style="color: #ccc;">—</span>
+              <ul *ngIf="r.errors.length > 0" style="margin: 0; padding-left: 16px; color: #c0392b;">
+                <li *ngFor="let e of r.errors">{{ e }}</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Complete Delete — deliberately the most visually alarming section on this page -->
