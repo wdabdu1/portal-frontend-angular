@@ -1,0 +1,130 @@
+<div style="max-width: 1000px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a routerLink="/settings" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Settings</a>
+  <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Receiver Banks</h1>
+  <p style="color: #888; font-size: 13px;">
+    Address supports multiple lines (used on the Pay Bank Dues settlement letter). Each bank can hold several of our own accounts.
+  </p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="margin-top: 1rem;">
+    <div *ngFor="let bank of banks" style="border: 1px solid #ddd; border-radius: 6px; margin-bottom: 12px; padding: 16px;">
+
+      <!-- View mode -->
+      <div *ngIf="editingId !== bank.id" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <div style="font-weight: 600; font-size: 14px;">{{ bank.name }} <span *ngIf="!bank.isActive" style="color: #c0392b; font-size: 11px; font-weight: 400;">(Inactive)</span></div>
+          <div style="color: #888; font-size: 12px; margin-top: 2px;">
+            Bank Charge {{ bank.bankChargeRate }}% + IM Charge {{ bank.imChargeRate }}% = {{ bank.totalChargeRate }}%
+          </div>
+          <div *ngIf="bank.address" style="white-space: pre-line; font-size: 12px; color: #555; margin-top: 6px;">{{ bank.address }}</div>
+          <div *ngIf="!bank.address" style="font-size: 12px; color: #ccc; margin-top: 6px;">No address set</div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+          <button (click)="toggleAccounts(bank)" style="padding: 5px 12px; background: transparent; color: #0a3d62; border: 1px solid #0a3d62; border-radius: 4px; cursor: pointer; font-size: 12px;">
+            Accounts ({{ bank.accounts.length }})
+          </button>
+          <button (click)="startEdit(bank)" style="padding: 5px 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <!-- Edit mode -->
+      <div *ngIf="editingId === bank.id">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label style="font-size: 12px; color: #555;">Name
+            <input [(ngModel)]="editDraft.name" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box;" />
+          </label>
+          <label style="font-size: 12px; color: #555;">Active
+            <input type="checkbox" [(ngModel)]="editDraft.isActive" style="display: block; margin-top: 8px;" />
+          </label>
+          <label style="font-size: 12px; color: #555;">Bank Charge Rate (%)
+            <input type="number" [(ngModel)]="editDraft.bankChargeRate" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box;" />
+          </label>
+          <label style="font-size: 12px; color: #555;">IM Charge Rate (%)
+            <input type="number" [(ngModel)]="editDraft.imChargeRate" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box;" />
+          </label>
+        </div>
+        <label style="font-size: 12px; color: #555; display: block; margin-top: 10px;">
+          Address (one line each — Bank Name / Street / City, Country)
+          <textarea [(ngModel)]="editDraft.address" rows="4" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box; font-family: inherit;"></textarea>
+        </label>
+        <div style="margin-top: 10px;">
+          <button (click)="saveEdit()" style="padding: 6px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 8px;">Save</button>
+          <button (click)="cancelEdit()" style="padding: 6px 14px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px;">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Accounts panel -->
+      <div *ngIf="expandedBankId === bank.id" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid #eee;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead>
+            <tr style="text-align: left; color: #888; border-bottom: 1px solid #eee;">
+              <th style="padding: 4px;">Account No.</th>
+              <th style="padding: 4px;">Account Name</th>
+              <th style="padding: 4px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let acc of bank.accounts" style="border-bottom: 1px solid #f5f5f5;">
+              <ng-container *ngIf="editingAccountId !== acc.id">
+                <td style="padding: 5px 4px;">{{ acc.accountNo }}</td>
+                <td style="padding: 5px 4px;">{{ acc.accountName }}</td>
+                <td style="padding: 5px 4px; text-align: right;">
+                  <button (click)="startEditAccount(acc)" style="border: none; background: none; color: #0a3d62; cursor: pointer; font-size: 12px;">Edit</button>
+                  <button (click)="removeAccount(bank, acc)" style="border: none; background: none; color: #c0392b; cursor: pointer; font-size: 12px; margin-left: 8px;">Remove</button>
+                </td>
+              </ng-container>
+              <ng-container *ngIf="editingAccountId === acc.id">
+                <td style="padding: 5px 4px;"><input [(ngModel)]="editAccountDraft.accountNo" style="width: 100%; padding: 4px; box-sizing: border-box;" /></td>
+                <td style="padding: 5px 4px;"><input [(ngModel)]="editAccountDraft.accountName" style="width: 100%; padding: 4px; box-sizing: border-box;" /></td>
+                <td style="padding: 5px 4px; text-align: right;">
+                  <button (click)="saveEditAccount(bank)" style="border: none; background: none; color: #0a3d62; cursor: pointer; font-size: 12px;">Save</button>
+                  <button (click)="cancelEditAccount()" style="border: none; background: none; color: #555; cursor: pointer; font-size: 12px; margin-left: 8px;">Cancel</button>
+                </td>
+              </ng-container>
+            </tr>
+            <tr *ngIf="bank.accounts.length === 0">
+              <td colspan="3" style="padding: 8px 4px; color: #ccc;">No accounts yet.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="newAccount[bank.id]" style="display: flex; gap: 8px; margin-top: 10px; align-items: center;">
+          <input [(ngModel)]="newAccount[bank.id].accountNo" placeholder="Account No." style="flex: 1; padding: 6px; font-size: 12px;" />
+          <input [(ngModel)]="newAccount[bank.id].accountName" placeholder="Account Name" style="flex: 2; padding: 6px; font-size: 12px;" />
+          <button (click)="addAccount(bank)" style="padding: 6px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- New bank -->
+    <div *ngIf="!creating">
+      <button (click)="startCreate()" style="padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">+ Add Receiver Bank</button>
+    </div>
+
+    <div *ngIf="creating" style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 12px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <label style="font-size: 12px; color: #555;">Name
+          <input [(ngModel)]="newBank.name" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box;" />
+        </label>
+        <label style="font-size: 12px; color: #555;">Bank Charge Rate (%)
+          <input type="number" [(ngModel)]="newBank.bankChargeRate" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box;" />
+        </label>
+        <label style="font-size: 12px; color: #555;">IM Charge Rate (%)
+          <input type="number" [(ngModel)]="newBank.imChargeRate" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box;" />
+        </label>
+      </div>
+      <label style="font-size: 12px; color: #555; display: block; margin-top: 10px;">
+        Address
+        <textarea [(ngModel)]="newBank.address" rows="4" style="display: block; width: 100%; padding: 6px; margin-top: 3px; box-sizing: border-box; font-family: inherit;"></textarea>
+      </label>
+      <div style="margin-top: 10px;">
+        <button (click)="saveCreate()" style="padding: 6px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 8px;">Create</button>
+        <button (click)="cancelCreate()" style="padding: 6px 14px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
