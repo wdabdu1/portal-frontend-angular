@@ -11,6 +11,7 @@ import { OrderDetails } from './purchase-orders/order-details/order-details';
 import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers';
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
 import { BankDuesList } from './bank-dues/bank-dues-list/bank-dues-list';
+import { PayBankDues } from './pay-bank-dues/pay-bank-dues';
 import { SupplierDuesList } from './supplier-dues/supplier-dues-list/supplier-dues-list';
 import { BusinessUnits } from './settings/business-units/business-units';
 import { SettingsMenu } from './settings/settings-menu/settings-menu';
@@ -73,6 +74,7 @@ export const routes: Routes = [
   { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard] },
   { path: 'clearance', component: ClearanceList, canActivate: [authGuard] },
   { path: 'bank-dues', component: BankDuesList, canActivate: [authGuard] },
+  { path: 'pay-bank-dues', component: PayBankDues, canActivate: [authGuard] },
   { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard] },
   { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard] },
