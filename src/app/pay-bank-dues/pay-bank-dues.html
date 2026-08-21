@@ -56,7 +56,7 @@
           <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
             <span *ngSwitchCase="'necessaryGoodType'" [style.color]="row.necessaryGoodType ? '#1e7e34' : '#888'" style="font-weight: 600;">{{ row.necessaryGoodType ? 'Yes' : 'No' }}</span>
             <span *ngSwitchCase="'remainingAed'" style="text-align: right; display: block;">{{ row.remainingAed | number: '1.2-2' }}</span>
-            <span *ngSwitchDefault>{{ (row as any)[col.key] ?? '—' }}</span>
+            <span *ngSwitchDefault>{{ getValue(row, col.key) || '—' }}</span>
           </td>
           <td style="padding: 8px 6px;">
             <span *ngIf="row.remainingAed <= 0" style="color: #1e7e34; font-size: 11px;">Settled</span>
