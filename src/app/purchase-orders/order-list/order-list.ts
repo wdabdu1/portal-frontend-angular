@@ -157,8 +157,16 @@ export class OrderList implements OnInit {
 
   searchTerm = '';
 
+  searchTerm = '';
+
+  // Defaults to Open so users land on their actual work queue, same
+  // pattern as the Clearance list.
+  statusFilter: 'Open' | 'Shipped' | 'All' = 'Open';
+
   get orders(): PurchaseOrderSummary[] {
     let filtered = applyFilters(this.allOrders, this.filters, (r, col) => this.getValue(r, col));
+    if (this.statusFilter === 'Open') filtered = filtered.filter((r) => r.percentShipped < 100);
+    if (this.statusFilter === 'Shipped') filtered = filtered.filter((r) => r.percentShipped >= 100);
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.trim().toLowerCase();
       filtered = filtered.filter((r) =>
