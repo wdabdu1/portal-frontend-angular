@@ -1,7 +1,7 @@
-<div style="max-width: 1100px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Pay Bank Dues</h1>
   <p style="color: #888; font-size: 13px;">
-    Select a Receiving Bank, then narrow by Sender Bank. Only shipments matching both, with a genuine outstanding balance, are selectable.
+    Browse everything outstanding below, sorted by Due Date, then pick a Receiving Bank to start a settlement.
   </p>
 
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
@@ -11,13 +11,63 @@
     <p style="font-size: 14px; font-weight: 600; color: #1e7e34; margin: 0 0 10px;">✓ Settlement confirmed and letter downloaded.</p>
     <p style="font-size: 13px; color: #555; margin: 0 0 14px;">Payment history has been updated for each shipment included.</p>
     <button (click)="startNew()" style="padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
-      Start a New Settlement
+      Back to All Dues
     </button>
   </div>
 
-  <div *ngIf="!done">
-    <!-- Step 1 & 2: Bank selection -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 1.5rem;">
+  <!-- ============ LANDING VIEW: all dues, sortable ============ -->
+  <div *ngIf="!done && !filtering">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.2rem;">
+      <label style="font-size: 13px; color: #555; display: flex; align-items: center; gap: 6px;">
+        <input type="checkbox" [checked]="showSettled" (change)="toggleShowSettled()" />
+        Show settled (fully paid) too
+      </label>
+      <button (click)="startFiltering()" style="padding: 7px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        Start a Settlement →
+      </button>
+    </div>
+
+    <p *ngIf="loadingAll" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+
+    <table *ngIf="!loadingAll" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
+          <th style="padding: 8px 6px; cursor: pointer;" (click)="setSort('blAwbNo')">BL/AWB</th>
+          <th style="padding: 8px 6px;">Category</th>
+          <th style="padding: 8px 6px;">Receiving Bank</th>
+          <th style="padding: 8px 6px;">Sender Bank</th>
+          <th style="padding: 8px 6px; cursor: pointer;" (click)="setSort('dueDate')">Due Date {{ sortKey === 'dueDate' ? (sortAsc ? '↑' : '↓') : '' }}</th>
+          <th style="padding: 8px 6px; cursor: pointer;" (click)="setSort('cbosDueDate')">CBOS Due {{ sortKey === 'cbosDueDate' ? (sortAsc ? '↑' : '↓') : '' }}</th>
+          <th style="padding: 8px 6px; text-align: right; cursor: pointer;" (click)="setSort('remainingAed')">Remaining (AED) {{ sortKey === 'remainingAed' ? (sortAsc ? '↑' : '↓') : '' }}</th>
+          <th style="padding: 8px 6px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of sortedAllDues()" style="border-bottom: 1px solid #f5f5f5;" [style.opacity]="row.remainingAed <= 0 ? 0.5 : 1">
+          <td style="padding: 6px;">{{ row.blAwbNo }}</td>
+          <td style="padding: 6px;">{{ row.category }}</td>
+          <td style="padding: 6px;">{{ row.receiverBankName }}</td>
+          <td style="padding: 6px;">{{ row.senderBankName || '—' }}</td>
+          <td style="padding: 6px;">{{ row.dueDate || '—' }}</td>
+          <td style="padding: 6px;">{{ row.cbosDueDate || '—' }}</td>
+          <td style="padding: 6px; text-align: right;">{{ row.remainingAed | number: '1.2-2' }}</td>
+          <td style="padding: 6px;">
+            <span *ngIf="row.remainingAed <= 0" style="color: #1e7e34; font-size: 11px;">Settled</span>
+            <button *ngIf="row.remainingAed > 0" (click)="startFilteringFrom(row)" style="border: none; background: none; color: #0a3d62; cursor: pointer; font-size: 12px;">Pay →</button>
+          </td>
+        </tr>
+        <tr *ngIf="sortedAllDues().length === 0">
+          <td colspan="8" style="padding: 12px 6px; color: #ccc;">Nothing outstanding right now.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ FILTERED VIEW: pick banks, select, pay ============ -->
+  <div *ngIf="!done && filtering">
+    <a (click)="backToAll()" style="font-size: 13px; color: #0a3d62; text-decoration: none; cursor: pointer; display: inline-block; margin-top: 1rem;">&larr; Back to All Dues</a>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 1rem;">
       <label style="font-size: 13px; color: #555;">Receiving Bank
         <select [(ngModel)]="selectedBankId" (ngModelChange)="onReceiverBankChange()" [disabled]="loadingBanks"
           style="display: block; width: 100%; padding: 7px; margin-top: 4px; box-sizing: border-box;">
@@ -47,7 +97,6 @@
       This bank has no accounts set up yet — add one under Settings → Receiver Banks first.
     </p>
 
-    <!-- Dues table -->
     <div *ngIf="selectedSenderBankId !== null" style="margin-top: 1.5rem;">
       <p *ngIf="loadingDues" style="color: #888; font-size: 13px;">Loading outstanding dues...</p>
 
@@ -62,6 +111,8 @@
             <th style="padding: 8px 6px;">BL/AWB</th>
             <th style="padding: 8px 6px;">Category</th>
             <th style="padding: 8px 6px;">Collection Ref.</th>
+            <th style="padding: 8px 6px;">Due Date</th>
+            <th style="padding: 8px 6px;">CBOS Due</th>
             <th style="padding: 8px 6px; text-align: right;">Value (AED)</th>
             <th style="padding: 8px 6px; text-align: right;">Settled (AED)</th>
             <th style="padding: 8px 6px; text-align: right;">Remaining (AED)</th>
@@ -74,18 +125,20 @@
             <td style="padding: 6px;">{{ row.blAwbNo }}</td>
             <td style="padding: 6px;">{{ row.category }}</td>
             <td style="padding: 6px;">{{ row.collectionRefNo }}</td>
+            <td style="padding: 6px;">{{ row.dueDate || '—' }}</td>
+            <td style="padding: 6px;">{{ row.cbosDueDate || '—' }}</td>
             <td style="padding: 6px; text-align: right;">{{ row.valueAed | number: '1.2-2' }}</td>
             <td style="padding: 6px; text-align: right;">{{ row.paidAed | number: '1.2-2' }}</td>
             <td style="padding: 6px; text-align: right;">{{ row.remainingAed | number: '1.2-2' }}</td>
             <td style="padding: 6px; text-align: right;">
-              <input *ngIf="selected[row.shipmentId]" type="number" [(ngModel)]="amounts[row.shipmentId]"
-                style="width: 110px; padding: 4px; text-align: right; box-sizing: border-box;" />
+              <input *ngIf="selected[row.shipmentId]" type="text" inputmode="decimal"
+                [value]="amountText[row.shipmentId]" (input)="onAmountInput(row, $any($event.target).value)"
+                style="width: 130px; padding: 4px; text-align: right; box-sizing: border-box;" />
             </td>
           </tr>
         </tbody>
       </table>
 
-      <!-- Subtotal + confirm -->
       <div *ngIf="!loadingDues && dues.length > 0" style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee;">
         <div style="font-size: 14px;">
           <strong>{{ selectedCount() }}</strong> selected — Subtotal: <strong>AED {{ subtotal() | number: '1.2-2' }}</strong>
