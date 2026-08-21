@@ -149,7 +149,7 @@ export class PayBankDues implements OnInit {
     if (!this.filters[key]) this.filters[key] = new Set();
   }
 
-  private getValue(row: PayableDueRow, col: string): string {
+  getValue(row: PayableDueRow, col: string): string {
     return String((row as any)[col] ?? '');
   }
 
