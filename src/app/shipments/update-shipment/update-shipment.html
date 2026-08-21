@@ -533,7 +533,7 @@
               <tfoot *ngIf="lastOffshoreData && lastOffshoreData.items.length > 0">
                 <tr style="font-weight:600; border-top:2px solid #ccc;">
                   <td colspan="6" style="padding:5px; text-align:right;">Grand Total:</td>
-                  <td style="padding:5px;">{{ lastOffshoreData.grandTotal | number: '1.2-2' }}</td>
+                  <td style="padding:5px;">{{ liveLastOffshoreTotal() | number: '1.2-2' }}</td>
                 </tr>
               </tfoot>
             </table>
