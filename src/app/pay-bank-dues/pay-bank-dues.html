@@ -15,7 +15,7 @@
     </button>
   </div>
 
-  <!-- ============ LANDING VIEW: all dues, sortable ============ -->
+  <!-- ============ LANDING VIEW: all dues, filterable/reorderable/sortable ============ -->
   <div *ngIf="!done && !filtering">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.2rem;">
       <label style="font-size: 13px; color: #555; display: flex; align-items: center; gap: 6px;">
@@ -26,43 +26,49 @@
         Pay Multiple Dues →
       </button>
     </div>
+    <p style="color: #888; font-size: 12px; margin-top: 4px;">Drag a column header to reorder it. Click the ▼ arrow to filter. Click column text to sort.</p>
 
     <p *ngIf="loadingAll" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
 
-    <table *ngIf="!loadingAll" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px;">
+    <div *ngIf="!loadingAll" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
       <thead>
-        <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
-          <th style="padding: 8px 6px; cursor: pointer;" (click)="setSort('blAwbNo')">BL/AWB</th>
-          <th style="padding: 8px 6px;">Category</th>
-          <th style="padding: 8px 6px;">Receiving Bank</th>
-          <th style="padding: 8px 6px;">Sender Bank</th>
-          <th style="padding: 8px 6px; cursor: pointer;" (click)="setSort('dueDate')">Due Date {{ sortKey === 'dueDate' ? (sortAsc ? '↑' : '↓') : '' }}</th>
-          <th style="padding: 8px 6px; cursor: pointer;" (click)="setSort('cbosDueDate')">CBOS Due {{ sortKey === 'cbosDueDate' ? (sortAsc ? '↑' : '↓') : '' }}</th>
-          <th style="padding: 8px 6px;">Necessary Good</th>
-          <th style="padding: 8px 6px; text-align: right; cursor: pointer;" (click)="setSort('remainingAed')">Remaining (AED) {{ sortKey === 'remainingAed' ? (sortAsc ? '↑' : '↓') : '' }}</th>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th
+            *ngFor="let col of columns; let i = index"
+            draggable="true"
+            (dragstart)="onDragStart(i)"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop(i)"
+            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+          >
+            <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+            <span (mousedown)="$event.stopPropagation()">
+              <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+            </span>
+          </th>
           <th style="padding: 8px 6px;"></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of sortedAllDues()" style="border-bottom: 1px solid #f5f5f5;" [style.opacity]="row.remainingAed <= 0 ? 0.5 : 1">
-          <td style="padding: 6px;">{{ row.blAwbNo }}</td>
-          <td style="padding: 6px;">{{ row.category }}</td>
-          <td style="padding: 6px;">{{ row.receiverBankName }}</td>
-          <td style="padding: 6px;">{{ row.senderBankName || '—' }}</td>
-          <td style="padding: 6px;">{{ row.dueDate || '—' }}</td>
-          <td style="padding: 6px;">{{ row.cbosDueDate || '—' }}</td>
-          <td style="padding: 6px;"><span [style.color]="row.necessaryGoodType ? '#1e7e34' : '#888'" style="font-weight: 600;">{{ row.necessaryGoodType ? 'Yes' : 'No' }}</span></td>
-          <td style="padding: 6px; text-align: right;">{{ row.remainingAed | number: '1.2-2' }}</td>
-          <td style="padding: 6px;">
+        <tr *ngFor="let row of rows" style="border-bottom: 1px solid #f5f5f5;" [style.opacity]="row.remainingAed <= 0 ? 0.5 : 1">
+          <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+            <span *ngSwitchCase="'necessaryGoodType'" [style.color]="row.necessaryGoodType ? '#1e7e34' : '#888'" style="font-weight: 600;">{{ row.necessaryGoodType ? 'Yes' : 'No' }}</span>
+            <span *ngSwitchCase="'remainingAed'" style="text-align: right; display: block;">{{ row.remainingAed | number: '1.2-2' }}</span>
+            <span *ngSwitchDefault>{{ (row as any)[col.key] ?? '—' }}</span>
+          </td>
+          <td style="padding: 8px 6px;">
             <span *ngIf="row.remainingAed <= 0" style="color: #1e7e34; font-size: 11px;">Settled</span>
             <button *ngIf="row.remainingAed > 0" (click)="startFilteringFrom(row)" style="border: none; background: none; color: #0a3d62; cursor: pointer; font-size: 12px;">Pay →</button>
           </td>
         </tr>
-        <tr *ngIf="sortedAllDues().length === 0">
-          <td colspan="8" style="padding: 12px 6px; color: #ccc;">Nothing outstanding right now.</td>
+        <tr *ngIf="rows.length === 0">
+          <td [attr.colspan]="columns.length + 1" style="padding: 12px 6px; color: #ccc;">Nothing outstanding right now.</td>
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 
   <!-- ============ FILTERED VIEW: pick banks, select, pay ============ -->
