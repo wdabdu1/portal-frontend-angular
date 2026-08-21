@@ -99,6 +99,10 @@ export class AuthService {
     return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'SuperUser', 'Treasury', 'CorpFinance', 'Manager']);
   }
 
+  canSeePayBankDues(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'Treasury', 'CorpFinance', 'SuperUser']);
+  }
+
   canSeeSettings(): boolean {
     return this.hasAnyRole(['Manager', 'SuperUser']);
   }
