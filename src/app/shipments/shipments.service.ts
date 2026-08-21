@@ -32,6 +32,7 @@ export interface ShipmentSummary {
   eta: string | null;
   lineItemCount: number;
   createdAt: string;
+  isClearanceCompleted: boolean;
 }
 
 export interface LineItemRemaining {
