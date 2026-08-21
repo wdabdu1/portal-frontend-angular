@@ -71,7 +71,8 @@ const MENU_GROUPS: MenuGroup[] = [
     items: [
       { label: 'Transfer Pricing', route: '/transfer-pricing', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Manager') || a.hasRole('SuperUser') },
       { label: 'Supplier Dues', route: '/supplier-dues', canAccess: (a) => a.canSeeSupplierDues() },
-      { label: 'Bank Dues', route: '/bank-dues', canAccess: (a) => a.canSeeBankDues() }
+      { label: 'Bank Dues', route: '/bank-dues', canAccess: (a) => a.canSeeBankDues() },
+      { label: 'Pay Bank Dues', route: '/pay-bank-dues', canAccess: (a) => a.canSeePayBankDues() }
     ]
   }
 ];
