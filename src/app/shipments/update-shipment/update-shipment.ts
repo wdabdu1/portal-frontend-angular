@@ -276,7 +276,6 @@ export class UpdateShipment implements OnInit {
   }
 
   saveLastOffshoreDetails(): void {
-  saveLastOffshoreDetails(): void {
     this.lastOffshoreError = '';
 
     // A price entered with no Currency selected saves silently but never
