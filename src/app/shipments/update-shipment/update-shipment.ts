@@ -262,7 +262,29 @@ export class UpdateShipment implements OnInit {
     });
   }
 
+  // Live total from what's actually typed, not the stale server value —
+  // so it updates instantly as the user types, rather than only after
+  // a save-and-reload round trip.
+  liveLastOffshoreTotal(): number {
+    if (!this.lastOffshoreData) return 0;
+    return this.lastOffshoreData.items.reduce((sum, item) => {
+      const edit = this.lastOffshoreItemEdits[item.shipmentLineItemId];
+      const price = edit?.unitPrice ?? 0;
+      return sum + (price * item.qty);
+    }, 0);
+  }
+
   saveLastOffshoreDetails(): void {
+    // A price entered with no Currency selected saves silently but never
+    // shows up in Transfer Pricing — block it here instead, with a clear
+    // reason, rather than letting it fail invisibly downstream.
+    const hasAnyPrice = Object.values(this.lastOffshoreItemEdits).some(e => e.unitPrice !== null && e.unitPrice > 0);
+    if (hasAnyPrice && !this.lastOffshoreForm.currencyId) {
+      this.error = 'Please select a Currency before saving — a Unit Price without a Currency won\'t appear in Transfer Pricing.';
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.savingLastOffshore = true;
     const items = Object.entries(this.lastOffshoreItemEdits).map(([lineItemId, edit]) => ({
       shipmentLineItemId: Number(lineItemId),
