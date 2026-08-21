@@ -70,6 +70,7 @@ export class UpdateShipment implements OnInit {
   lastOffshoreItemEdits: Record<number, { hsCode: string; description: string; unitPrice: number | null }> = {};
   loadingLastOffshore = false;
   savingLastOffshore = false;
+  lastOffshoreError = '';
   savingHsCodes = false;
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
   ssmoForm = { cocRequired: null as boolean | null, cocAvailable: null as boolean | null, applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '' };
@@ -275,12 +276,15 @@ export class UpdateShipment implements OnInit {
   }
 
   saveLastOffshoreDetails(): void {
+  saveLastOffshoreDetails(): void {
+    this.lastOffshoreError = '';
+
     // A price entered with no Currency selected saves silently but never
     // shows up in Transfer Pricing — block it here instead, with a clear
     // reason, rather than letting it fail invisibly downstream.
     const hasAnyPrice = Object.values(this.lastOffshoreItemEdits).some(e => e.unitPrice !== null && e.unitPrice > 0);
     if (hasAnyPrice && !this.lastOffshoreForm.currencyId) {
-      this.error = 'Please select a Currency before saving — a Unit Price without a Currency won\'t appear in Transfer Pricing.';
+      this.lastOffshoreError = 'Please select a Currency before saving — a Unit Price without a Currency won\'t appear in Transfer Pricing.';
       this.cdr.markForCheck();
       return;
     }
@@ -308,7 +312,7 @@ export class UpdateShipment implements OnInit {
         this.loadLastOffshoreDetails();
         this.cdr.markForCheck();
       },
-      error: () => { this.savingLastOffshore = false; this.error = 'Could not save Last Offshore Details.'; this.cdr.markForCheck(); }
+      error: () => { this.savingLastOffshore = false; this.lastOffshoreError = 'Could not save Last Offshore Details.'; this.cdr.markForCheck(); }
     });
   }
 
