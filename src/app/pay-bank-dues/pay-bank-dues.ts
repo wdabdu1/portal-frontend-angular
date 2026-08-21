@@ -3,6 +3,9 @@ import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LookupEntity, SettingsLookupService } from '../settings/settings-lookup.service';
 import { ReceiverBankAccount } from '../settings/receiver-bank-accounts.service';
+import { ExcelHeaderFilter } from '../shared/excel-header-filter';
+import { applyFilters, columnOptions } from '../shared/table-filter.util';
+import { TablePreferencesService } from '../table-preferences/table-preferences.service';
 import { PayableDueRow, PayBankDuesService, SenderBankOption } from './pay-bank-dues.service';
 
 interface ReceiverBank extends LookupEntity {
@@ -11,11 +14,27 @@ interface ReceiverBank extends LookupEntity {
   accounts: ReceiverBankAccount[];
 }
 
-type SortKey = 'dueDate' | 'cbosDueDate' | 'blAwbNo' | 'remainingAed';
+type SortColumn = keyof PayableDueRow;
+
+interface ColumnDef {
+  key: SortColumn;
+  label: string;
+}
+
+const DEFAULT_COLUMNS: ColumnDef[] = [
+  { key: 'blAwbNo', label: 'BL/AWB' },
+  { key: 'category', label: 'Category' },
+  { key: 'receiverBankName', label: 'Receiving Bank' },
+  { key: 'senderBankName', label: 'Sender Bank' },
+  { key: 'dueDate', label: 'Due Date' },
+  { key: 'cbosDueDate', label: 'CBOS Due' },
+  { key: 'necessaryGoodType', label: 'Necessary Good' },
+  { key: 'remainingAed', label: 'Remaining (AED)' },
+];
 
 @Component({
   selector: 'app-pay-bank-dues',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ExcelHeaderFilter],
   templateUrl: './pay-bank-dues.html'
 })
 export class PayBankDues implements OnInit {
@@ -24,11 +43,16 @@ export class PayBankDues implements OnInit {
   banks: ReceiverBank[] = [];
   loadingBanks = true;
 
-  // Initial, unfiltered landing view
+  // Initial, unfiltered landing view — filterable/sortable/reorderable,
+  // same pattern as the existing Collecting Bank Dues table.
   allDues: PayableDueRow[] = [];
   loadingAll = true;
   showSettled = false;
-  sortKey: SortKey = 'dueDate';
+
+  columns: ColumnDef[] = [...DEFAULT_COLUMNS];
+  private dragFromIndex: number | null = null;
+  filters: Record<string, Set<string>> = {};
+  sortColumn: SortColumn = 'dueDate';
   sortAsc = true;
 
   // Filtered / payment mode
@@ -52,14 +76,54 @@ export class PayBankDues implements OnInit {
   submitError = '';
   done = false;
 
-  constructor(private lookupService: SettingsLookupService, private service: PayBankDuesService) {}
+  constructor(private lookupService: SettingsLookupService, private service: PayBankDuesService, private tablePrefs: TablePreferencesService) {}
 
   ngOnInit(): void {
     this.lookupService.getAll<ReceiverBank>('receiver-banks').subscribe({
       next: (r) => { this.loadingBanks = false; this.banks = r.filter(b => b.isActive); this.cdr.markForCheck(); },
       error: () => { this.loadingBanks = false; this.error = 'Failed to load Receiver Banks.'; this.cdr.markForCheck(); }
     });
-    this.loadAll();
+
+    this.tablePrefs.get('payBankDues').subscribe({
+      next: (pref) => {
+        if (pref) { this.sortColumn = pref.sortColumn as SortColumn; this.sortAsc = pref.sortAsc; }
+        this.loadAll();
+      },
+      error: () => this.loadAll()
+    });
+    this.tablePrefs.getColumnOrder('payBankDues').subscribe({
+      next: (order) => { if (order && order.length > 0) this.applyColumnOrder(order); }
+    });
+  }
+
+  private applyColumnOrder(savedOrder: string[]): void {
+    const byKey = new Map(DEFAULT_COLUMNS.map((c) => [c.key, c]));
+    const ordered: ColumnDef[] = [];
+    for (const key of savedOrder) {
+      const col = byKey.get(key as SortColumn);
+      if (col) { ordered.push(col); byKey.delete(key as SortColumn); }
+    }
+    ordered.push(...byKey.values());
+    this.columns = ordered;
+    this.cdr.markForCheck();
+  }
+
+  onDragStart(index: number): void {
+    this.dragFromIndex = index;
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  onDrop(index: number): void {
+    if (this.dragFromIndex === null || this.dragFromIndex === index) return;
+    const cols = [...this.columns];
+    const [moved] = cols.splice(this.dragFromIndex, 1);
+    cols.splice(index, 0, moved);
+    this.columns = cols;
+    this.dragFromIndex = null;
+    this.tablePrefs.saveColumnOrder('payBankDues', cols.map((c) => c.key)).subscribe();
   }
 
   loadAll(): void {
@@ -75,20 +139,47 @@ export class PayBankDues implements OnInit {
     this.loadAll();
   }
 
-  setSort(key: SortKey): void {
-    if (this.sortKey === key) { this.sortAsc = !this.sortAsc; }
-    else { this.sortKey = key; this.sortAsc = true; }
+  sortBy(column: SortColumn): void {
+    if (this.sortColumn === column) { this.sortAsc = !this.sortAsc; }
+    else { this.sortColumn = column; this.sortAsc = true; }
+    this.tablePrefs.save('payBankDues', this.sortColumn, this.sortAsc).subscribe();
   }
 
-  sortedAllDues(): PayableDueRow[] {
+  private ensureFilterKey(key: string): void {
+    if (!this.filters[key]) this.filters[key] = new Set();
+  }
+
+  private getValue(row: PayableDueRow, col: string): string {
+    return String((row as any)[col] ?? '');
+  }
+
+  optionsFor(col: string): string[] {
+    this.ensureFilterKey(col);
+    return columnOptions(this.allDues, this.filters, col, (r, c) => this.getValue(r, c));
+  }
+
+  onFilterChange(col: string, values: Set<string>): void {
+    this.filters[col] = values;
+    this.cdr.markForCheck();
+  }
+
+  isColumnFiltered(col: string): boolean {
+    const selected = this.filters[col];
+    if (!selected || selected.size === 0) return false;
+    return selected.size < this.optionsFor(col).length;
+  }
+
+  get rows(): PayableDueRow[] {
+    let filtered = applyFilters(this.allDues, this.filters, (r, col) => this.getValue(r, col));
     const dir = this.sortAsc ? 1 : -1;
-    return [...this.allDues].sort((a, b) => {
-      const av = a[this.sortKey] as any;
-      const bv = b[this.sortKey] as any;
-      if (av === null && bv === null) return 0;
-      if (av === null) return 1;
-      if (bv === null) return -1;
-      return av > bv ? dir : av < bv ? -dir : 0;
+    return [...filtered].sort((a, b) => {
+      const av = a[this.sortColumn] as any;
+      const bv = b[this.sortColumn] as any;
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
     });
   }
 
@@ -148,8 +239,6 @@ export class PayBankDues implements OnInit {
     this.amountText = {};
   }
 
-  // Comma-formatted amount handling — stored as text, parsed to a number
-  // only when needed, to avoid fat-finger errors on large values.
   private parseAmount(text: string | undefined): number {
     if (!text) return 0;
     const n = parseFloat(text.replace(/,/g, ''));
