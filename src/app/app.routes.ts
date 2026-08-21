@@ -266,7 +266,7 @@ export const routes: Routes = [
       ]
     }
   },
-  {
+  
   { path: 'settings/receiver-banks', component: ReceiverBanks, canActivate: [authGuard] },
   {
     path: 'settings/spc-storage-tiers',
