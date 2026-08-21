@@ -527,7 +527,7 @@
                   <td style="padding:5px;"><input [(ngModel)]="lastOffshoreItemEdits[item.shipmentLineItemId].hsCode" style="width:100px; padding:4px;" /></td>
                   <td style="padding:5px;"><input [(ngModel)]="lastOffshoreItemEdits[item.shipmentLineItemId].description" style="width:150px; padding:4px;" /></td>
                   <td style="padding:5px;"><input type="text" appThousands [(ngModel)]="lastOffshoreItemEdits[item.shipmentLineItemId].unitPrice" style="width:100px; padding:4px;" /></td>
-                  <td style="padding:5px;">{{ item.total !== null ? (item.total | number: '1.2-2') : '—' }}</td>
+                  <td style="padding:5px;">{{ (lastOffshoreItemEdits[item.shipmentLineItemId].unitPrice ?? 0) * item.qty | number: '1.2-2' }}</td>
                 </tr>
               </tbody>
               <tfoot *ngIf="lastOffshoreData && lastOffshoreData.items.length > 0">
@@ -539,13 +539,13 @@
             </table>
           </div>
 
-          <div style="margin-top:16px; display:flex; gap:8px;">
+          <div style="margin-top:16px; display:flex; gap:8px; align-items:center;">
             <button (click)="saveLastOffshoreDetails()" [disabled]="savingLastOffshore" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">
               {{ savingLastOffshore ? 'Saving...' : 'Save Items' }}
             </button>
+            <span *ngIf="lastOffshoreError" style="color:#c0392b; font-size:12px;">{{ lastOffshoreError }}</span>
           </div>
         </div>
-
         <div style="margin-top:20px; display:flex; gap:8px;">
           <button (click)="saveErpColumn(allOffshoreColumns[0].purchaseOrderOffshorePartnerId, true)" *ngIf="allOffshoreColumns.length > 0" [disabled]="saving.erpInfo" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">Save & Next</button>
         </div>
