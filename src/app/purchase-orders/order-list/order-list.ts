@@ -157,8 +157,6 @@ export class OrderList implements OnInit {
 
   searchTerm = '';
 
-  searchTerm = '';
-
   // Defaults to Open so users land on their actual work queue, same
   // pattern as the Clearance list.
   statusFilter: 'Open' | 'Shipped' | 'All' = 'Open';
