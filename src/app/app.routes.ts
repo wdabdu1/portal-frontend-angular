@@ -15,6 +15,7 @@ import { SupplierDuesList } from './supplier-dues/supplier-dues-list/supplier-du
 import { BusinessUnits } from './settings/business-units/business-units';
 import { SettingsMenu } from './settings/settings-menu/settings-menu';
 import { SimpleLookup } from './settings/simple-lookup/simple-lookup';
+import { ReceiverBanks } from './settings/receiver-banks/receiver-banks';
 import { NewSupplierOrder } from './purchase-orders/new-supplier-order/new-supplier-order';
 import { OrderList } from './purchase-orders/order-list/order-list';
 import { NewShipment } from './shipments/new-shipment/new-shipment';
@@ -266,20 +267,7 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'settings/receiver-banks',
-    component: SimpleLookup,
-    canActivate: [authGuard],
-    data: {
-      title: 'Receiver Banks',
-      resource: 'receiver-banks',
-      fields: [
-        { key: 'name', label: 'Name', type: 'text' },
-        { key: 'bankChargeRate', label: 'Bank Charge Rate', type: 'number' },
-        { key: 'imChargeRate', label: 'IM Charge Rate', type: 'number' },
-        { key: 'totalChargeRate', label: 'Total Charge Rate (%)', type: 'number', readonly: true, format: 'percent' }
-      ]
-    }
-  },
+  { path: 'settings/receiver-banks', component: ReceiverBanks, canActivate: [authGuard] },
   {
     path: 'settings/spc-storage-tiers',
     component: SpcStorageTiers,
