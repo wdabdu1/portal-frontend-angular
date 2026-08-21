@@ -13,6 +13,11 @@
   <p style="color: #888; font-size: 12px; margin-top: 8px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column.</p>
 
   <input [(ngModel)]="searchTerm" placeholder="Search BL/AWB No. or PO Number" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 240px; margin-top: 4px;" />
+  <select [(ngModel)]="statusFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 4px; margin-left: 8px;">
+    <option value="Open">Open</option>
+    <option value="Cleared">Cleared</option>
+    <option value="All">All</option>
+  </select>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
