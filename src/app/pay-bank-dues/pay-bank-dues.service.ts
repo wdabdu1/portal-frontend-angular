@@ -14,6 +14,7 @@ export interface PayableDueRow {
   senderBankId: number | null;
   dueDate: string | null;
   cbosDueDate: string | null;
+  necessaryGoodType: boolean;
   valueAed: number;
   paidAed: number;
   remainingAed: number;
