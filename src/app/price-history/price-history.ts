@@ -20,6 +20,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'actualArrivalDate', label: 'Actual Arrival Date' },
   { key: 'category', label: 'Cat' },
   { key: 'modelProduct', label: 'Model/Product' },
+  { key: 'hsCode', label: 'HS Code' },
   { key: 'description', label: 'Description' },
   { key: 'costPrice', label: 'CP' },
   { key: 'currency', label: 'Currency' }
