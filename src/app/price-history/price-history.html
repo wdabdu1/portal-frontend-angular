@@ -1,0 +1,55 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Price History</h1>
+    <button (click)="onExportClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      Export to Excel
+    </button>
+  </div>
+  <p style="color: #888; font-size: 13px;">
+    Every offshore-priced item ever entered, across all shipments — search prior items by BU or Category to see what price was set last time, for consistency.
+    Drag a column header to reorder it. Click the ▼ arrow to filter. Click column text to sort.
+  </p>
+
+  <input
+    [(ngModel)]="searchText"
+    placeholder="Search by BL, Model/Product, Description, or HS Code"
+    style="width: 100%; max-width: 450px; padding: 8px; margin-top: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+  />
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee;">
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'costPrice'">{{ r.costPrice !== null ? (r.costPrice | number: '1.2-2') : '—' }}</span>
+          <span *ngSwitchDefault>{{ getValue(r, col.key) || '—' }}</span>
+        </td>
+      </tr>
+      <tr *ngIf="rows.length === 0">
+        <td [attr.colspan]="columns.length" style="padding: 12px 6px; color: #ccc;">No price history found.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
