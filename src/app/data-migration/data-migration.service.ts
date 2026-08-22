@@ -40,4 +40,8 @@ export class DataMigrationService {
   completeDelete(confirmationPhrase: string) {
     return this.http.post<{ message: string; tables: string[] }>(`${API_URL}/data-migration/complete-delete`, { confirmationPhrase });
   }
+
+  deletePo(poNumber: string) {
+    return this.http.post<{ message: string }>(`${API_URL}/data-migration/delete-po`, { poNumber });
+  }
 }
