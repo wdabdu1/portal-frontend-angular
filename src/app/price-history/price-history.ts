@@ -106,7 +106,7 @@ export class PriceHistory implements OnInit {
     if (!this.filters[key]) this.filters[key] = new Set();
   }
 
-  private getValue(row: PriceHistoryRow, col: string): string {
+  getValue(row: PriceHistoryRow, col: string): string {
     return String((row as any)[col] ?? '');
   }
 
