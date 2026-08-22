@@ -188,4 +188,39 @@ export class DataMigration {
       error: (err) => { this.deletingAll = false; this.deleteError = err?.error?.message ?? 'Delete failed.'; this.cdr.markForCheck(); }
     });
   }
+
+  // --- Delete a single PO — for correcting an early mistake (wrong PO,
+  // or a wrong shipment linked to one). The backend itself refuses if
+  // Clearance has started, so the confirmation here is lighter than
+  // Complete Delete's typed-phrase requirement, but still explicit.
+  deletePoNumber = '';
+  deletingPo = false;
+  deletePoResult: string | null = null;
+  deletePoError = '';
+  confirmingDeletePo = false;
+
+  startDeletePo(): void {
+    if (!this.deletePoNumber.trim()) return;
+    this.confirmingDeletePo = true;
+  }
+
+  cancelDeletePo(): void {
+    this.confirmingDeletePo = false;
+  }
+
+  confirmDeletePo(): void {
+    this.confirmingDeletePo = false;
+    this.deletingPo = true;
+    this.deletePoResult = null;
+    this.deletePoError = '';
+    this.service.deletePo(this.deletePoNumber.trim()).subscribe({
+      next: (r) => {
+        this.deletingPo = false;
+        this.deletePoResult = r.message;
+        this.deletePoNumber = '';
+        this.cdr.markForCheck();
+      },
+      error: (err) => { this.deletingPo = false; this.deletePoError = err?.error?.message ?? 'Delete failed.'; this.cdr.markForCheck(); }
+    });
+  }
 }
