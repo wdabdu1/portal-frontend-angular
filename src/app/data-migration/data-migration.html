@@ -171,6 +171,46 @@
     </div>
   </div>
 
+  <!-- Delete a Single PO — for correcting an early mistake (wrong PO,
+       or a wrong shipment linked to one). Refuses server-side if
+       Clearance has already started on any of its shipments. -->
+  <div style="border: 1px solid #d97706; border-radius: 6px; margin-top: 1.5rem; padding: 20px; background: #fffbeb;">
+    <h3 style="font-size: 15px; margin: 0 0 6px; color: #92400e;">Delete a Single PO</h3>
+    <p style="color: #78350f; font-size: 12px; margin: 0 0 14px;">
+      Permanently deletes one Purchase Order and everything under it (line items, shipments, and their sub-sections). For correcting an early mistake — a wrongly-created PO, or a wrong shipment linked to one.
+      Refuses automatically if any of its shipments already has a Clearance record.
+    </p>
+
+    <label style="font-size: 12px; color: #78350f; display: block; margin-bottom: 6px;">PO Number</label>
+    <input
+      [(ngModel)]="deletePoNumber"
+      style="width: 200px; padding: 7px; border: 1px solid #d97706; border-radius: 4px; font-size: 13px;"
+      placeholder="PO-12345"
+    />
+    <button
+      (click)="startDeletePo()"
+      [disabled]="!deletePoNumber.trim() || deletingPo"
+      style="margin-left: 10px; padding: 7px 16px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+    >
+      {{ deletingPo ? 'Deleting...' : 'Delete PO' }}
+    </button>
+
+    <div *ngIf="confirmingDeletePo" style="margin-top: 14px; padding: 14px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px;">
+      <p style="font-size: 13px; margin: 0 0 10px; color: #6d5300;">
+        This will permanently delete PO <strong>{{ deletePoNumber }}</strong> and everything under it. This cannot be undone. Are you sure?
+      </p>
+      <button (click)="confirmDeletePo()" style="padding: 6px 14px; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 8px;">
+        Yes, Delete
+      </button>
+      <button (click)="cancelDeletePo()" style="padding: 6px 14px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        Cancel
+      </button>
+    </div>
+
+    <p *ngIf="deletePoError" style="color: #c0392b; font-size: 13px; margin-top: 12px; font-weight: 600;">{{ deletePoError }}</p>
+    <p *ngIf="deletePoResult" style="color: #1e7e34; font-size: 13px; margin-top: 12px; font-weight: 600;">✓ {{ deletePoResult }}</p>
+  </div>
+
   <!-- Complete Delete — deliberately the most visually alarming section on this page -->
   <div style="border: 2px solid #c0392b; border-radius: 6px; margin-top: 1.5rem; padding: 20px; background: #fff5f5;">
     <h3 style="font-size: 15px; margin: 0 0 6px; color: #c0392b;">⚠ Complete Delete</h3>
