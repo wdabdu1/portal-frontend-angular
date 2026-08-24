@@ -56,7 +56,8 @@ const MENU_GROUPS: MenuGroup[] = [
     label: 'Logistics',
     items: [
       { label: 'Logistics', route: '/logistics', canAccess: () => true },
-      { label: 'Truck Loads', route: '/logistics/truck-loads', canAccess: () => true }
+      { label: 'Truck Loads', route: '/logistics/truck-loads', canAccess: () => true },
+      { label: 'Truck Availability', route: '/logistics/truck-availability', canAccess: () => true }
     ]
   },
   {
