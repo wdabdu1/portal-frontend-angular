@@ -6,34 +6,19 @@ export interface TruckAvailabilityRow {
   truckId: number;
   plateNo: string;
   driverName: string | null;
-  status: 'Available' | 'InTransit' | 'Unplaced';
-  currentCityId: number | null;
-  currentCityName: string | null;
-  inTransitToCityId: number | null;
-  inTransitToCityName: string | null;
-  expectedArrivalDate: string | null;
+  isAvailable: boolean;
+  cityName: string | null;
+  expectedAvailableDate: string | null;
 }
 
 export interface TruckMovementRow {
   id: number;
-  plateNo: string;
-  fromCityName: string | null;
-  toCityName: string;
   moveDate: string;
+  fromCity: string;
+  toCity: string;
   reason: string | null;
   value: number | null;
   notes: string | null;
-  confirmedByName: string;
-  createdAt: string;
-}
-
-export interface MoveTruckRequest {
-  truckId: number;
-  toCityId: number;
-  moveDate: string;
-  reason?: string;
-  value?: number;
-  notes?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -44,11 +29,15 @@ export class TruckAvailabilityService {
     return this.http.get<TruckAvailabilityRow[]>(`${API_URL}/truck-availability`);
   }
 
-  getMovements() {
-    return this.http.get<TruckMovementRow[]>(`${API_URL}/truck-availability/movements`);
+  move(truckId: number, req: { toCityId: number; moveDate: string; reason: string | null; value: number | null; notes: string | null }) {
+    return this.http.post(`${API_URL}/truck-availability/${truckId}/move`, req);
   }
 
-  moveTruck(req: MoveTruckRequest) {
-    return this.http.post(`${API_URL}/truck-availability/move`, req);
+  setStartingCity(truckId: number, cityId: number) {
+    return this.http.post(`${API_URL}/truck-availability/${truckId}/set-starting-city`, cityId);
+  }
+
+  getMovements(truckId: number) {
+    return this.http.get<TruckMovementRow[]>(`${API_URL}/truck-availability/${truckId}/movements`);
   }
 }
