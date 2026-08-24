@@ -1,0 +1,147 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Truck Availability</h1>
+    <button (click)="onExportClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      Export to Excel
+    </button>
+  </div>
+  <p style="color: #888; font-size: 13px;">
+    Where every truck is right now, or when it's next expected to be free. Click a row to log a manual move (service, or a haul outside the system) or set a starting city.
+    Drag a column header to reorder it. Click the ▼ arrow to filter. Click column text to sort.
+  </p>
+
+  <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+    <select [(ngModel)]="statusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+      <option value="Available">Available</option>
+      <option value="InTransit">In Transit</option>
+      <option value="All">All</option>
+    </select>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let t of rows">
+        <tr
+          (click)="selectTruck(t)"
+          [style.background]="selectedTruck === t ? '#f0f6fb' : 'transparent'"
+          style="border-bottom: 1px solid #eee; cursor: pointer;"
+        >
+          <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+            <span *ngSwitchCase="'isAvailable'">
+              <span [style.color]="t.isAvailable ? '#1e7e34' : '#c0392b'" style="font-weight: 600;">{{ t.isAvailable ? 'Available' : 'In Transit' }}</span>
+            </span>
+            <span *ngSwitchCase="'cityName'">{{ t.cityName || '—' }}</span>
+            <span *ngSwitchCase="'expectedAvailableDate'" style="color: #888;">{{ t.expectedAvailableDate ? (t.expectedAvailableDate | date: 'MMM d, y') : '—' }}</span>
+            <span *ngSwitchDefault>{{ getValue(t, col.key) || '—' }}</span>
+          </td>
+        </tr>
+
+        <tr *ngIf="selectedTruck === t">
+          <td [attr.colspan]="columns.length" style="padding: 16px; background: #f9f9f9;">
+
+            <div *ngIf="!t.cityName">
+              <p style="font-size: 13px; color: #555; margin-top: 0;">This truck has no starting city yet — set one to begin tracking it.</p>
+              <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Starting City</label>
+                  <select [(ngModel)]="moveToCityId" style="padding:6px;">
+                    <option [ngValue]="null">-- select --</option>
+                    <option *ngFor="let c of cities" [ngValue]="c.id">{{ c['name'] }}</option>
+                  </select>
+                </div>
+                <button (click)="setStartingCity()" [disabled]="moving || !moveToCityId" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+                  {{ moving ? 'Saving...' : 'Set Starting City' }}
+                </button>
+              </div>
+              <p *ngIf="moveError" style="color:#c0392b; font-size:12px;">{{ moveError }}</p>
+            </div>
+
+            <div *ngIf="t.cityName">
+              <p *ngIf="loadingMovements" style="color: #888; font-size: 12px;">Loading history...</p>
+
+              <table *ngIf="!loadingMovements && movements.length > 0" style="width:100%; max-width:700px; border-collapse:collapse; font-size:13px; margin-bottom: 12px;">
+                <thead>
+                  <tr style="text-align:left; border-bottom:1px solid #ddd;">
+                    <th style="padding:5px;">Date</th>
+                    <th style="padding:5px;">From</th>
+                    <th style="padding:5px;">To</th>
+                    <th style="padding:5px;">Reason</th>
+                    <th style="padding:5px;">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let m of movements" style="border-bottom:1px solid #eee;">
+                    <td style="padding:5px;">{{ m.moveDate | date: 'MMM d, y' }}</td>
+                    <td style="padding:5px;">{{ m.fromCity }}</td>
+                    <td style="padding:5px;">{{ m.toCity }}</td>
+                    <td style="padding:5px;">{{ m.reason || '—' }}</td>
+                    <td style="padding:5px;">{{ m.value !== null ? (m.value | number: '1.0-2') : '—' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p *ngIf="moveError" style="color:#c0392b; font-size:12px;">{{ moveError }}</p>
+
+              <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Move To</label>
+                  <select [(ngModel)]="moveToCityId" style="padding:6px;">
+                    <option [ngValue]="null">-- select --</option>
+                    <option *ngFor="let c of cities" [ngValue]="c.id">{{ c['name'] }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Date</label>
+                  <input type="date" [(ngModel)]="moveDate" style="padding:6px;" />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Reason</label>
+                  <input [(ngModel)]="moveReason" placeholder="Service, external haul, etc." style="padding:6px;" />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Value (optional)</label>
+                  <input type="number" [(ngModel)]="moveValue" style="padding:6px; width:100px;" />
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; color:#555;">Notes</label>
+                  <input [(ngModel)]="moveNotes" style="padding:6px;" />
+                </div>
+                <button (click)="moveTruck()" [disabled]="moving || !moveToCityId || !moveDate" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+                  {{ moving ? 'Saving...' : 'Log Move' }}
+                </button>
+              </div>
+            </div>
+
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+  </div>
+
+  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No trucks match this filter.
+  </p>
+</div>
