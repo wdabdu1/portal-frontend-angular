@@ -1,57 +1,19 @@
 <div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h1 style="font-size: 20px; font-weight: 500;">Logistics — Warehouse Allocation</h1>
+    <h1 style="font-size: 20px; font-weight: 500;">Shipments for Dispatch</h1>
     <button (click)="onExportClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
       Export to Excel
     </button>
   </div>
   <p style="color: #888; font-size: 13px;">Items approaching or at clearance completion. Drag a column header to reorder it. Click the ▼ arrow to filter. Click a row to allocate quantities to warehouses.</p>
-
-  <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; overflow: hidden;">
-    <div style="padding: 12px 16px; background: #f0f6fb;">
-      <strong style="font-size: 14px;">Ready for Truck Assignment</strong>
-      <span style="font-size: 12px; color: #666; margin-left: 8px;">Allocated to a warehouse, not yet loaded onto a truck</span>
-    </div>
-    <p *ngIf="loadingReadyForTruck" style="color: #888; font-size: 13px; padding: 12px 16px;">Loading...</p>
-    <table *ngIf="!loadingReadyForTruck && readyForTruck.length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px;">
-      <thead>
-        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th style="padding: 8px 16px;">BU</th>
-          <th style="padding: 8px 6px;">BL No.</th>
-          <th style="padding: 8px 6px;">Product/Model</th>
-          <th style="padding: 8px 6px;">Warehouse</th>
-          <th style="padding: 8px 6px;">Allocated</th>
-          <th style="padding: 8px 6px;">Loaded</th>
-          <th style="padding: 8px 6px;">Remaining</th>
-          <th style="padding: 8px 16px;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let r of readyForTruck" style="border-bottom: 1px solid #eee;">
-          <td style="padding: 8px 16px;">{{ r.businessUnit }}</td>
-          <td style="padding: 8px 6px; font-family: monospace;">{{ r.blAwbNo }}</td>
-          <td style="padding: 8px 6px;">{{ r.modelProduct }}</td>
-          <td style="padding: 8px 6px;">{{ r.warehouseName }}</td>
-          <td style="padding: 8px 6px;">{{ r.allocatedQty | number: '1.0-2' }} {{ r.unit }}</td>
-          <td style="padding: 8px 6px;">{{ r.loadedQty | number: '1.0-2' }}</td>
-          <td style="padding: 8px 6px; font-weight: 600; color: #0a3d62;">{{ r.remainingQty | number: '1.0-2' }}</td>
-          <td style="padding: 8px 16px;"><a routerLink="/logistics/truck-loads" style="color: #0a3d62; font-size: 12px;">Assign Truck →</a></td>
-        </tr>
-      </tbody>
-    </table>
-    <p *ngIf="!loadingReadyForTruck && readyForTruck.length === 0" style="color: #888; font-size: 13px; padding: 12px 16px;">
-      Nothing waiting on a truck right now.
-    </p>
-  </div>
-
   <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
     <h2 style="font-size: 15px; font-weight: 600; color: #333; margin: 0;">Warehouse Allocation</h2>
     <select [(ngModel)]="statusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
-      <option value="Pending">Pending</option>
-      <option value="Completed">Completed</option>
+      <option value="Pending">Pending Allocation</option>
+      <option value="Partial">Partially Allocated</option>
+      <option value="Completed">Fully Allocated</option>
       <option value="All">All</option>
     </select>
-  </div>
 
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
