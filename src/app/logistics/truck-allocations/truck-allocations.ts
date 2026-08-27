@@ -28,6 +28,8 @@ export class TruckAllocations implements OnInit {
 
   expandedCity: string | null = null;
   qtyByAllocationId: Record<number, number | null> = {};
+  inHousePriceByAllocationId: Record<number, number | null> = {};
+  parallelMarketPriceByAllocationId: Record<number, number | null> = {};
 
   assignTruckId: number | null = null;
   assignDriverId: number | null = null;
@@ -92,6 +94,8 @@ export class TruckAllocations implements OnInit {
     }
     this.expandedCity = city;
     this.qtyByAllocationId = {};
+    this.inHousePriceByAllocationId = {};
+    this.parallelMarketPriceByAllocationId = {};
     const group = this.groups.find((g) => g.city === city);
     if (group) for (const item of group.items) this.qtyByAllocationId[item.warehouseAllocationId] = item.remainingQty;
     this.assignTruckId = null;
@@ -110,7 +114,11 @@ export class TruckAllocations implements OnInit {
     if (!this.assignTruckId || !this.assignLoadDate) return;
     const items = group.items
       .filter((i) => (this.qtyByAllocationId[i.warehouseAllocationId] ?? 0) > 0)
-      .map((i) => ({ warehouseAllocationId: i.warehouseAllocationId, qty: this.qtyByAllocationId[i.warehouseAllocationId]! }));
+      .map((i) => ({
+        warehouseAllocationId: i.warehouseAllocationId, qty: this.qtyByAllocationId[i.warehouseAllocationId]!,
+        inHousePrice: this.inHousePriceByAllocationId[i.warehouseAllocationId] ?? null,
+        parallelMarketPrice: this.parallelMarketPriceByAllocationId[i.warehouseAllocationId] ?? null
+      }));
     if (items.length === 0) { this.assignError = 'Enter a quantity for at least one item.'; return; }
 
     // Every item in a city group can span different warehouses within
