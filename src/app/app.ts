@@ -55,10 +55,10 @@ const MENU_GROUPS: MenuGroup[] = [
   {
     label: 'Logistics',
     items: [
-      { label: 'Logistics', route: '/logistics', canAccess: () => true },
-      { label: 'Goods in Transit', route: '/logistics/truck-loads', canAccess: () => true },
+      { label: 'Shipments for Dispatch', route: '/logistics', canAccess: () => true },
       { label: 'Truck Availability', route: '/logistics/truck-availability', canAccess: () => true },
-      { label: 'Truck Allocations', route: '/logistics/truck-allocations', canAccess: () => true }
+      { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: () => true },
+      { label: 'Cargo Under Delivery', route: '/dashboards/goods-in-transit', canAccess: () => true }
     ]
   },
   {
