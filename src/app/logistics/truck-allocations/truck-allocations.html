@@ -36,6 +36,8 @@
           <th style="padding: 6px 6px;">Product/Model</th>
           <th style="padding: 6px 6px;">Remaining</th>
           <th *ngIf="expandedCity === group.city" style="padding: 6px 16px;">Qty to Load</th>
+          <th *ngIf="expandedCity === group.city" style="padding: 6px 6px;">In-House Price</th>
+          <th *ngIf="expandedCity === group.city" style="padding: 6px 6px;">Parallel Market Price</th>
         </tr>
       </thead>
       <tbody>
@@ -51,6 +53,12 @@
               [(ngModel)]="qtyByAllocationId[item.warehouseAllocationId]"
               style="width: 90px; padding: 4px;"
             />
+          </td>
+          <td *ngIf="expandedCity === group.city" style="padding: 6px 6px;">
+            <input type="number" [(ngModel)]="inHousePriceByAllocationId[item.warehouseAllocationId]" style="width: 100px; padding: 4px;" />
+          </td>
+          <td *ngIf="expandedCity === group.city" style="padding: 6px 6px;">
+            <input type="number" [(ngModel)]="parallelMarketPriceByAllocationId[item.warehouseAllocationId]" style="width: 100px; padding: 4px;" />
           </td>
         </tr>
       </tbody>
