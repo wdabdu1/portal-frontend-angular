@@ -1,0 +1,45 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Truck Allocations</h1>
+    <button (click)="onExportClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      Export to Excel
+    </button>
+  </div>
+  <p style="color: #888; font-size: 13px;">
+    Everything waiting on a truck, grouped by city. Open a city to pick a truck and assign it directly — no separate screen, no re-finding the item.
+  </p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+  <p *ngIf="!loading && groups.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    Nothing waiting on a truck right now.
+  </p>
+
+  <div *ngFor="let group of groups" style="margin-top: 1.5rem; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+    <div
+      (click)="toggleCity(group.city)"
+      style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #f5f7fa; cursor: pointer;"
+    >
+      <div>
+        <span style="font-weight: 600; font-size: 15px;">{{ group.city }}</span>
+        <span style="color: #888; font-size: 13px; margin-left: 10px;">{{ group.items.length }} item(s), {{ group.totalRemaining | number: '1.0-2' }} total qty</span>
+      </div>
+      <span style="color: #0a3d62; font-size: 13px;">{{ expandedCity === group.city ? 'Close ▲' : 'Assign Truck ▼' }}</span>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #eee; background: #fafafa;">
+          <th style="padding: 6px 16px;">Warehouse</th>
+          <th style="padding: 6px 6px;">BU</th>
+          <th style="padding: 6px 6px;">BL No.</th>
+          <th style="padding: 6px 6px;">Product/Model</th>
+          <th style="padding: 6px 6px;">Remaining</th>
+          <th *ngIf="expandedCity === group.city" style="padding: 6px 16px;">Qty to Load</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of group.items" style="border-bottom: 1px solid #f2f2f2;">
+          <td style="padding: 6px 16px;">{{ item.warehouseName }}</td>
+          <td style="padding: 6px 6px;">{{ item.businessUnit }}</td>
+          <td style="padding: 6px 6px; font-family: monospace;">{{
