@@ -47,26 +47,30 @@ export class TruckAllocations implements OnInit {
     this.load();
   }
 
-  load(): void {
-    this.loading = true;
-    this.service.getReadyForAssignment().subscribe({
-      next: (r) => { this.allItems = r; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.error = 'Could not load items ready for assignment.'; this.loading = false; this.cdr.markForCheck(); }
-    });
-  }
+  // Computed once per load, not on every change-detection cycle — this
+  // used to be a live getter, which meant *ngFor got a brand-new array of
+  // brand-new objects on every keystroke/click and had to rebuild the
+  // entire table's DOM each time, which is what caused the page to hang.
+  groups: CityGroup[] = [];
 
-  // Grouped by city so dispatch can plan "what needs a truck to Gadarif
-  // today" as one glance, rather than hunting through a flat list.
-  get groups(): CityGroup[] {
+  private computeGroups(): void {
     const byCity = new Map<string, ReadyForTruckAssignment[]>();
     for (const item of this.allItems) {
       const key = item.city || 'No City Set';
       if (!byCity.has(key)) byCity.set(key, []);
       byCity.get(key)!.push(item);
     }
-    return Array.from(byCity.entries())
+    this.groups = Array.from(byCity.entries())
       .map(([city, items]) => ({ city, items, totalRemaining: items.reduce((sum, i) => sum + i.remainingQty, 0) }))
       .sort((a, b) => a.city.localeCompare(b.city));
+  }
+
+  load(): void {
+    this.loading = true;
+    this.service.getReadyForAssignment().subscribe({
+      next: (r) => { this.allItems = r; this.computeGroups(); this.loading = false; this.cdr.markForCheck(); },
+      error: () => { this.error = 'Could not load items ready for assignment.'; this.loading = false; this.cdr.markForCheck(); }
+    });
   }
 
   onExportClick(): void {
