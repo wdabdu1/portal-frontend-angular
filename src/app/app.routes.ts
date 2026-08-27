@@ -36,6 +36,7 @@ import { LogisticsList } from './logistics/logistics-list/logistics-list';
 import { TruckLoadList } from './logistics/truck-load-list/truck-load-list';
 import { TruckLoadDetailComponent } from './logistics/truck-load-detail/truck-load-detail';
 import { TruckAvailability } from './logistics/truck-availability/truck-availability';
+import { TruckAllocations } from './logistics/truck-allocations/truck-allocations';
 import { TransferPricingDetailComponent } from './transfer-pricing/transfer-pricing-detail/transfer-pricing-detail';
 import { TransferPricingList } from './transfer-pricing/transfer-pricing-list/transfer-pricing-list';
 import { TransferPricingAccumulated } from './transfer-pricing/transfer-pricing-accumulated/transfer-pricing-accumulated';
@@ -92,6 +93,7 @@ export const routes: Routes = [
   { path: 'logistics/truck-loads', component: TruckLoadList, canActivate: [authGuard] },
   { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard] },
   { path: 'logistics/truck-availability', component: TruckAvailability, canActivate: [authGuard] },
+  { path: 'logistics/truck-allocations', component: TruckAllocations, canActivate: [authGuard] },
   { path: 'transfer-pricing', component: TransferPricingList, canActivate: [authGuard] },
   { path: 'transfer-pricing/accumulated', component: TransferPricingAccumulated, canActivate: [authGuard] },
   { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard] },
