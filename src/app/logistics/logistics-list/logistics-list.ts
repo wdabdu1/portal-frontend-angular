@@ -8,7 +8,6 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { exportToExcel } from '../../shared/excel-export.util';
 import { AllocationResponse, LogisticsItemRow, LogisticsService } from '../logistics.service';
-import { ReadyForTruckAssignment, TruckLoadService } from '../truck-load.service';
 
 type SortColumn = keyof LogisticsItemRow;
 
@@ -50,10 +49,8 @@ export class LogisticsList implements OnInit {
 
   // Defaults to Pending so this stays the "still needs allocating" queue —
   // fully allocated items are still one click away via the toggle.
-  statusFilter: 'Pending' | 'Completed' | 'All' = 'Pending';
+  statusFilter: 'Pending' | 'Partial' | 'Completed' | 'All' = 'Pending';
 
-  readyForTruck: ReadyForTruckAssignment[] = [];
-  loadingReadyForTruck = true;
 
   columns: ColumnDef[] = [...DEFAULT_COLUMNS];
   private dragFromIndex: number | null = null;
@@ -75,17 +72,14 @@ export class LogisticsList implements OnInit {
   constructor(
     private service: LogisticsService,
     private lookups: SettingsLookupService,
-    private tablePrefs: TablePreferencesService,
-    private truckLoadService: TruckLoadService
+    private tablePrefs: TablePreferencesService
   ) {}
 
   ngOnInit(): void {
     this.lookups.getAll<LookupEntity>('warehouses').subscribe({
       next: (r) => { this.warehouses = r; this.cdr.markForCheck(); }
     });
-
-    this.loadReadyForTruck();
-
+    
     this.tablePrefs.get('logistics').subscribe({
       next: (pref) => {
         if (pref) {
@@ -158,17 +152,11 @@ export class LogisticsList implements OnInit {
     return selected.size < this.optionsFor(col).length;
   }
 
-  loadReadyForTruck(): void {
-    this.loadingReadyForTruck = true;
-    this.truckLoadService.getReadyForAssignment().subscribe({
-      next: (r) => { this.readyForTruck = r; this.loadingReadyForTruck = false; this.cdr.markForCheck(); },
-      error: () => { this.loadingReadyForTruck = false; this.cdr.markForCheck(); }
-    });
-  }
 
   get items(): LogisticsItemRow[] {
     let filtered = applyFilters(this.allItems, this.filters, (r, col) => this.getValue(r, col));
-    if (this.statusFilter === 'Pending') filtered = filtered.filter((i) => i.remainingQty > 0);
+    if (this.statusFilter === 'Pending') filtered = filtered.filter((i) => i.allocatedQty === 0);
+    if (this.statusFilter === 'Partial') filtered = filtered.filter((i) => i.allocatedQty > 0 && i.remainingQty > 0);
     if (this.statusFilter === 'Completed') filtered = filtered.filter((i) => i.remainingQty <= 0);
     const dir = this.sortAsc ? 1 : -1;
     return [...filtered].sort((a, b) => {
