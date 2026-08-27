@@ -147,12 +147,20 @@ export class TruckLoadList implements OnInit {
     if (!selected || selected.size === 0) return false;
     return selected.size < this.optionsFor(col).length;
   }
-
   daysLateOrEarly(item: TruckLoadItemRow): number | null {
     if (!item.expectedDeliveryDate || !item.actualDropOffDate) return null;
     const expected = new Date(item.expectedDeliveryDate).getTime();
     const actual = new Date(item.actualDropOffDate).getTime();
     return Math.round((actual - expected) / (1000 * 60 * 60 * 24));
+  }
+
+  // Only meaningful while still in transit — once arrived, daysLateOrEarly
+  // takes over as the relevant figure instead.
+  daysRemaining(item: TruckLoadItemRow): number | null {
+    if (!item.expectedDeliveryDate || item.actualDropOffDate) return null;
+    const expected = new Date(item.expectedDeliveryDate).getTime();
+    const today = new Date(new Date().toDateString()).getTime();
+    return Math.round((expected - today) / (1000 * 60 * 60 * 24));
   }
 
   get items(): TruckLoadItemRow[] {
