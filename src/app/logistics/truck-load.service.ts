@@ -74,11 +74,29 @@ export interface ReadyForTruckAssignment {
   modelProduct: string;
   unit: string;
   blAwbNo: string;
+  warehouseId: number;
   warehouseName: string;
+  city: string | null;
   allocatedQty: number;
   loadedQty: number;
   remainingQty: number;
   allocatedAt: string;
+}
+
+export interface QuickAssignItem {
+  warehouseAllocationId: number;
+  qty: number;
+  inHousePrice?: number | null;
+  parallelMarketPrice?: number | null;
+}
+
+export interface QuickAssignRequest {
+  truckId: number;
+  driverId: number | null;
+  loadDate: string;
+  warehouseId: number;
+  expectedDeliveryDate: string | null;
+  items: QuickAssignItem[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -111,6 +129,10 @@ export class TruckLoadService {
 
   getReadyForAssignment() {
     return this.http.get<ReadyForTruckAssignment[]>(`${API_URL}/truck-loads/ready-for-assignment`);
+  }
+
+  quickAssign(req: QuickAssignRequest) {
+    return this.http.post<{ truckLoadId: number; dropId: number }>(`${API_URL}/truck-loads/quick-assign`, req);
   }
 
   deleteDrop(dropId: number) {
