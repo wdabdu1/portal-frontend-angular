@@ -80,7 +80,12 @@
             <span *ngSwitchCase="'driverName'">{{ item.driverName || '—' }}</span>
             <span *ngSwitchCase="'loadDate'" style="color: #888;">{{ item.loadDate | date: 'MMM d, y' }}</span>
             <span *ngSwitchCase="'city'">{{ item.city || '—' }}</span>
-           <span *ngSwitchCase="'expectedDeliveryDate'" style="color: #0a3d62;">{{ item.expectedDeliveryDate ? (item.expectedDeliveryDate | date: 'MMM d, y') : '—' }}</span>
+           <span *ngSwitchCase="'expectedDeliveryDate'" style="color: #0a3d62;">
+              {{ item.expectedDeliveryDate ? (item.expectedDeliveryDate | date: 'MMM d, y') : '—' }}
+              <span *ngIf="daysRemaining(item) !== null" [style.color]="daysRemaining(item)! < 0 ? '#c0392b' : '#888'" style="font-size: 11px; margin-left: 4px;">
+                ({{ daysRemaining(item)! > 0 ? daysRemaining(item) + 'd left' : (daysRemaining(item)! < 0 ? (-daysRemaining(item)!) + 'd overdue' : 'due today') }})
+              </span>
+            </span>
             <span *ngSwitchCase="'actualDropOffDate'">
               <span *ngIf="item.actualDropOffDate" style="color: #1e7e34;">{{ item.actualDropOffDate | date: 'MMM d, y' }}</span>
               <span *ngIf="!item.actualDropOffDate" style="color: #a66a00;">Pending</span>
