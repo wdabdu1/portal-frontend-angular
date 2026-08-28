@@ -15,13 +15,25 @@ interface ColumnDef {
   label: string;
 }
 
-const DEFAULT_COLUMNS: ColumnDef[] = [
+// Two independent tables instead of one table + a dropdown filter, so both
+// "who's free right now" and "who's en route" are visible simultaneously.
+// "Status" is dropped as a column on both — which table a row is in already
+// says that.
+const DEFAULT_AVAILABLE_COLUMNS: ColumnDef[] = [
   { key: 'plateNo', label: 'Truck' },
   { key: 'driverName', label: 'Driver' },
-  { key: 'isAvailable', label: 'Status' },
-  { key: 'cityName', label: 'City' },
+  { key: 'cityName', label: 'City' }
+];
+
+const DEFAULT_IN_TRANSIT_COLUMNS: ColumnDef[] = [
+  { key: 'plateNo', label: 'Truck' },
+  { key: 'driverName', label: 'Driver' },
+  { key: 'cityName', label: 'Heading To' },
   { key: 'expectedAvailableDate', label: 'Available From' }
 ];
+
+const AVAILABLE_PREF_KEY = 'truckAvailabilityAvailable';
+const IN_TRANSIT_PREF_KEY = 'truckAvailabilityInTransit';
 
 @Component({
   selector: 'app-truck-availability',
@@ -31,21 +43,34 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
 export class TruckAvailability implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  allRows: TruckAvailabilityRow[] = [];
   loading = true;
   error = '';
 
-  sortColumn: SortColumn = 'cityName';
-  sortAsc = true;
+  // Raw split of the last load — source of truth for each table's filter
+  // option lists and for recomputing rows after a sort/filter change.
+  private availableItems: TruckAvailabilityRow[] = [];
+  private inTransitItems: TruckAvailabilityRow[] = [];
 
-  // Defaults to Available so this reads as "who can I dispatch right now" —
-  // trucks still en route are one click away via the toggle.
-  statusFilter: 'Available' | 'InTransit' | 'All' = 'Available';
+  // Computed once per load/sort/filter and stored as plain properties, not
+  // live getters — a live getter here previously handed *ngFor a brand-new
+  // array of brand-new objects on every change-detection cycle, forcing a
+  // full DOM rebuild on every keystroke/click and hanging the page. Same
+  // fix as Truck Allocations' `groups`.
+  availableRows: TruckAvailabilityRow[] = [];
+  inTransitRows: TruckAvailabilityRow[] = [];
 
-  columns: ColumnDef[] = [...DEFAULT_COLUMNS];
-  private dragFromIndex: number | null = null;
+  availableColumns: ColumnDef[] = [...DEFAULT_AVAILABLE_COLUMNS];
+  inTransitColumns: ColumnDef[] = [...DEFAULT_IN_TRANSIT_COLUMNS];
+  private dragFromIndexAvailable: number | null = null;
+  private dragFromIndexInTransit: number | null = null;
 
-  filters: Record<string, Set<string>> = {};
+  sortAvailableColumn: SortColumn = 'plateNo';
+  sortAvailableAsc = true;
+  sortInTransitColumn: SortColumn = 'expectedAvailableDate';
+  sortInTransitAsc = true;
+
+  filtersAvailable: Record<string, Set<string>> = {};
+  filtersInTransit: Record<string, Set<string>> = {};
 
   cities: LookupEntity[] = [];
 
@@ -70,56 +95,153 @@ export class TruckAvailability implements OnInit {
   ngOnInit(): void {
     this.lookups.getAll<LookupEntity>('logistics-cities').subscribe({ next: (r) => { this.cities = r; this.cdr.markForCheck(); } });
 
-    this.tablePrefs.get('truckAvailability').subscribe({
+    this.tablePrefs.get(AVAILABLE_PREF_KEY).subscribe({
       next: (pref) => {
         if (pref) {
-          this.sortColumn = pref.sortColumn as SortColumn;
-          this.sortAsc = pref.sortAsc;
+          this.sortAvailableColumn = pref.sortColumn as SortColumn;
+          this.sortAvailableAsc = pref.sortAsc;
         }
         this.load();
       },
       error: () => this.load()
     });
 
-    this.tablePrefs.getColumnOrder('truckAvailability').subscribe({
-      next: (order) => { if (order && order.length > 0) this.applyColumnOrder(order); }
+    this.tablePrefs.get(IN_TRANSIT_PREF_KEY).subscribe({
+      next: (pref) => {
+        if (pref) {
+          this.sortInTransitColumn = pref.sortColumn as SortColumn;
+          this.sortInTransitAsc = pref.sortAsc;
+        }
+      }
+    });
+
+    this.tablePrefs.getColumnOrder(AVAILABLE_PREF_KEY).subscribe({
+      next: (order) => { if (order && order.length > 0) this.applyColumnOrder(order, DEFAULT_AVAILABLE_COLUMNS, (c) => (this.availableColumns = c)); }
+    });
+
+    this.tablePrefs.getColumnOrder(IN_TRANSIT_PREF_KEY).subscribe({
+      next: (order) => { if (order && order.length > 0) this.applyColumnOrder(order, DEFAULT_IN_TRANSIT_COLUMNS, (c) => (this.inTransitColumns = c)); }
     });
   }
 
-  private applyColumnOrder(savedOrder: string[]): void {
-    const byKey = new Map(DEFAULT_COLUMNS.map((c) => [c.key, c]));
+  private applyColumnOrder(savedOrder: string[], defaults: ColumnDef[], assign: (cols: ColumnDef[]) => void): void {
+    const byKey = new Map(defaults.map((c) => [c.key, c]));
     const ordered: ColumnDef[] = [];
     for (const key of savedOrder) {
       const col = byKey.get(key as SortColumn);
       if (col) { ordered.push(col); byKey.delete(key as SortColumn); }
     }
     ordered.push(...byKey.values());
-    this.columns = ordered;
+    assign(ordered);
     this.cdr.markForCheck();
   }
 
-  onDragStart(index: number): void { this.dragFromIndex = index; }
-  onDragOver(event: DragEvent): void { event.preventDefault(); }
-  onDrop(index: number): void {
-    if (this.dragFromIndex === null || this.dragFromIndex === index) return;
-    const cols = [...this.columns];
-    const [moved] = cols.splice(this.dragFromIndex, 1);
+  // --- Available table ---
+
+  onAvailableDragStart(index: number): void { this.dragFromIndexAvailable = index; }
+  onAvailableDragOver(event: DragEvent): void { event.preventDefault(); }
+  onAvailableDrop(index: number): void {
+    if (this.dragFromIndexAvailable === null || this.dragFromIndexAvailable === index) return;
+    const cols = [...this.availableColumns];
+    const [moved] = cols.splice(this.dragFromIndexAvailable, 1);
     cols.splice(index, 0, moved);
-    this.columns = cols;
-    this.dragFromIndex = null;
-    this.tablePrefs.saveColumnOrder('truckAvailability', cols.map((c) => c.key)).subscribe();
+    this.availableColumns = cols;
+    this.dragFromIndexAvailable = null;
+    this.tablePrefs.saveColumnOrder(AVAILABLE_PREF_KEY, cols.map((c) => c.key)).subscribe();
   }
 
-  load(): void {
-    this.loading = true;
-    this.service.getAll().subscribe({
-      next: (r) => { this.allRows = r; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.error = 'Could not load truck availability.'; this.loading = false; this.cdr.markForCheck(); }
-    });
+  availableOptionsFor(col: string): string[] {
+    this.ensureFilterKey(this.filtersAvailable, col);
+    return columnOptions(this.availableItems, this.filtersAvailable, col, (r, c) => this.getValue(r, c));
   }
 
-  private ensureFilterKey(key: string): void {
-    if (!this.filters[key]) this.filters[key] = new Set();
+  onAvailableFilterChange(col: string, values: Set<string>): void {
+    this.filtersAvailable[col] = values;
+    this.recomputeAvailable();
+    this.cdr.markForCheck();
+  }
+
+  isAvailableColumnFiltered(col: string): boolean {
+    const selected = this.filtersAvailable[col];
+    if (!selected || selected.size === 0) return false;
+    return selected.size < this.availableOptionsFor(col).length;
+  }
+
+  sortAvailableBy(column: SortColumn): void {
+    if (this.sortAvailableColumn === column) {
+      this.sortAvailableAsc = !this.sortAvailableAsc;
+    } else {
+      this.sortAvailableColumn = column;
+      this.sortAvailableAsc = true;
+    }
+    this.recomputeAvailable();
+    this.tablePrefs.save(AVAILABLE_PREF_KEY, this.sortAvailableColumn, this.sortAvailableAsc).subscribe();
+  }
+
+  onExportAvailableClick(): void {
+    exportToExcel('Truck Availability - Available', this.availableColumns, this.availableRows);
+  }
+
+  private recomputeAvailable(): void {
+    const filtered = applyFilters(this.availableItems, this.filtersAvailable, (r, c) => this.getValue(r, c));
+    this.availableRows = this.sortRows(filtered, this.sortAvailableColumn, this.sortAvailableAsc);
+  }
+
+  // --- In Transit table ---
+
+  onInTransitDragStart(index: number): void { this.dragFromIndexInTransit = index; }
+  onInTransitDragOver(event: DragEvent): void { event.preventDefault(); }
+  onInTransitDrop(index: number): void {
+    if (this.dragFromIndexInTransit === null || this.dragFromIndexInTransit === index) return;
+    const cols = [...this.inTransitColumns];
+    const [moved] = cols.splice(this.dragFromIndexInTransit, 1);
+    cols.splice(index, 0, moved);
+    this.inTransitColumns = cols;
+    this.dragFromIndexInTransit = null;
+    this.tablePrefs.saveColumnOrder(IN_TRANSIT_PREF_KEY, cols.map((c) => c.key)).subscribe();
+  }
+
+  inTransitOptionsFor(col: string): string[] {
+    this.ensureFilterKey(this.filtersInTransit, col);
+    return columnOptions(this.inTransitItems, this.filtersInTransit, col, (r, c) => this.getValue(r, c));
+  }
+
+  onInTransitFilterChange(col: string, values: Set<string>): void {
+    this.filtersInTransit[col] = values;
+    this.recomputeInTransit();
+    this.cdr.markForCheck();
+  }
+
+  isInTransitColumnFiltered(col: string): boolean {
+    const selected = this.filtersInTransit[col];
+    if (!selected || selected.size === 0) return false;
+    return selected.size < this.inTransitOptionsFor(col).length;
+  }
+
+  sortInTransitBy(column: SortColumn): void {
+    if (this.sortInTransitColumn === column) {
+      this.sortInTransitAsc = !this.sortInTransitAsc;
+    } else {
+      this.sortInTransitColumn = column;
+      this.sortInTransitAsc = true;
+    }
+    this.recomputeInTransit();
+    this.tablePrefs.save(IN_TRANSIT_PREF_KEY, this.sortInTransitColumn, this.sortInTransitAsc).subscribe();
+  }
+
+  onExportInTransitClick(): void {
+    exportToExcel('Truck Availability - In Transit', this.inTransitColumns, this.inTransitRows);
+  }
+
+  private recomputeInTransit(): void {
+    const filtered = applyFilters(this.inTransitItems, this.filtersInTransit, (r, c) => this.getValue(r, c));
+    this.inTransitRows = this.sortRows(filtered, this.sortInTransitColumn, this.sortInTransitAsc);
+  }
+
+  // --- Shared ---
+
+  private ensureFilterKey(filters: Record<string, Set<string>>, key: string): void {
+    if (!filters[key]) filters[key] = new Set();
   }
 
   getValue(row: TruckAvailabilityRow, col: string): string {
@@ -127,30 +249,11 @@ export class TruckAvailability implements OnInit {
     return String((row as any)[col] ?? '');
   }
 
-  optionsFor(col: string): string[] {
-    this.ensureFilterKey(col);
-    return columnOptions(this.allRows, this.filters, col, (r, c) => this.getValue(r, c));
-  }
-
-  onFilterChange(col: string, values: Set<string>): void {
-    this.filters[col] = values;
-    this.cdr.markForCheck();
-  }
-
-  isColumnFiltered(col: string): boolean {
-    const selected = this.filters[col];
-    if (!selected || selected.size === 0) return false;
-    return selected.size < this.optionsFor(col).length;
-  }
-
-  get rows(): TruckAvailabilityRow[] {
-    let filtered = applyFilters(this.allRows, this.filters, (r, col) => this.getValue(r, col));
-    if (this.statusFilter === 'Available') filtered = filtered.filter((r) => r.isAvailable);
-    if (this.statusFilter === 'InTransit') filtered = filtered.filter((r) => !r.isAvailable);
-    const dir = this.sortAsc ? 1 : -1;
-    return [...filtered].sort((a, b) => {
-      const av = a[this.sortColumn];
-      const bv = b[this.sortColumn];
+  private sortRows(rows: TruckAvailabilityRow[], column: SortColumn, asc: boolean): TruckAvailabilityRow[] {
+    const dir = asc ? 1 : -1;
+    return [...rows].sort((a, b) => {
+      const av = a[column];
+      const bv = b[column];
       if (av === null || av === undefined) return 1;
       if (bv === null || bv === undefined) return -1;
       if (av < bv) return -1 * dir;
@@ -159,18 +262,19 @@ export class TruckAvailability implements OnInit {
     });
   }
 
-  onExportClick(): void {
-    exportToExcel('Truck Availability', this.columns, this.rows);
-  }
-
-  sortBy(column: SortColumn): void {
-    if (this.sortColumn === column) {
-      this.sortAsc = !this.sortAsc;
-    } else {
-      this.sortColumn = column;
-      this.sortAsc = true;
-    }
-    this.tablePrefs.save('truckAvailability', this.sortColumn, this.sortAsc).subscribe();
+  load(): void {
+    this.loading = true;
+    this.service.getAll().subscribe({
+      next: (r) => {
+        this.availableItems = r.filter((t) => t.isAvailable);
+        this.inTransitItems = r.filter((t) => !t.isAvailable);
+        this.recomputeAvailable();
+        this.recomputeInTransit();
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.error = 'Could not load truck availability.'; this.loading = false; this.cdr.markForCheck(); }
+    });
   }
 
   selectTruck(truck: TruckAvailabilityRow): void {
@@ -199,7 +303,7 @@ export class TruckAvailability implements OnInit {
     this.moveError = '';
     this.service.setStartingCity(this.selectedTruck.truckId, this.moveToCityId).subscribe({
       next: () => { this.moving = false; this.load(); this.selectedTruck = null; },
-      error: (err) => { this.moving = false; this.moveError = err?.error?.message || 'Could not set starting city.'; this.cdr.markForCheck(); }
+      error: (err: any) => { this.moving = false; this.moveError = err?.error?.message || 'Could not set starting city.'; this.cdr.markForCheck(); }
     });
   }
 
@@ -217,7 +321,7 @@ export class TruckAvailability implements OnInit {
         this.loadMovements();
         this.load();
       },
-      error: (err) => { this.moving = false; this.moveError = err?.error?.message || 'Could not move truck.'; this.cdr.markForCheck(); }
+      error: (err: any) => { this.moving = false; this.moveError = err?.error?.message || 'Could not move truck.'; this.cdr.markForCheck(); }
     });
   }
 }
