@@ -2,7 +2,8 @@
   <h1 style="font-size: 20px; font-weight: 500;">Truck Availability</h1>
   <p style="color: #888; font-size: 13px;">
     Who's free to dispatch right now, and who's still en route — shown side by side instead of behind a filter.
-    Click a row to log a manual move (service, or a haul outside the system) or set a starting city.
+    Click a row to log a manual move (service, or a haul outside the system), set a starting city, or — for a truck
+    in transit — update its expected or actual drop-off date.
     Drag a column header to reorder it. Click the ▼ arrow to filter. Click column text to sort.
   </p>
 
@@ -56,7 +57,7 @@
 
               <tr *ngIf="selectedTruck === t">
                 <td [attr.colspan]="availableColumns.length" style="padding: 16px; background: #f9f9f9;">
-                  <ng-container *ngTemplateOutlet="truckDetail; context: { $implicit: t }"></ng-container>
+                  <ng-container *ngTemplateOutlet="truckDetail; context: { $implicit: t, inTransit: false }"></ng-container>
                 </td>
               </tr>
             </ng-container>
@@ -114,7 +115,7 @@
 
               <tr *ngIf="selectedTruck === t">
                 <td [attr.colspan]="inTransitColumns.length" style="padding: 16px; background: #f9f9f9;">
-                  <ng-container *ngTemplateOutlet="truckDetail; context: { $implicit: t }"></ng-container>
+                  <ng-container *ngTemplateOutlet="truckDetail; context: { $implicit: t, inTransit: true }"></ng-container>
                 </td>
               </tr>
             </ng-container>
@@ -130,10 +131,29 @@
   </ng-container>
 </div>
 
-<!-- Shared expanded-row detail: set starting city (no city yet) or log a move
-     (has a city). Used by both tables via ngTemplateOutlet so the move-history
-     panel, form fields and validation only exist once. -->
-<ng-template #truckDetail let-t>
+<!-- Shared expanded-row detail: set starting city (no city yet), log a move
+     (has a city), or — for an in-transit row — update the active drop's
+     expected/actual dates. Used by both tables via ngTemplateOutlet so the
+     move-history panel, form fields and validation only exist once. -->
+<ng-template #truckDetail let-t let-inTransit="inTransit">
+  <div *ngIf="inTransit && t.activeDropId" style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eee;">
+    <div>
+      <label style="display:block; font-size:12px; color:#555;">Expected Delivery Date</label>
+      <input type="date" [(ngModel)]="expectedDeliveryDraft" style="padding:6px;" />
+    </div>
+    <button (click)="saveExpectedDelivery()" [disabled]="savingDropDates" style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
+      {{ savingDropDates ? 'Saving...' : 'Update Expected Date' }}
+    </button>
+    <div>
+      <label style="display:block; font-size:12px; color:#555;">Actual Drop Off Date</label>
+      <input type="date" [(ngModel)]="actualDropOffDraft" style="padding:6px;" />
+    </div>
+    <button (click)="saveActualDropOff()" [disabled]="savingDropDates" style="padding:7px 14px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer;">
+      {{ savingDropDates ? 'Saving...' : 'Mark Arrived' }}
+    </button>
+    <p *ngIf="dropDatesError" style="color:#c0392b; font-size:12px; margin: 0;">{{ dropDatesError }}</p>
+  </div>
+
   <div *ngIf="!t.cityName">
     <p style="font-size: 13px; color: #555; margin-top: 0;">This truck has no starting city yet — set one to begin tracking it.</p>
     <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">

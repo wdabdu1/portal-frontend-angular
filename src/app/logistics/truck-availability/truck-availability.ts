@@ -7,6 +7,7 @@ import { LookupEntity, SettingsLookupService } from '../../settings/settings-loo
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { exportToExcel } from '../../shared/excel-export.util';
 import { TruckAvailabilityRow, TruckAvailabilityService, TruckMovementRow } from '../truck-availability.service';
+import { TruckLoadService } from '../truck-load.service';
 
 type SortColumn = keyof TruckAvailabilityRow;
 
@@ -86,8 +87,18 @@ export class TruckAvailability implements OnInit {
   moving = false;
   moveError = '';
 
+  // Editing the active drop's dates for an in-transit truck — separate
+  // from the manual move fields above, since these two dates are a
+  // different action (updating the planned/actual leg of an existing
+  // truck load, not logging an ad-hoc move).
+  expectedDeliveryDraft = '';
+  actualDropOffDraft = '';
+  savingDropDates = false;
+  dropDatesError = '';
+
   constructor(
     private service: TruckAvailabilityService,
+    private truckLoadService: TruckLoadService,
     private lookups: SettingsLookupService,
     private tablePrefs: TablePreferencesService
   ) {}
@@ -285,7 +296,36 @@ export class TruckAvailability implements OnInit {
     this.moveValue = null;
     this.moveNotes = '';
     this.moveError = '';
+    this.expectedDeliveryDraft = this.selectedTruck?.expectedAvailableDate ?? '';
+    this.actualDropOffDraft = '';
+    this.dropDatesError = '';
     if (this.selectedTruck) this.loadMovements();
+  }
+
+  saveExpectedDelivery(): void {
+    if (!this.selectedTruck?.activeDropId) return;
+    this.savingDropDates = true;
+    this.dropDatesError = '';
+    this.truckLoadService.updateExpectedDelivery(this.selectedTruck.activeDropId, this.expectedDeliveryDraft || null).subscribe({
+      next: () => { this.savingDropDates = false; this.load(); },
+      error: (err: any) => { this.savingDropDates = false; this.dropDatesError = err?.error?.message || 'Could not update expected delivery date.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveActualDropOff(): void {
+    if (!this.selectedTruck?.activeDropId) return;
+    this.savingDropDates = true;
+    this.dropDatesError = '';
+    this.truckLoadService.setActualDropOff(this.selectedTruck.activeDropId, this.actualDropOffDraft || null).subscribe({
+      next: () => {
+        this.savingDropDates = false;
+        // The truck may now be Available and have moved to the other
+        // table — its row reference is stale either way once reloaded.
+        this.selectedTruck = null;
+        this.load();
+      },
+      error: (err: any) => { this.savingDropDates = false; this.dropDatesError = err?.error?.message || 'Could not save actual drop off date.'; this.cdr.markForCheck(); }
+    });
   }
 
   loadMovements(): void {
