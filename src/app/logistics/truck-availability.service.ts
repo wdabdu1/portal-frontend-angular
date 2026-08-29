@@ -9,6 +9,10 @@ export interface TruckAvailabilityRow {
   isAvailable: boolean;
   cityName: string | null;
   expectedAvailableDate: string | null;
+  // The drop currently in progress for this truck (null once available) —
+  // lets the UI update that drop's dates directly from this row without a
+  // separate lookup.
+  activeDropId: number | null;
 }
 
 export interface TruckMovementRow {

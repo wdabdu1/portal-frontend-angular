@@ -123,6 +123,10 @@ export class TruckLoadService {
     return this.http.put(`${API_URL}/truck-loads/drops/${dropId}/actual-dropoff`, { actualDropOffDate });
   }
 
+  updateExpectedDelivery(dropId: number, expectedDeliveryDate: string | null) {
+    return this.http.put(`${API_URL}/truck-loads/drops/${dropId}/expected-delivery`, { expectedDeliveryDate });
+  }
+
   getItems() {
     return this.http.get<TruckLoadItemRow[]>(`${API_URL}/truck-loads/items`);
   }
