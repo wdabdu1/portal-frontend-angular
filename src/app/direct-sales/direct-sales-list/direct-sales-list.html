@@ -1,0 +1,78 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">Direct Sales</h1>
+    <button (click)="onExportClick()" style="padding: 6px 14px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      Export to Excel
+    </button>
+  </div>
+  <p style="color: #888; font-size: 13px;">Customer dues for Direct Sales shipments. Collections are matched to dues oldest-due-first. Drag a column header to reorder it. Click the ▼ arrow to filter.</p>
+
+  <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:1rem;">
+    <div style="display:flex; gap:4px;">
+      <button (click)="setStatusFilter('open')" [style.background]="statusFilter === 'open' ? '#0a3d62' : '#eee'" [style.color]="statusFilter === 'open' ? 'white' : '#333'" style="padding:6px 14px; border:none; border-radius:4px; cursor:pointer; font-size:13px;">Open</button>
+      <button (click)="setStatusFilter('settled')" [style.background]="statusFilter === 'settled' ? '#0a3d62' : '#eee'" [style.color]="statusFilter === 'settled' ? 'white' : '#333'" style="padding:6px 14px; border:none; border-radius:4px; cursor:pointer; font-size:13px;">Settled</button>
+      <button (click)="setStatusFilter('all')" [style.background]="statusFilter === 'all' ? '#0a3d62' : '#eee'" [style.color]="statusFilter === 'all' ? 'white' : '#333'" style="padding:6px 14px; border:none; border-radius:4px; cursor:pointer; font-size:13px;">All</button>
+    </div>
+    <input
+      [(ngModel)]="searchText"
+      placeholder="Search by Consignee, BL/AWB, or BU"
+      style="flex:1; min-width:260px; max-width: 450px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+    />
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
+        <th style="padding: 8px 6px;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee;">
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ r.blAwbNo }}</span>
+          <span *ngSwitchCase="'dueDate'" style="color: #888;">{{ r.dueDate | date: 'MMM d, y' }}</span>
+          <span *ngSwitchCase="'dueAmount'">{{ r.dueAmount | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'dueAmountUsd'">{{ r.dueAmountUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'collectedUsd'" style="color:#1e7e34;">{{ r.collectedUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'remainingUsd'" [style.color]="r.remainingUsd > 0 ? '#c0392b' : '#1e7e34'" style="font-weight: 600;">{{ r.remainingUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchDefault>{{ r[col.key] || '—' }}</span>
+        </td>
+        <td style="padding: 8px 6px;">
+          <span [style.color]="r.settled ? '#1e7e34' : '#a66a00'" style="font-weight:600;">{{ r.settled ? 'Settled' : 'Open' }}</span>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot *ngIf="rows.length > 0">
+      <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+        <td [attr.colspan]="columns.length - 3" style="padding: 8px 6px; text-align: right;">Totals:</td>
+        <td style="padding: 8px 6px;">{{ totalDueAmountUsd | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px;">{{ totalCollectedUsd | number: '1.2-2' }}</td>
+        <td style="padding: 8px 6px; color: #c0392b;">{{ totalRemainingUsd | number: '1.2-2' }}</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  <p *ngIf="!loading && rows.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No Direct Sales dues match this view.
+  </p>
+</div>
