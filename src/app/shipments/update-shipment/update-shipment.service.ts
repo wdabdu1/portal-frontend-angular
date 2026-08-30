@@ -151,6 +151,12 @@ export interface CustomerCollection {
   value: number;
 }
 
+// Direct Sales only — "Confirm Deal Closed" section.
+export interface CloseDealStatus {
+  closed: boolean;
+  closedAt: string | null;
+}
+
 export interface ShipmentDetail {
   id: number;
   blAwbNo: string;
@@ -292,5 +298,15 @@ export class UpdateShipmentService {
 
   deleteCustomerCollection(shipmentId: number, recordId: number) {
     return this.http.delete(`${API_URL}/direct-sales/${shipmentId}/collections/${recordId}`);
+  }
+
+  // --- Direct Sales: Confirm Deal Closed ---
+
+  getCloseStatus(shipmentId: number) {
+    return this.http.get<CloseDealStatus>(`${API_URL}/direct-sales/${shipmentId}/close-status`);
+  }
+
+  closeDeal(shipmentId: number, req: { documentsHanded: boolean; paymentCollected: boolean }) {
+    return this.http.post<CloseDealStatus>(`${API_URL}/direct-sales/${shipmentId}/close`, req);
   }
 }

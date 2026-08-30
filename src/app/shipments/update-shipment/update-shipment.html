@@ -745,5 +745,38 @@
         ✓ Confirmed — visible to all teams
       </span>
     </div>
+
+    <!-- Direct Sales: Confirm Deal Closed -->
+    <div *ngIf="detail.isDirectSales" style="margin-top: 2rem; padding: 16px; border-top: 1px solid #ddd; background:#fafafa; border-radius:4px;">
+      <strong style="font-size:14px;">Confirm Deal Closed</strong>
+
+      <ng-container *ngIf="!closeDealStatus?.closed">
+        <p style="font-size:12px; color:#666; margin-top:6px;">
+          Once all documents are delivered and payment is fully collected, tick both items below and close the deal. This will remove it from the Home Page and Shipment Dashboard's pending/open lists.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="checkbox" [(ngModel)]="documentsHandedChecked" />
+            Original Documents Handed
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <input type="checkbox" [(ngModel)]="paymentCollectedChecked" />
+            Full Payment Collected
+          </label>
+        </div>
+        <button
+          type="button"
+          (click)="closeDeal()"
+          [disabled]="!documentsHandedChecked || !paymentCollectedChecked || closingDeal"
+          style="margin-top:12px; padding:8px 18px; background:#1e7e34; color:white; border:none; border-radius:4px; cursor:pointer; font-size:13px;"
+        >
+          {{ closingDeal ? 'Closing...' : 'Close Deal' }}
+        </button>
+      </ng-container>
+
+      <p *ngIf="closeDealStatus?.closed" style="font-size:13px; color:#1e7e34; font-weight:600; margin-top:6px;">
+        ✓ Deal Closed on {{ closeDealStatus!.closedAt | date: 'mediumDate' }}
+      </p>
+    </div>
   </div>
 </div>

@@ -7,7 +7,7 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
-import { CustomerCollection, CustomerDue, ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
+import { CloseDealStatus, CustomerCollection, CustomerDue, ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
 
 type SectionKey = 'orderExecution' | 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'paymentDue' | 'banking' | 'erpInfo' | 'lastOffshore';
 
@@ -136,6 +136,7 @@ export class UpdateShipment implements OnInit {
         if (detail.isDirectSales) {
           this.loadCustomerDues();
           this.loadCustomerCollections();
+          this.loadCloseStatus();
         }
         this.cdr.markForCheck();
       },
@@ -600,6 +601,34 @@ export class UpdateShipment implements OnInit {
       currencyCode,
       balance: (dueMap.get(currencyCode) ?? 0) - (collectedMap.get(currencyCode) ?? 0)
     }));
+  }
+
+  // --- Direct Sales: Confirm Deal Closed ---
+  closeDealStatus: CloseDealStatus | null = null;
+  documentsHandedChecked = false;
+  paymentCollectedChecked = false;
+  closingDeal = false;
+
+  loadCloseStatus(): void {
+    this.service.getCloseStatus(this.shipmentId).subscribe({
+      next: (r) => { this.closeDealStatus = r; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+  }
+
+  closeDeal(): void {
+    if (!this.documentsHandedChecked || !this.paymentCollectedChecked) return;
+    this.closingDeal = true;
+    this.service.closeDeal(this.shipmentId, {
+      documentsHanded: this.documentsHandedChecked, paymentCollected: this.paymentCollectedChecked
+    }).subscribe({
+      next: (r) => {
+        this.closingDeal = false;
+        this.closeDealStatus = r;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.closingDeal = false; this.error = 'Could not close deal.'; this.cdr.markForCheck(); }
+    });
   }
 
   confirmShipment(): void {
