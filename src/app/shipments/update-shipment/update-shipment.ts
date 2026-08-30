@@ -7,7 +7,7 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
-import { ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
+import { CustomerCollection, CustomerDue, ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
 
 type SectionKey = 'orderExecution' | 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'paymentDue' | 'banking' | 'erpInfo' | 'lastOffshore';
 
@@ -133,6 +133,10 @@ export class UpdateShipment implements OnInit {
         this.loading = false;
         this.loadErpInfo();
         this.loadLastOffshoreDetails();
+        if (detail.isDirectSales) {
+          this.loadCustomerDues();
+          this.loadCustomerCollections();
+        }
         this.cdr.markForCheck();
       },
       error: () => {
@@ -498,6 +502,104 @@ export class UpdateShipment implements OnInit {
       collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId,
       addCbosAllowanceId: this.bankingForm.addCbosAllowanceId
     }), andNext);
+  }
+
+  // --- Direct Sales: Customer Agreed Payment / Customer Collected Payment ---
+  customerDues: CustomerDue[] = [];
+  customerCollections: CustomerCollection[] = [];
+  loadingCustomerDues = false;
+  newCustomerDueForm = { dueDate: '', currencyId: null as number | null, value: null as number | null };
+  addingCustomerDue = false;
+  deletingCustomerDueId: number | null = null;
+  newCustomerCollectionForm = { paymentDate: '', currencyId: null as number | null, value: null as number | null };
+  addingCustomerCollection = false;
+  deletingCustomerCollectionId: number | null = null;
+
+  loadCustomerDues(): void {
+    this.loadingCustomerDues = true;
+    this.service.getCustomerDues(this.shipmentId).subscribe({
+      next: (r) => { this.customerDues = r; this.loadingCustomerDues = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingCustomerDues = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  addCustomerDue(): void {
+    if (!this.newCustomerDueForm.dueDate || !this.newCustomerDueForm.currencyId || !this.newCustomerDueForm.value) return;
+    this.addingCustomerDue = true;
+    this.service.addCustomerDue(this.shipmentId, {
+      dueDate: this.newCustomerDueForm.dueDate, currencyId: this.newCustomerDueForm.currencyId, value: this.newCustomerDueForm.value
+    }).subscribe({
+      next: () => {
+        this.addingCustomerDue = false;
+        this.newCustomerDueForm = { dueDate: '', currencyId: null, value: null };
+        this.loadCustomerDues();
+      },
+      error: () => { this.addingCustomerDue = false; this.error = 'Could not add customer due.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  deleteCustomerDue(dueId: number): void {
+    this.deletingCustomerDueId = dueId;
+    this.service.deleteCustomerDue(this.shipmentId, dueId).subscribe({
+      next: () => { this.deletingCustomerDueId = null; this.loadCustomerDues(); },
+      error: () => { this.deletingCustomerDueId = null; this.error = 'Could not delete customer due.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  loadCustomerCollections(): void {
+    this.service.getCustomerCollections(this.shipmentId).subscribe({
+      next: (r) => { this.customerCollections = r; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+  }
+
+  addCustomerCollection(): void {
+    if (!this.newCustomerCollectionForm.paymentDate || !this.newCustomerCollectionForm.currencyId || !this.newCustomerCollectionForm.value) return;
+    this.addingCustomerCollection = true;
+    this.service.addCustomerCollection(this.shipmentId, {
+      paymentDate: this.newCustomerCollectionForm.paymentDate, currencyId: this.newCustomerCollectionForm.currencyId, value: this.newCustomerCollectionForm.value
+    }).subscribe({
+      next: () => {
+        this.addingCustomerCollection = false;
+        this.newCustomerCollectionForm = { paymentDate: '', currencyId: null, value: null };
+        this.loadCustomerCollections();
+      },
+      error: () => { this.addingCustomerCollection = false; this.error = 'Could not add customer collection.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  deleteCustomerCollection(recordId: number): void {
+    this.deletingCustomerCollectionId = recordId;
+    this.service.deleteCustomerCollection(this.shipmentId, recordId).subscribe({
+      next: () => { this.deletingCustomerCollectionId = null; this.loadCustomerCollections(); },
+      error: () => { this.deletingCustomerCollectionId = null; this.error = 'Could not delete customer collection.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  // Totals shown per currency, rather than summed together, since Agreed
+  // Payment and Collected Payment entries can each be in different
+  // currencies — the Direct Sales Finance page is where a true
+  // cross-currency (USD) comparison happens.
+  get customerDueTotalsByCurrency(): { currencyCode: string; total: number }[] {
+    const map = new Map<string, number>();
+    for (const d of this.customerDues) map.set(d.currencyCode, (map.get(d.currencyCode) ?? 0) + d.value);
+    return Array.from(map.entries()).map(([currencyCode, total]) => ({ currencyCode, total }));
+  }
+
+  get customerCollectionTotalsByCurrency(): { currencyCode: string; total: number }[] {
+    const map = new Map<string, number>();
+    for (const c of this.customerCollections) map.set(c.currencyCode, (map.get(c.currencyCode) ?? 0) + c.value);
+    return Array.from(map.entries()).map(([currencyCode, total]) => ({ currencyCode, total }));
+  }
+
+  get customerBalanceByCurrency(): { currencyCode: string; balance: number }[] {
+    const dueMap = new Map(this.customerDueTotalsByCurrency.map((x) => [x.currencyCode, x.total]));
+    const collectedMap = new Map(this.customerCollectionTotalsByCurrency.map((x) => [x.currencyCode, x.total]));
+    const codes = new Set([...dueMap.keys(), ...collectedMap.keys()]);
+    return Array.from(codes).map((currencyCode) => ({
+      currencyCode,
+      balance: (dueMap.get(currencyCode) ?? 0) - (collectedMap.get(currencyCode) ?? 0)
+    }));
   }
 
   confirmShipment(): void {

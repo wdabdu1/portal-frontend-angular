@@ -132,6 +132,25 @@ export interface ShipmentLineItemHsCode {
   hsCode: string | null;
 }
 
+// Direct Sales only — "Customer Agreed Payment" schedule.
+export interface CustomerDue {
+  id: number;
+  dueDate: string;
+  currencyId: number;
+  currencyCode: string;
+  value: number;
+}
+
+// Direct Sales only — "Customer Collected Payment" (reuses the same
+// backend table Bank Dues collections use, under its own route).
+export interface CustomerCollection {
+  id: number;
+  paymentDate: string;
+  currencyId: number;
+  currencyCode: string;
+  value: number;
+}
+
 export interface ShipmentDetail {
   id: number;
   blAwbNo: string;
@@ -157,6 +176,8 @@ export interface ShipmentDetail {
   receivedSignedPiDate: string | null;
   orderExecutionDate: string | null;
   latestShippingDate: string | null;
+  isDirectSales: boolean;
+  consigneeName: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -245,5 +266,31 @@ export class UpdateShipmentService {
 
   deletePaymentDue(shipmentId: number, dueId: number) {
     return this.http.delete(`${API_URL}/shipments/${shipmentId}/supplier-payment/dues/${dueId}`);
+  }
+
+  // --- Direct Sales: Customer Agreed Payment / Customer Collected Payment ---
+
+  getCustomerDues(shipmentId: number) {
+    return this.http.get<CustomerDue[]>(`${API_URL}/direct-sales/${shipmentId}/dues`);
+  }
+
+  addCustomerDue(shipmentId: number, req: { dueDate: string; currencyId: number; value: number }) {
+    return this.http.post<CustomerDue>(`${API_URL}/direct-sales/${shipmentId}/dues`, req);
+  }
+
+  deleteCustomerDue(shipmentId: number, dueId: number) {
+    return this.http.delete(`${API_URL}/direct-sales/${shipmentId}/dues/${dueId}`);
+  }
+
+  getCustomerCollections(shipmentId: number) {
+    return this.http.get<CustomerCollection[]>(`${API_URL}/direct-sales/${shipmentId}/collections`);
+  }
+
+  addCustomerCollection(shipmentId: number, req: { paymentDate: string; currencyId: number; value: number }) {
+    return this.http.post<CustomerCollection>(`${API_URL}/direct-sales/${shipmentId}/collections`, req);
+  }
+
+  deleteCustomerCollection(shipmentId: number, recordId: number) {
+    return this.http.delete(`${API_URL}/direct-sales/${shipmentId}/collections/${recordId}`);
   }
 }

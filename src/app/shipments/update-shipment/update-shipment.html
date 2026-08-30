@@ -7,8 +7,12 @@
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
 
   <div *ngIf="!loading && detail">
-    <h1 style="font-size: 20px; font-weight: 500;">Shipment {{ detail.blAwbNo }}</h1>
+    <h1 style="font-size: 20px; font-weight: 500;">
+      Shipment {{ detail.blAwbNo }}
+      <span *ngIf="detail.isDirectSales" style="font-size:11px; font-weight:600; color:#8a5a00; background:#fff3cd; padding:3px 8px; border-radius:10px; vertical-align:middle;">Direct Sales{{ detail.consigneeName ? ' — ' + detail.consigneeName : '' }}</span>
+    </h1>
     <p style="color: #888; font-size: 13px;">{{ detail.businessUnit }} — PO {{ detail.poNumber }} — {{ detail.supplier }} — {{ detail.category }} — Status: {{ detail.status }}</p>
+    <p *ngIf="detail.isDirectSales" style="color: #a66a00; font-size: 12px;">This shipment is Direct Sales — it does not go through Clearance.</p>
     <p style="color: #888; font-size: 13px;">
       {{ detail.fcl20Count }}× 20' + {{ detail.fcl40Count }}× 40'
       <span *ngIf="invoiceSummary"> — Shipment Value: {{ invoiceSummary.invoiceValue | number: '1.2-2' }} {{ invoiceSummary.invoiceCurrency }} ({{ invoiceSummary.invoiceValueUsd | number: '1.2-2' }} USD)</span>
@@ -611,14 +615,14 @@
               <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
             </select>
           </div>
-          <div>
+          <div *ngIf="!detail.isDirectSales">
             <label style="display:block; font-size:12px; color:#555;">Tenor</label>
             <select [(ngModel)]="bankingForm.tenorId" style="width:100%; padding:6px;">
               <option [ngValue]="null">-- select --</option>
               <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['days'] }} days</option>
             </select>
           </div>
-          <div>
+          <div *ngIf="!detail.isDirectSales">
             <label style="display:block; font-size:12px; color:#555;">Add. CBOS Allowance</label>
             <select [(ngModel)]="bankingForm.addCbosAllowanceId" style="width:100%; padding:6px;">
               <option [ngValue]="null">-- select --</option>
@@ -627,6 +631,96 @@
           </div>
         </div>
         <p *ngIf="detail.banking?.senderBankCharges !== null && detail.banking?.senderBankCharges !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG</p>
+
+        <!-- Direct Sales: Customer Agreed Payment / Customer Collected Payment -->
+        <div *ngIf="detail.isDirectSales" style="margin-top:20px; padding-top:16px; border-top:1px solid #eee;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div>
+              <strong style="font-size:13px;">Customer Agreed Payment</strong>
+              <p *ngIf="loadingCustomerDues" style="font-size:12px; color:#888;">Loading...</p>
+              <table *ngIf="!loadingCustomerDues" style="width:100%; border-collapse:collapse; font-size:12px; margin-top:6px;">
+                <thead>
+                  <tr style="text-align:left; border-bottom:1px solid #ddd;">
+                    <th style="padding:4px;">Due Date</th>
+                    <th style="padding:4px;">Value</th>
+                    <th style="padding:4px;">Currency</th>
+                    <th style="padding:4px;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let d of customerDues" style="border-bottom:1px solid #f0f0f0;">
+                    <td style="padding:4px;">{{ d.dueDate }}</td>
+                    <td style="padding:4px;">{{ d.value | number: '1.2-2' }}</td>
+                    <td style="padding:4px;">{{ d.currencyCode }}</td>
+                    <td style="padding:4px;">
+                      <button type="button" (click)="deleteCustomerDue(d.id)" [disabled]="deletingCustomerDueId === d.id" style="border:none; background:transparent; color:#c0392b; cursor:pointer;">&times;</button>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let t of customerDueTotalsByCurrency" style="font-weight:600;">
+                    <td style="padding:4px;">Total</td>
+                    <td style="padding:4px;">{{ t.total | number: '1.2-2' }}</td>
+                    <td style="padding:4px;">{{ t.currencyCode }}</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="display:flex; gap:6px; margin-top:8px; align-items:center;">
+                <input type="date" [(ngModel)]="newCustomerDueForm.dueDate" style="padding:4px; width:120px;" />
+                <input type="text" appThousands [(ngModel)]="newCustomerDueForm.value" placeholder="Value" style="padding:4px; width:80px;" />
+                <select [(ngModel)]="newCustomerDueForm.currencyId" style="padding:4px;">
+                  <option [ngValue]="null">Currency</option>
+                  <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+                </select>
+                <button type="button" (click)="addCustomerDue()" [disabled]="addingCustomerDue" style="padding:4px 10px; background:#eee; border:none; border-radius:4px; cursor:pointer;">Add</button>
+              </div>
+            </div>
+
+            <div>
+              <strong style="font-size:13px;">Customer Collected Payment</strong>
+              <table style="width:100%; border-collapse:collapse; font-size:12px; margin-top:6px;">
+                <thead>
+                  <tr style="text-align:left; border-bottom:1px solid #ddd;">
+                    <th style="padding:4px;">Date</th>
+                    <th style="padding:4px;">Value</th>
+                    <th style="padding:4px;">Currency</th>
+                    <th style="padding:4px;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let c of customerCollections" style="border-bottom:1px solid #f0f0f0;">
+                    <td style="padding:4px;">{{ c.paymentDate }}</td>
+                    <td style="padding:4px;">{{ c.value | number: '1.2-2' }}</td>
+                    <td style="padding:4px;">{{ c.currencyCode }}</td>
+                    <td style="padding:4px;">
+                      <button type="button" (click)="deleteCustomerCollection(c.id)" [disabled]="deletingCustomerCollectionId === c.id" style="border:none; background:transparent; color:#c0392b; cursor:pointer;">&times;</button>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let t of customerCollectionTotalsByCurrency" style="font-weight:600;">
+                    <td style="padding:4px;">Total</td>
+                    <td style="padding:4px;">{{ t.total | number: '1.2-2' }}</td>
+                    <td style="padding:4px;">{{ t.currencyCode }}</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="display:flex; gap:6px; margin-top:8px; align-items:center;">
+                <input type="date" [(ngModel)]="newCustomerCollectionForm.paymentDate" style="padding:4px; width:120px;" />
+                <input type="text" appThousands [(ngModel)]="newCustomerCollectionForm.value" placeholder="Value" style="padding:4px; width:80px;" />
+                <select [(ngModel)]="newCustomerCollectionForm.currencyId" style="padding:4px;">
+                  <option [ngValue]="null">Currency</option>
+                  <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+                </select>
+                <button type="button" (click)="addCustomerCollection()" [disabled]="addingCustomerCollection" style="padding:4px 10px; background:#eee; border:none; border-radius:4px; cursor:pointer;">Add</button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="customerBalanceByCurrency.length > 0" style="margin-top:12px; font-size:12px;">
+            <strong>Balance (Agreed − Collected):</strong>
+            <span *ngFor="let b of customerBalanceByCurrency" style="margin-left:10px;">{{ b.balance | number: '1.2-2' }} {{ b.currencyCode }}</span>
+          </div>
+        </div>
+
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveBanking(false)" [disabled]="saving.banking || isLocked('banking')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
           <button (click)="saveBanking(true)" [disabled]="saving.banking || isLocked('banking')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving.banking ? 'Saving...' : 'Save & Next' }}</button>
