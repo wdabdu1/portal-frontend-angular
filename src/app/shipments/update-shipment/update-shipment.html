@@ -634,7 +634,7 @@
 
         <!-- Direct Sales: Customer Agreed Payment / Customer Collected Payment -->
         <div *ngIf="detail.isDirectSales" style="margin-top:20px; padding-top:16px; border-top:1px solid #eee;">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
             <div>
               <strong style="font-size:13px;">Customer Agreed Payment</strong>
               <p *ngIf="loadingCustomerDues" style="font-size:12px; color:#888;">Loading...</p>
@@ -664,14 +664,14 @@
                   </tr>
                 </tbody>
               </table>
-              <div style="display:flex; gap:6px; margin-top:8px; align-items:center;">
-                <input type="date" [(ngModel)]="newCustomerDueForm.dueDate" style="padding:4px; width:120px;" />
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; align-items:center;">
+                <input type="date" [(ngModel)]="newCustomerDueForm.dueDate" style="padding:4px; width:130px;" />
                 <input type="text" appThousands [(ngModel)]="newCustomerDueForm.value" placeholder="Value" style="padding:4px; width:80px;" />
                 <select [(ngModel)]="newCustomerDueForm.currencyId" style="padding:4px;">
                   <option [ngValue]="null">Currency</option>
                   <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
                 </select>
-                <button type="button" (click)="addCustomerDue()" [disabled]="addingCustomerDue" style="padding:4px 10px; background:#eee; border:none; border-radius:4px; cursor:pointer;">Add</button>
+                <button type="button" (click)="addCustomerDue()" [disabled]="addingCustomerDue" style="padding:4px 10px; background:#eee; border:none; border-radius:4px; cursor:pointer; white-space:nowrap;">Add</button>
               </div>
             </div>
 
@@ -703,14 +703,14 @@
                   </tr>
                 </tbody>
               </table>
-              <div style="display:flex; gap:6px; margin-top:8px; align-items:center;">
-                <input type="date" [(ngModel)]="newCustomerCollectionForm.paymentDate" style="padding:4px; width:120px;" />
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; align-items:center;">
+                <input type="date" [(ngModel)]="newCustomerCollectionForm.paymentDate" style="padding:4px; width:130px;" />
                 <input type="text" appThousands [(ngModel)]="newCustomerCollectionForm.value" placeholder="Value" style="padding:4px; width:80px;" />
                 <select [(ngModel)]="newCustomerCollectionForm.currencyId" style="padding:4px;">
                   <option [ngValue]="null">Currency</option>
                   <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
                 </select>
-                <button type="button" (click)="addCustomerCollection()" [disabled]="addingCustomerCollection" style="padding:4px 10px; background:#eee; border:none; border-radius:4px; cursor:pointer;">Add</button>
+                <button type="button" (click)="addCustomerCollection()" [disabled]="addingCustomerCollection" style="padding:4px 10px; background:#eee; border:none; border-radius:4px; cursor:pointer; white-space:nowrap;">Add</button>
               </div>
             </div>
           </div>
