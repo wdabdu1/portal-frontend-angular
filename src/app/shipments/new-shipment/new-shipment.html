@@ -60,6 +60,37 @@
         <input type="checkbox" [(ngModel)]="soc" name="soc" id="soc" />
         <label for="soc" style="font-size:13px;">SOC (Shipper Owned Container)</label>
       </div>
+      <div style="display:flex; align-items:center; gap:6px; padding-top:20px;">
+        <input type="checkbox" [(ngModel)]="isDirectSales" name="isDirectSales" id="isDirectSales" />
+        <label for="isDirectSales" style="font-size:13px;">Direct Sales (dispatched directly under a client's name — skips Clearance)</label>
+      </div>
+      <div *ngIf="isDirectSales">
+        <label style="display:block; font-size:12px; color:#555;">Consignee Name *</label>
+        <input [(ngModel)]="consigneeName" name="consigneeName" [style.border]="fieldBorder('consigneeName')" style="width:100%; padding:6px;" />
+      </div>
+    </div>
+
+    <div *ngIf="purchaseOrderId" style="margin-top: 1rem; padding: 12px; border: 1px solid #eee; border-radius: 6px; background: #fafafa;">
+      <label style="display:block; font-size:12px; color:#555; margin-bottom:6px;">Combine with another Purchase Order (optional)</label>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 8px;" *ngIf="selectedOrders.length > 0">
+        <span *ngFor="let o of selectedOrders" style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; background:#e8eef5; border-radius:12px; font-size:12px;">
+          {{ o.poNumber }}
+          <button *ngIf="o.id !== selectedOrders[0].id" type="button" (click)="removeOrder(o.id)" style="border:none; background:transparent; color:#c0392b; cursor:pointer; font-weight:bold; padding:0; line-height:1;">&times;</button>
+        </span>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <select [(ngModel)]="additionalPurchaseOrderId" name="additionalPurchaseOrderId" style="flex:1; padding:6px;">
+          <option [ngValue]="null">-- select another PO to combine --</option>
+          <option *ngFor="let po of additionalOrderOptions" [ngValue]="po.id">{{ po.poNumber }} — {{ po.supplier }}</option>
+        </select>
+        <button type="button" (click)="addOrder()" [disabled]="!additionalPurchaseOrderId" style="padding:6px 12px; background:#eee; border:none; border-radius:4px; cursor:pointer;">Add</button>
+      </div>
+      <p *ngIf="additionalOrderOptions.length === 0" style="font-size:12px; color:#888; margin-top:6px; margin-bottom:0;">
+        No other confirmed orders share this PO's Supplier, Business Unit, and Division — that's required to combine orders into one shipment.
+      </p>
+      <p *ngIf="selectedOrders.length > 1" style="font-size:12px; color:#888; margin-top:6px; margin-bottom:0;">
+        This shipment will combine {{ selectedOrders.length }} purchase orders. Their Offshore Partner chain must also match — this is checked when you save.
+      </p>
     </div>
 
     <h3 style="font-size: 15px; margin-top: 1.5rem;">Line Items</h3>
@@ -72,6 +103,7 @@
       <thead>
         <tr style="text-align:left; border-bottom:1px solid #ddd;">
           <th style="padding:6px;"></th>
+          <th *ngIf="selectedOrders.length > 1" style="padding:6px;">PO</th>
           <th style="padding:6px;">Product</th>
           <th style="padding:6px;">Ordered</th>
           <th style="padding:6px;">Remaining</th>
@@ -81,6 +113,7 @@
       <tbody>
         <tr *ngFor="let li of lineItems" style="border-bottom:1px solid #eee;">
           <td style="padding:6px;"><input type="checkbox" [(ngModel)]="li.selected" [name]="'sel'+li.id" /></td>
+          <td *ngIf="selectedOrders.length > 1" style="padding:6px; color:#888;">{{ li.poNumber }}</td>
           <td style="padding:6px;">{{ li.modelProduct }} ({{ li.productCategory }})</td>
           <td style="padding:6px; color:#888;">{{ li.qty }} {{ li.unitOfMeasure }}</td>
           <td style="padding:6px;" [style.color]="li.qtyRemaining === 0 ? '#c0392b' : '#2a7d2a'">
