@@ -9,7 +9,6 @@ export interface ShipmentLineItemRequest {
 
 export interface CreateShipmentRequest {
   blAwbNo: string;
-  purchaseOrderId: number;
   blAwbDate?: string;
   etd?: string;
   eta?: string;
@@ -19,6 +18,8 @@ export interface CreateShipmentRequest {
   fcl40Count: number;
   soc: boolean;
   blFreeDays?: number;
+  isDirectSales: boolean;
+  consigneeName?: string | null;
   lineItems: ShipmentLineItemRequest[];
 }
 
@@ -33,6 +34,21 @@ export interface ShipmentSummary {
   lineItemCount: number;
   createdAt: string;
   isClearanceCompleted: boolean;
+}
+
+// Raw ids included so the New Shipment page can work out client-side
+// which other confirmed orders could be combined with a given one into
+// one shipment (same Supplier + Business Unit + Division) — the actual
+// rule is enforced server-side on create.
+export interface ConfirmedOrderOption {
+  id: number;
+  poNumber: string;
+  businessUnit: string;
+  supplier: string;
+  orderValueUsd: number;
+  businessUnitId: number;
+  supplierId: number;
+  divisionId: number;
 }
 
 export interface LineItemRemaining {
@@ -61,7 +77,7 @@ export class ShipmentsService {
   }
 
   getConfirmedOrders() {
-    return this.http.get<{ id: number; poNumber: string; businessUnit: string; supplier: string }[]>(`${API_URL}/purchase-orders/confirmed`);
+    return this.http.get<ConfirmedOrderOption[]>(`${API_URL}/purchase-orders/confirmed`);
   }
 
   getLineItemsRemaining(purchaseOrderId: number) {
