@@ -470,13 +470,14 @@ export class UpdateShipment implements OnInit {
     }), andNext);
   }
 
-  saveSsmo(andNext: boolean): void {
-    this.genericSave('ssmo', () => this.service.saveSsmo(this.shipmentId, {
-      applicationDate: this.ssmoForm.applicationDate || null, cost: this.ssmoForm.cost,
-      costSettledDate: this.ssmoForm.costSettledDate || null, refNumber: this.ssmoForm.refNumber || null,
-      approvalDate: this.ssmoForm.approvalDate || null
-    }), andNext);
-  }
+saveSsmo(andNext: boolean): void {
+  this.genericSave('ssmo', () => this.service.saveSsmo(this.shipmentId, {
+    cocRequired: this.ssmoForm.cocRequired, cocAvailable: this.ssmoForm.cocAvailable,
+    applicationDate: this.ssmoForm.applicationDate || null, cost: this.ssmoForm.cost,
+    costSettledDate: this.ssmoForm.costSettledDate || null, refNumber: this.ssmoForm.refNumber || null,
+    approvalDate: this.ssmoForm.approvalDate || null
+  }), andNext);
+}
 
   saveMot(andNext: boolean): void {
     this.genericSave('mot', () => this.service.saveMot(this.shipmentId, {
