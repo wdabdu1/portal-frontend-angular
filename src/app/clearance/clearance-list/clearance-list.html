@@ -64,6 +64,7 @@
             </span>
           </span>
           <span *ngSwitchCase="'declarationNo'">{{ s.declarationNo || '—' }}</span>
+          <span *ngSwitchCase="'originalShipmentSetReceivedDate'">{{ s.originalShipmentSetReceivedDate ? (s.originalShipmentSetReceivedDate | date: 'MMM d, y') : '—' }}</span>
           <span *ngSwitchCase="'routeStatus'" style="font-size: 12px; color: #666;">{{ routeLabel(s.routeStatus) }}</span>
           <div *ngSwitchCase="'slaPercent'" style="display:flex; align-items:center; gap:6px;">
             <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
