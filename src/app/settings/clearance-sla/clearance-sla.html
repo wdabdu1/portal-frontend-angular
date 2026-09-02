@@ -11,21 +11,38 @@
 
     <div *ngFor="let group of section.groups" style="margin-top: 1.25rem;">
       <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
-        <h3 style="font-size: 14px; color: #333; margin: 0;">{{ group.label }}</h3>
-        <span style="font-size: 12px; color: #666; font-weight: 600;">
+        <h3 style="font-size: 14px; color: #333; margin: 0;">{{ group.label !== section.label ? group.label : '' }}</h3>
+        <span *ngIf="!group.hasEtd" style="font-size: 12px; color: #666; font-weight: 600;">
           {{ group.isRoute ? 'Total Duration' : 'Subtotal' }}: {{ (group.isRoute ? combinedRouteTotal(group) : groupTotal(group)) }} days
         </span>
+        <span *ngIf="group.hasEtd" style="font-size: 12px; color: #666; font-weight: 600;">
+          ETA total: {{ groupTotal(group) }} days &middot; ETD total: {{ groupTotalEtd(group) }} days
+        </span>
       </div>
+      <p *ngIf="group.hasEtd" style="font-size: 12px; color: #888; margin: 4px 0 0;">
+        Each step's target date is whichever comes first: the ETA days counted back from ETA, or the ETD days counted forward from ETD.
+      </p>
 
       <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px;">
         <tbody>
           <tr *ngFor="let s of group.rows" style="border-bottom: 1px solid #eee;">
-            <td style="padding: 6px;">{{ s.groupItem }}</td>
+            <td style="padding: 6px;">{{ rowLabel(s.groupItem) }}</td>
             <td style="padding: 6px; width: 90px;">
+              <div *ngIf="group.hasEtd" style="font-size: 10px; color: #888; margin-bottom: 2px;">ETA</div>
               <input
                 type="number"
                 step="0.25"
                 [(ngModel)]="s.targetDays"
+                [disabled]="!canEdit"
+                style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
+              />
+            </td>
+            <td *ngIf="group.hasEtd" style="padding: 6px; width: 90px;">
+              <div style="font-size: 10px; color: #888; margin-bottom: 2px;">ETD</div>
+              <input
+                type="number"
+                step="0.25"
+                [(ngModel)]="s.targetDaysEtd"
                 [disabled]="!canEdit"
                 style="width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
               />

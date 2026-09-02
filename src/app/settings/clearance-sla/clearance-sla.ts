@@ -12,6 +12,7 @@ interface ClearanceSlaSetting {
   groupItem: string;
   sequenceOrder: number;
   targetDays: number;
+  targetDaysEtd: number;
   isActive: boolean;
 }
 
@@ -19,6 +20,10 @@ interface DivisionGroup {
   division: string;
   label: string;
   isRoute: boolean;
+  // True only for PreClearanceDocs: the one group whose rows each carry
+  // both a backward-from-ETA and a forward-from-ETD target, so the UI
+  // shows two inputs and two subtotals instead of one.
+  hasEtd: boolean;
   rows: ClearanceSlaSetting[];
 }
 
@@ -35,27 +40,43 @@ interface SlaSection {
 const SECTIONS: SlaSection[] = [
   { label: 'Pre-Clearance — Document Chain', divisions: ['PreClearanceDocs'] },
   { label: 'Pre-Clearance — Approvals (backward from ETA)', divisions: ['PreClearanceMot', 'PreClearanceSsmo'] },
-  { label: 'Clearance — Common Task', divisions: ['ClearanceGeneral', 'PreClearanceDo'] },
+  { label: 'Clearance — Common Task', divisions: ['PreClearanceDo', 'ClearanceGeneral'] },
   { label: 'Clearance — Route 1: Clear at Port', divisions: ['Route1'] },
   { label: 'Clearance — Route 2: FZ Deposit', divisions: ['Route2'] },
   { label: 'Clearance — Route 3: Clear from FZ', divisions: ['Route3'] }
 ];
 
 const DIVISION_LABELS: Record<string, string> = {
-  ClearanceGeneral: 'Clearance General',
-  Route1: 'Route 1 — Clear at Port',
-  Route2: 'Route 2 — FZ Deposit',
-  Route3: 'Route 3 — Clear from FZ',
-  PreClearanceDocs: 'Pre-Clearance — Document Chain (backward from ETA / forward from ETD)',
+  ClearanceGeneral: 'Clearance General (from previous step)',
+  Route1: 'Route 1 — Clear at Port (from previous step)',
+  Route2: 'Route 2 — FZ Deposit (from previous step)',
+  Route3: 'Route 3 — Clear from FZ (from previous step)',
+  PreClearanceDocs: 'Pre-Clearance — Document Chain',
   PreClearanceMot: 'MOT Approval (backward from ETA)',
   PreClearanceSsmo: 'SSMO Approval (backward from ETA)',
-  PreClearanceDo: 'DO Received (forward from Vessel Arrival)'
+  PreClearanceDo: 'Manifest Process and ability to start process from Actual Arrival Data'
+};
+
+// Frontend-only display overrides for individual Document Chain row
+// labels. The keys are the raw `groupItem` values stored in the database —
+// backend logic (PreClearanceReadinessService.ActualFor) pattern-matches
+// on those exact strings, so they can't be renamed at the source; this
+// only changes what the Settings page shows.
+const GROUP_ITEM_LABELS: Record<string, string> = {
+  'Final Draft Received': 'Final Draft Received from Supplier',
+  'Final Draft Confirmed': 'Final Draft Confirmed to Supplier',
+  'FS Received': 'Original BL received from Supplier',
+  'Original Shipment Set Received': 'Sender->Banking Doc Cycle'
 };
 
 // Divisions that combine with General's total to form a route's real
 // duration. Pre-clearance tracks are standalone — measured backward from
 // ETA, nothing to do with the forward clearance cascade at all.
 const ROUTE_DIVISIONS = ['Route1', 'Route2', 'Route3'];
+
+// The one division whose rows carry both an ETA-backward and an
+// ETD-forward target (see DivisionGroup.hasEtd above).
+const DUAL_TARGET_DIVISIONS = ['PreClearanceDocs'];
 
 @Component({
   selector: 'app-clearance-sla',
@@ -99,6 +120,7 @@ export class ClearanceSla implements OnInit {
               division,
               label: DIVISION_LABELS[division] ?? division,
               isRoute: ROUTE_DIVISIONS.includes(division),
+              hasEtd: DUAL_TARGET_DIVISIONS.includes(division),
               rows: byDivision.get(division)!.sort((a, b) => a.sequenceOrder - b.sequenceOrder)
             }))
         }));
@@ -118,9 +140,21 @@ export class ClearanceSla implements OnInit {
     return this.sections.flatMap((s) => s.groups);
   }
 
-  // Sum for this division only.
+  // Frontend-only display override for an individual row's label (see
+  // GROUP_ITEM_LABELS) — falls back to the raw database value.
+  rowLabel(groupItem: string): string {
+    return GROUP_ITEM_LABELS[groupItem] ?? groupItem;
+  }
+
+  // Sum for this division only (the ETA-backward target for every row —
+  // for a dual-target group this is only half the picture, see groupTotalEtd).
   groupTotal(group: DivisionGroup): number {
     return group.rows.reduce((sum, r) => sum + (r.targetDays || 0), 0);
+  }
+
+  // ETD-forward sum, only meaningful for a dual-target group (hasEtd).
+  groupTotalEtd(group: DivisionGroup): number {
+    return group.rows.reduce((sum, r) => sum + (r.targetDaysEtd || 0), 0);
   }
 
   // Clearance General's own subtotal, used to add onto each route's total.
@@ -140,7 +174,10 @@ export class ClearanceSla implements OnInit {
   save(setting: ClearanceSlaSetting): void {
     this.savingId = setting.id;
     this.savedId = null;
-    this.http.put(`${API_URL}/settings/clearance-sla-settings/${setting.id}`, { targetDays: setting.targetDays }).subscribe({
+    this.http.put(`${API_URL}/settings/clearance-sla-settings/${setting.id}`, {
+      targetDays: setting.targetDays,
+      targetDaysEtd: setting.targetDaysEtd
+    }).subscribe({
       next: () => {
         this.savingId = null;
         this.savedId = setting.id;
