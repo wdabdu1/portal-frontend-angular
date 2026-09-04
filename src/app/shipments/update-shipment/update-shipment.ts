@@ -65,12 +65,11 @@ export class UpdateShipment implements OnInit {
 
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
   acdForm = { processDate: '', costSettledDate: '', refNumber: '' };
+  // Read-only here — C_Cat/C_Type/HS Code/Description/Currency/CP are now
+  // entered exclusively via the C Pricing working table (/c-pricing); this
+  // section just displays whatever's been saved there so far.
   lastOffshoreData: LastOffshoreDetails | null = null;
-  lastOffshoreForm = { currencyId: null as number | null };
-  lastOffshoreItemEdits: Record<number, { hsCode: string; description: string; unitPrice: number | null }> = {};
   loadingLastOffshore = false;
-  savingLastOffshore = false;
-  lastOffshoreError = '';
   savingHsCodes = false;
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
   ssmoForm = { cocRequired: null as boolean | null, cocAvailable: null as boolean | null, applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '' };
@@ -254,69 +253,10 @@ export class UpdateShipment implements OnInit {
     this.service.getLastOffshoreDetails(this.shipmentId).subscribe({
       next: (d) => {
         this.lastOffshoreData = d;
-        this.lastOffshoreForm = { currencyId: d.currencyId };
-        this.lastOffshoreItemEdits = {};
-        for (const item of d.items) {
-          this.lastOffshoreItemEdits[item.shipmentLineItemId] = {
-            hsCode: item.hsCode ?? '', description: item.description ?? '', unitPrice: item.unitPrice
-          };
-        }
         this.loadingLastOffshore = false;
         this.cdr.markForCheck();
       },
       error: () => { this.loadingLastOffshore = false; this.error = 'Could not load Last Offshore Details.'; this.cdr.markForCheck(); }
-    });
-  }
-
-  // Live total from what's actually typed, not the stale server value —
-  // so it updates instantly as the user types, rather than only after
-  // a save-and-reload round trip.
-  liveLastOffshoreTotal(): number {
-    if (!this.lastOffshoreData) return 0;
-    return this.lastOffshoreData.items.reduce((sum, item) => {
-      const edit = this.lastOffshoreItemEdits[item.shipmentLineItemId];
-      const price = edit?.unitPrice ?? 0;
-      return sum + (price * item.qty);
-    }, 0);
-  }
-
-  saveLastOffshoreDetails(): void {
-    this.lastOffshoreError = '';
-
-    // A price entered with no Currency selected saves silently but never
-    // shows up in Transfer Pricing — block it here instead, with a clear
-    // reason, rather than letting it fail invisibly downstream.
-    const hasAnyPrice = Object.values(this.lastOffshoreItemEdits).some(e => e.unitPrice !== null && e.unitPrice > 0);
-    if (hasAnyPrice && !this.lastOffshoreForm.currencyId) {
-      this.lastOffshoreError = 'Please select a Currency before saving — a Unit Price without a Currency won\'t appear in Transfer Pricing.';
-      this.cdr.markForCheck();
-      return;
-    }
-
-    this.savingLastOffshore = true;
-    const items = Object.entries(this.lastOffshoreItemEdits).map(([lineItemId, edit]) => ({
-      shipmentLineItemId: Number(lineItemId),
-      hsCode: edit.hsCode || null,
-      description: edit.description || null,
-      unitPrice: edit.unitPrice
-    }));
-    this.service.saveLastOffshoreDetails(this.shipmentId, {
-      // Inspection No./GRN/Invoice No./Remarks now live in Offshore
-      // Routes' own Last column — not sent from here, so this save
-      // can't silently overwrite that with a stale/blank value.
-      inspectionNo: null,
-      grn: null,
-      invoiceNo: null,
-      remarks: null,
-      currencyId: this.lastOffshoreForm.currencyId,
-      items
-    }).subscribe({
-      next: () => {
-        this.savingLastOffshore = false;
-        this.loadLastOffshoreDetails();
-        this.cdr.markForCheck();
-      },
-      error: () => { this.savingLastOffshore = false; this.lastOffshoreError = 'Could not save Last Offshore Details.'; this.cdr.markForCheck(); }
     });
   }
 

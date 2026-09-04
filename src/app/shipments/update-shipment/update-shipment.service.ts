@@ -112,6 +112,10 @@ export interface LastOffshoreItem {
   unitPrice: number | null;
   qty: number;
   total: number | null;
+  // Read-only display fields — entered via the C Pricing working table.
+  cPricingCategory: string | null;
+  cPricingType: string | null;
+  currencyCode: string | null;
 }
 
 export interface LastOffshoreDetails {

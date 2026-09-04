@@ -499,55 +499,38 @@
         </div>
 
         <div *ngIf="!loadingLastOffshore" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
-          <div style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
-            <div>
-              <label style="display:block; font-size:12px; color:#555;">Currency <span style="font-weight:normal; color:#888;">(for {{ lastOffshoreCompanyName }}'s items below)</span></label>
-              <select [(ngModel)]="lastOffshoreForm.currencyId" style="padding:6px; box-sizing:border-box;">
-                <option [ngValue]="null">-- select --</option>
-                <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
-              </select>
-            </div>
-          </div>
-
-          <h4 style="font-size:13px; margin:16px 0 8px; color:#333;">{{ lastOffshoreCompanyName }} — Items</h4>
+          <h4 style="font-size:13px; margin:0 0 4px; color:#333;">{{ lastOffshoreCompanyName }} — Items</h4>
+          <p style="font-size:12px; color:#888; margin:0 0 8px;">
+            Read-only — entered via the C Pricing working table.
+          </p>
           <div style="overflow-x:auto;">
-            <table style="width:100%; min-width:800px; border-collapse:collapse; font-size:13px;">
+            <table style="width:100%; min-width:700px; border-collapse:collapse; font-size:13px;">
               <thead>
                 <tr style="text-align:left; border-bottom:1px solid #ddd;">
-                  <th style="padding:5px;">BU</th>
-                  <th style="padding:5px;">Cat</th>
                   <th style="padding:5px;">Item</th>
+                  <th style="padding:5px;">C_Cat</th>
+                  <th style="padding:5px;">C_Type</th>
                   <th style="padding:5px;">HS Code</th>
                   <th style="padding:5px;">Description</th>
                   <th style="padding:5px;">CP</th>
-                  <th style="padding:5px;">Total</th>
+                  <th style="padding:5px;">Currency</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of lastOffshoreData?.items" style="border-bottom:1px solid #eee;">
-                  <td style="padding:5px;">{{ item.businessUnit }}</td>
-                  <td style="padding:5px;">{{ item.category }}</td>
                   <td style="padding:5px;">{{ item.modelProduct }}</td>
-                  <td style="padding:5px;"><input [(ngModel)]="lastOffshoreItemEdits[item.shipmentLineItemId].hsCode" style="width:100px; padding:4px;" /></td>
-                  <td style="padding:5px;"><input [(ngModel)]="lastOffshoreItemEdits[item.shipmentLineItemId].description" style="width:150px; padding:4px;" /></td>
-                  <td style="padding:5px;"><input type="text" appThousands [(ngModel)]="lastOffshoreItemEdits[item.shipmentLineItemId].unitPrice" style="width:100px; padding:4px;" /></td>
-                  <td style="padding:5px;">{{ (lastOffshoreItemEdits[item.shipmentLineItemId].unitPrice ?? 0) * item.qty | number: '1.2-2' }}</td>
+                  <td style="padding:5px;">{{ item.cPricingCategory || '—' }}</td>
+                  <td style="padding:5px;">{{ item.cPricingType || '—' }}</td>
+                  <td style="padding:5px;">{{ item.hsCode || '—' }}</td>
+                  <td style="padding:5px;">{{ item.description || '—' }}</td>
+                  <td style="padding:5px;">{{ item.unitPrice !== null ? (item.unitPrice | number: '1.2-2') : '—' }}</td>
+                  <td style="padding:5px;">{{ item.currencyCode || '—' }}</td>
+                </tr>
+                <tr *ngIf="lastOffshoreData && lastOffshoreData.items.length === 0">
+                  <td colspan="7" style="padding:8px 5px; color:#ccc;">No items.</td>
                 </tr>
               </tbody>
-              <tfoot *ngIf="lastOffshoreData && lastOffshoreData.items.length > 0">
-                <tr style="font-weight:600; border-top:2px solid #ccc;">
-                  <td colspan="6" style="padding:5px; text-align:right;">Grand Total:</td>
-                  <td style="padding:5px;">{{ liveLastOffshoreTotal() | number: '1.2-2' }}</td>
-                </tr>
-              </tfoot>
             </table>
-          </div>
-
-          <div style="margin-top:16px; display:flex; gap:8px; align-items:center;">
-            <button (click)="saveLastOffshoreDetails()" [disabled]="savingLastOffshore" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">
-              {{ savingLastOffshore ? 'Saving...' : 'Save Items' }}
-            </button>
-            <span *ngIf="lastOffshoreError" style="color:#c0392b; font-size:12px;">{{ lastOffshoreError }}</span>
           </div>
         </div>
         <div style="margin-top:20px; display:flex; gap:8px;">
