@@ -48,7 +48,7 @@
       <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee;">
         <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
           <span *ngSwitchCase="'costPrice'">{{ r.costPrice !== null ? (r.costPrice | number: '1.2-2') : '—' }}</span>
-          <span *ngSwitchCase="'approvalDate'">{{ r.approvalDate ? (r.approvalDate | date: 'MMM d, y h:mm a') : '—' }}</span>
+          <span *ngSwitchCase="'approvalDate'">{{ r.approvalDate ? (r.approvalDate | date: 'dd/MM/yyyy') : '—' }}</span>
           <span *ngSwitchDefault>{{ getValue(r, col.key) || '—' }}</span>
         </td>
       </tr>
