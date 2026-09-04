@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
+import { cPricingLockGuard } from './auth/c-pricing-lock.guard';
+import { CPricingList } from './c-pricing/c-pricing-list/c-pricing-list';
+import { CPricingHistory } from './c-pricing/c-pricing-history/c-pricing-history';
+import { CPricingSettings } from './c-pricing/c-pricing-settings/c-pricing-settings';
 import { Login } from './auth/login/login';
 import { ShippingLines } from './settings/shipping-lines/shipping-lines';
 import { ShipmentDetails } from './shipments/shipment-details/shipment-details';
@@ -12,7 +16,6 @@ import { SpcStorageTiers } from './settings/spc-storage-tiers/spc-storage-tiers'
 import { EstimateLineItems } from './clearance/estimate-line-items/estimate-line-items';
 import { BankDuesList } from './bank-dues/bank-dues-list/bank-dues-list';
 import { DirectSalesList } from './direct-sales/direct-sales-list/direct-sales-list';
-import { PriceHistory } from './price-history/price-history';
 import { PayBankDues } from './pay-bank-dues/pay-bank-dues';
 import { SupplierDuesList } from './supplier-dues/supplier-dues-list/supplier-dues-list';
 import { BusinessUnits } from './settings/business-units/business-units';
@@ -56,67 +59,68 @@ import { ProcessPerformance } from './dashboards/process-performance/process-per
 
 
 export const routes: Routes = [
-  { path: '', component: Home, canActivate: [authGuard], pathMatch: 'full' },
+  { path: '', component: Home, canActivate: [authGuard, cPricingLockGuard], pathMatch: 'full' },
   { path: 'login', component: Login },
 
   {
     path: 'settings/tariff-groups',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Tariff Groups', resource: 'tariff-groups', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/clearance-charge-types',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Clearance Charge Types', resource: 'clearance-charge-types', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
-  { path: 'settings', component: SettingsMenu, canActivate: [authGuard] },
-  { path: 'profile', component: Profile, canActivate: [authGuard] },
-  { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard] },
-  { path: 'settings/divisions', component: Divisions, canActivate: [authGuard] },
-  { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard] },
-  { path: 'clearance', component: ClearanceList, canActivate: [authGuard] },
-  { path: 'bank-dues', component: BankDuesList, canActivate: [authGuard] },
-  { path: 'direct-sales', component: DirectSalesList, canActivate: [authGuard] },
-  { path: 'price-history', component: PriceHistory, canActivate: [authGuard] },
-  { path: 'pay-bank-dues', component: PayBankDues, canActivate: [authGuard] },
-  { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard] },
-  { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard] },
-  { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard] },
-  { path: 'settings/offshore-markup-defaults', component: OffshoreMarkupDefaults, canActivate: [authGuard] },
-  { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard] },
-  { path: 'users', component: Users, canActivate: [authGuard] },
-  { path: 'data-migration', component: DataMigration, canActivate: [authGuard] },
-  { path: 'user-activity', component: UserActivity, canActivate: [authGuard] },
-  { path: 'fz-inventory', component: FzInventoryList, canActivate: [authGuard] },
-  { path: 'withdrawals/:id', component: WithdrawalDetailComponent, canActivate: [authGuard] },
-  { path: 'logistics', component: LogisticsList, canActivate: [authGuard] },
-  { path: 'logistics/truck-loads', component: TruckLoadList, canActivate: [authGuard] },
-  { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard] },
-  { path: 'logistics/truck-availability', component: TruckAvailability, canActivate: [authGuard] },
-  { path: 'logistics/truck-allocations', component: TruckAllocations, canActivate: [authGuard] },
-  { path: 'transfer-pricing', component: TransferPricingList, canActivate: [authGuard] },
-  { path: 'transfer-pricing/accumulated', component: TransferPricingAccumulated, canActivate: [authGuard] },
-  { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard] },
-  { path: 'clearance', component: ClearanceList, canActivate: [authGuard] },
-  { path: 'dashboards/clearance-readiness', component: ClearanceReadiness, canActivate: [authGuard] },
-  { path: 'mobile/pipeline-health', component: PipelineHealthMobile, canActivate: [authGuard] },
-  { path: 'dashboards/cashflow', component: CashflowDashboard, canActivate: [authGuard] },
-  { path: 'dashboards/purchase-orders', component: PoDashboard, canActivate: [authGuard] },
-  { path: 'dashboards/fz', component: FzDashboard, canActivate: [authGuard] },
-  { path: 'dashboards/shipments', component: ShipmentDashboard, canActivate: [authGuard] },
-  { path: 'dashboards/under-clearance', component: UnderClearanceDashboard, canActivate: [authGuard] },
-  { path: 'dashboards/goods-in-transit', component: GoodsInTransitDashboard, canActivate: [authGuard] },
-  { path: 'dashboards/department-performance', component: DepartmentPerformance, canActivate: [authGuard] },
-  { path: 'dashboards/demurrage-analysis', component: DemurrageAnalysis, canActivate: [authGuard] },
-  { path: 'dashboards/supplier-delay', component: SupplierDelay, canActivate: [authGuard] },
-  { path: 'dashboards/process-performance', component: ProcessPerformance, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsMenu, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'profile', component: Profile, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'settings/divisions', component: Divisions, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'bank-dues', component: BankDuesList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'direct-sales', component: DirectSalesList, canActivate: [authGuard, cPricingLockGuard] },
+  // 'price-history' route removed — superseded by 'c-pricing/history' below;
+  // its backend endpoint moved from api/price-history to api/c-pricing/history.
+  { path: 'pay-bank-dues', component: PayBankDues, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'settings/offshore-markup-defaults', component: OffshoreMarkupDefaults, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'users', component: Users, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'data-migration', component: DataMigration, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'user-activity', component: UserActivity, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'fz-inventory', component: FzInventoryList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'withdrawals/:id', component: WithdrawalDetailComponent, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'logistics', component: LogisticsList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'logistics/truck-loads', component: TruckLoadList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'logistics/truck-availability', component: TruckAvailability, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'logistics/truck-allocations', component: TruckAllocations, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'transfer-pricing', component: TransferPricingList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'transfer-pricing/accumulated', component: TransferPricingAccumulated, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/clearance-readiness', component: ClearanceReadiness, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'mobile/pipeline-health', component: PipelineHealthMobile, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/cashflow', component: CashflowDashboard, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/purchase-orders', component: PoDashboard, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/fz', component: FzDashboard, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/shipments', component: ShipmentDashboard, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/under-clearance', component: UnderClearanceDashboard, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/goods-in-transit', component: GoodsInTransitDashboard, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/department-performance', component: DepartmentPerformance, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/demurrage-analysis', component: DemurrageAnalysis, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/supplier-delay', component: SupplierDelay, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'dashboards/process-performance', component: ProcessPerformance, canActivate: [authGuard, cPricingLockGuard] },
 
   {
     path: 'settings/business-partners',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Business Partners',
       resource: 'business-partners',
@@ -132,19 +136,19 @@ export const routes: Routes = [
   {
     path: 'settings/approval-types',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Approval Types', resource: 'approval-types', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/payment-terms',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Payment Terms', resource: 'payment-terms', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/incoterms',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Incoterms',
       resource: 'incoterms',
@@ -157,25 +161,25 @@ export const routes: Routes = [
   {
     path: 'settings/origin-countries',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Origin Countries', resource: 'origin-countries', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/units-of-measure',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Units of Measure', resource: 'units-of-measure', fields: [{ key: 'code', label: 'Code', type: 'text' }] }
   },
   {
     path: 'settings/shipment-modes',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Shipment Modes', resource: 'shipment-modes', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/product-categories',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Product Categories',
       resource: 'product-categories',
@@ -188,19 +192,19 @@ export const routes: Routes = [
   {
     path: 'settings/product-types',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Product Types', resource: 'product-types', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/model-products',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Model/Product', resource: 'model-products', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/currencies',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Currencies',
       resource: 'currencies',
@@ -213,24 +217,24 @@ export const routes: Routes = [
   {
     path: 'settings/shipping-lines',
     component: ShippingLines,
-    canActivate: [authGuard]
+    canActivate: [authGuard, cPricingLockGuard]
   },
   {
     path: 'settings/couriers',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Couriers', resource: 'couriers', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/forwarders',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Forwarders', resource: 'forwarders', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/shipment-destinations',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Shipment Destinations',
       resource: 'shipment-destinations',
@@ -244,7 +248,7 @@ export const routes: Routes = [
   {
     path: 'settings/public-holidays',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Public Holidays',
       resource: 'public-holidays',
@@ -259,13 +263,13 @@ export const routes: Routes = [
   {
     path: 'settings/tenors',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Tenors', resource: 'tenors', fields: [{ key: 'days', label: 'No of Days', type: 'number' }] }
   },
   {
     path: 'settings/sender-banks',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Sender Banks',
       resource: 'sender-banks',
@@ -277,16 +281,16 @@ export const routes: Routes = [
     }
   },
   
-  { path: 'settings/receiver-banks', component: ReceiverBanks, canActivate: [authGuard] },
+  { path: 'settings/receiver-banks', component: ReceiverBanks, canActivate: [authGuard, cPricingLockGuard] },
   {
     path: 'settings/spc-storage-tiers',
     component: SpcStorageTiers,
-    canActivate: [authGuard]
+    canActivate: [authGuard, cPricingLockGuard]
   },
   {
     path: 'settings/acd-cost-settings',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'ACD Cost Settings',
       resource: 'acd-cost-settings',
@@ -300,7 +304,7 @@ export const routes: Routes = [
   {
     path: 'settings/logistics-cities',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Logistics — Cities',
       resource: 'logistics-cities',
@@ -310,7 +314,7 @@ export const routes: Routes = [
   {
     path: 'settings/drivers',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Logistics — Drivers',
       resource: 'drivers',
@@ -323,7 +327,7 @@ export const routes: Routes = [
   {
     path: 'settings/trucks',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Logistics — Trucks',
       resource: 'trucks',
@@ -336,7 +340,7 @@ export const routes: Routes = [
   {
     path: 'settings/warehouses',
     component: SimpleLookup,
-    canActivate: [authGuard],
+    canActivate: [authGuard, cPricingLockGuard],
     data: {
       title: 'Logistics — Warehouses',
       resource: 'warehouses',
@@ -349,11 +353,18 @@ export const routes: Routes = [
     }
   },
 
-  { path: 'orders', component: OrderList, canActivate: [authGuard] },
-  { path: 'orders/new', component: NewSupplierOrder, canActivate: [authGuard] },
-  { path: 'orders/:id', component: OrderDetails, canActivate: [authGuard] },
-  { path: 'shipments', component: ShipmentList, canActivate: [authGuard] },
-  { path: 'shipments/new', component: NewShipment, canActivate: [authGuard] },
-  { path: 'shipments/:id/update', component: UpdateShipment, canActivate: [authGuard] },
-  { path: 'shipments/:id', component: ShipmentDetails, canActivate: [authGuard] },
+  { path: 'orders', component: OrderList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'orders/new', component: NewSupplierOrder, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'orders/:id', component: OrderDetails, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'shipments', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'shipments/new', component: NewShipment, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'shipments/:id/update', component: UpdateShipment, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'shipments/:id', component: ShipmentDetails, canActivate: [authGuard, cPricingLockGuard] },
+
+  // C Pricing — these three are deliberately NOT given cPricingLockGuard
+  // (every other route below is): that guard redirects a CPricing-only
+  // user straight back to /c-pricing, so applying it here too would loop.
+  { path: 'c-pricing', component: CPricingList, canActivate: [authGuard] },
+  { path: 'c-pricing/history', component: CPricingHistory, canActivate: [authGuard] },
+  { path: 'c-pricing/settings', component: CPricingSettings, canActivate: [authGuard] },
 ];

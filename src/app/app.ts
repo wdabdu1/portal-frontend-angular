@@ -75,8 +75,17 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Supplier Dues', route: '/supplier-dues', canAccess: (a) => a.canSeeSupplierDues() },
       { label: 'Bank Dues', route: '/bank-dues', canAccess: (a) => a.canSeeBankDues() },
       { label: 'Direct Sales', route: '/direct-sales', canAccess: (a) => a.canSeeBankDues() },
-      { label: 'CP History', route: '/price-history', canAccess: (a) => a.canSeeBankDues() },
       { label: 'Pay Bank Dues', route: '/pay-bank-dues', canAccess: (a) => a.canSeePayBankDues() }
+    ]
+  },
+  {
+    // Moved out of Finance entirely — the CPricing role and its data are
+    // deliberately not visible to Treasury/CorpFinance.
+    label: 'C Pricing',
+    items: [
+      { label: 'C Pricing', route: '/c-pricing', canAccess: (a) => a.canSeeCPricing() },
+      { label: 'History', route: '/c-pricing/history', canAccess: (a) => a.canSeeCPricing() },
+      { label: 'Settings', route: '/c-pricing/settings', canAccess: (a) => a.canSeeCPricing() }
     ]
   }
 ];
