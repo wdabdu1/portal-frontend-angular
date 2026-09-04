@@ -106,4 +106,17 @@ export class AuthService {
   canSeeSettings(): boolean {
     return this.hasAnyRole(['Manager', 'SuperUser']);
   }
+
+  canSeeCPricing(): boolean {
+    return this.hasAnyRole(['CPricing', 'Manager', 'SuperUser']);
+  }
+
+  // True only for a user whose *sole* access is the CPricing role — a
+  // Manager or SuperUser who also happens to hold CPricing keeps their
+  // normal full access, since they're broad roles first. This is what the
+  // page-lockdown guard checks to decide whether to redirect a user away
+  // from everything except the C Pricing pages.
+  isCPricingOnly(): boolean {
+    return this.hasRole('CPricing') && !this.hasRole('Manager') && !this.hasRole('SuperUser');
+  }
 }
