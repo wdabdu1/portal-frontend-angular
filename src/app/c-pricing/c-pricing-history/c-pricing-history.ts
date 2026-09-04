@@ -16,6 +16,7 @@ interface ColumnDef {
 }
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
+  { key: 'approvalDate', label: 'Approval Date' },
   { key: 'businessUnit', label: 'BU' },
   { key: 'blAwbNo', label: 'BL' },
   { key: 'actualArrivalDate', label: 'Actual Arrival Date' },
@@ -44,7 +45,9 @@ export class CPricingHistory implements OnInit {
   loading = true;
   error = '';
   searchText = '';
-  sortColumn: SortColumn = 'actualArrivalDate';
+  // Default: most recently saved items first, so the daily user sees their
+  // own recent work at the top.
+  sortColumn: SortColumn = 'approvalDate';
   sortAsc = false;
 
   columns: ColumnDef[] = [...DEFAULT_COLUMNS];
