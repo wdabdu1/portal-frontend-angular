@@ -1,0 +1,100 @@
+<div style="max-width: 1400px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">C Pricing</h1>
+    <a routerLink="/c-pricing/history" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px;">
+      History
+    </a>
+  </div>
+  <p style="color: #888; font-size: 13px;">
+    Every shipment item awaiting its C Pricing details. Complete C_Cat, C_Type, HS Code, Description, Currency and CP, then Save —
+    the item moves from Pending to Confirmed and stays editable afterward.
+  </p>
+
+  <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
+    <select [(ngModel)]="statusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="Pending">Pending</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="All">All</option>
+    </select>
+    <select [(ngModel)]="buFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All BUs</option>
+      <option *ngFor="let bu of businessUnits" [value]="bu">{{ bu }}</option>
+    </select>
+    <select [(ngModel)]="catFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All Categories</option>
+      <option *ngFor="let c of productCategories" [value]="c">{{ c }}</option>
+    </select>
+    <input [(ngModel)]="searchText" placeholder="Search by BL or Model/Product" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 240px;" />
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
+
+  <div *ngIf="!loading" style="overflow-x: auto;">
+  <table style="width: 100%; min-width: 1300px; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th style="padding: 6px;">BU</th>
+        <th style="padding: 6px;">BL</th>
+        <th style="padding: 6px;">Cat</th>
+        <th style="padding: 6px;">Model/Product</th>
+        <th style="padding: 6px;">ETA</th>
+        <th style="padding: 6px;">C_Cat</th>
+        <th style="padding: 6px;">C_Type</th>
+        <th style="padding: 6px;">HS Code</th>
+        <th style="padding: 6px;">Description</th>
+        <th style="padding: 6px;">Currency</th>
+        <th style="padding: 6px;">CP</th>
+        <th style="padding: 6px;">Status</th>
+        <th style="padding: 6px;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of items" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 6px; white-space: nowrap;">{{ row.businessUnit }}</td>
+        <td style="padding: 6px; font-family: monospace; white-space: nowrap;">{{ row.blAwbNo }}</td>
+        <td style="padding: 6px;">{{ row.category }}</td>
+        <td style="padding: 6px;">{{ row.modelProduct }}</td>
+        <td style="padding: 6px; white-space: nowrap;">{{ row.eta ? (row.eta | date: 'MMM d, y') : '—' }}</td>
+        <td style="padding: 4px;">
+          <select [(ngModel)]="edits[row.shipmentLineItemId].cPricingCategoryId" (ngModelChange)="onCategoryChange(row)" style="width: 110px; padding: 4px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+        </td>
+        <td style="padding: 4px;">
+          <select [(ngModel)]="edits[row.shipmentLineItemId].cPricingTypeId" [disabled]="!edits[row.shipmentLineItemId].cPricingCategoryId" style="width: 110px; padding: 4px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let t of typesFor(edits[row.shipmentLineItemId].cPricingCategoryId)" [ngValue]="t.id">{{ t.name }}</option>
+          </select>
+        </td>
+        <td style="padding: 4px;"><input [(ngModel)]="edits[row.shipmentLineItemId].hsCode" style="width: 90px; padding: 4px;" /></td>
+        <td style="padding: 4px;"><input [(ngModel)]="edits[row.shipmentLineItemId].description" style="width: 130px; padding: 4px;" /></td>
+        <td style="padding: 4px;">
+          <select [(ngModel)]="edits[row.shipmentLineItemId].currencyId" style="width: 80px; padding: 4px;">
+            <option [ngValue]="null">-- --</option>
+            <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+          </select>
+        </td>
+        <td style="padding: 4px;"><input type="number" [(ngModel)]="edits[row.shipmentLineItemId].cp" style="width: 90px; padding: 4px;" /></td>
+        <td style="padding: 6px;">
+          <span [style.background]="row.isConfirmed ? '#e6f4ea' : '#fff4e5'" [style.color]="row.isConfirmed ? '#1e7e34' : '#a66a00'" style="padding: 2px 8px; border-radius: 4px; font-size: 12px; white-space: nowrap;">
+            {{ row.isConfirmed ? 'Confirmed' : 'Pending' }}
+          </span>
+        </td>
+        <td style="padding: 4px; white-space: nowrap;">
+          <button (click)="save(row)" [disabled]="savingId === row.shipmentLineItemId" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            {{ savingId === row.shipmentLineItemId ? 'Saving...' : 'Save' }}
+          </button>
+          <span *ngIf="savedId === row.shipmentLineItemId" style="color: #2a7d2a; font-size: 12px; margin-left: 4px;">✓</span>
+          <div *ngIf="rowError[row.shipmentLineItemId]" style="color: #c0392b; font-size: 11px; margin-top: 4px;">{{ rowError[row.shipmentLineItemId] }}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p *ngIf="!loading && items.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No {{ statusFilter === 'All' ? '' : (statusFilter.toLowerCase() + ' ') }}items.
+  </p>
+</div>
