@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../settings/settings-lookup.service';
 import { BuAccessInput, UserSummary, UsersService } from './users.service';
 
-const ROLES = ['IP_User', 'IP_Supervisor', 'CLR_Usr', 'CLR_Supervisor', 'BU', 'Treasury', 'CorpFinance', 'Manager', 'SuperUser'];
+const ROLES = ['IP_User', 'IP_Supervisor', 'CLR_Usr', 'CLR_Supervisor', 'BU', 'Treasury', 'CorpFinance', 'Manager', 'SuperUser', 'CPricing'];
 const BU_SCOPED_ROLES = ['IP_User', 'IP_Supervisor', 'BU'];
 
 interface NewBuRow {
