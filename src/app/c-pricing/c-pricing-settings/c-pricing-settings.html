@@ -1,0 +1,103 @@
+<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">C Pricing — Settings</h1>
+    <a routerLink="/c-pricing" style="padding: 6px 14px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px;">
+      Back to C Pricing
+    </a>
+  </div>
+  <p style="color: #888; font-size: 13px;">Create a C_Cat first, then create each C_Type against one of the C_Cats below.</p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <div *ngIf="!loading">
+    <!-- C_Cat -->
+    <h2 style="font-size: 16px; color: #0a3d62; margin: 1.5rem 0 4px; padding-bottom: 6px; border-bottom: 2px solid #0a3d62;">C_Cat</h2>
+    <div style="display: flex; gap: 8px; margin-top: 10px;">
+      <input [(ngModel)]="newCategoryName" placeholder="New C_Cat name" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+      <button (click)="addCategory()" [disabled]="savingCategory || !newCategoryName.trim()" style="padding: 8px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        {{ savingCategory ? 'Adding...' : 'Add C_Cat' }}
+      </button>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px;">
+      <tbody>
+        <tr *ngFor="let c of categories" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">
+            <input *ngIf="editingCategoryId === c.id" [(ngModel)]="editCategoryName" style="width: 100%; padding: 4px; box-sizing: border-box;" />
+            <span *ngIf="editingCategoryId !== c.id" [style.color]="c.isActive ? '#333' : '#bbb'">{{ c.name }}</span>
+          </td>
+          <td style="padding: 6px; width: 90px;">
+            <span [style.color]="c.isActive ? '#1e7e34' : '#888'" style="font-size: 12px;">{{ c.isActive ? 'Active' : 'Inactive' }}</span>
+          </td>
+          <td style="padding: 6px; width: 220px; text-align: right; white-space: nowrap;">
+            <ng-container *ngIf="editingCategoryId === c.id">
+              <button (click)="saveEditCategory(c)" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+              <button (click)="editingCategoryId = null" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">Cancel</button>
+            </ng-container>
+            <ng-container *ngIf="editingCategoryId !== c.id">
+              <button (click)="startEditCategory(c)" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+              <button (click)="toggleCategoryActive(c)" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">{{ c.isActive ? 'Deactivate' : 'Activate' }}</button>
+              <button (click)="deleteCategory(c)" style="padding: 4px 10px; font-size: 12px; background: #fdecea; color: #c0392b; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">Delete</button>
+            </ng-container>
+          </td>
+        </tr>
+        <tr *ngIf="categories.length === 0"><td colspan="3" style="padding: 8px 6px; color: #888;">No C_Cat yet.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- C_Type -->
+    <h2 style="font-size: 16px; color: #0a3d62; margin: 2.5rem 0 4px; padding-bottom: 6px; border-bottom: 2px solid #0a3d62;">C_Type</h2>
+    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+      <select [(ngModel)]="newTypeCategoryId" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <option [ngValue]="null">-- select C_Cat --</option>
+        <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+      </select>
+      <input [(ngModel)]="newTypeName" placeholder="New C_Type name" style="flex: 1; min-width: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+      <button (click)="addType()" [disabled]="savingType || !newTypeName.trim() || !newTypeCategoryId" style="padding: 8px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        {{ savingType ? 'Adding...' : 'Add C_Type' }}
+      </button>
+    </div>
+    <p *ngIf="categories.length === 0" style="color: #a66a00; font-size: 12px; margin-top: 6px;">Create a C_Cat above first — a C_Type must belong to one.</p>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+          <th style="padding: 6px;">C_Type</th>
+          <th style="padding: 6px;">C_Cat</th>
+          <th style="padding: 6px; width: 90px;">Status</th>
+          <th style="padding: 6px; width: 220px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of types" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px;">
+            <input *ngIf="editingTypeId === t.id" [(ngModel)]="editTypeName" style="width: 100%; padding: 4px; box-sizing: border-box;" />
+            <span *ngIf="editingTypeId !== t.id" [style.color]="t.isActive ? '#333' : '#bbb'">{{ t.name }}</span>
+          </td>
+          <td style="padding: 6px;">
+            <select *ngIf="editingTypeId === t.id" [(ngModel)]="editTypeCategoryId" style="padding: 4px;">
+              <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+            </select>
+            <span *ngIf="editingTypeId !== t.id">{{ categoryName(t.cPricingCategoryId) }}</span>
+          </td>
+          <td style="padding: 6px;">
+            <span [style.color]="t.isActive ? '#1e7e34' : '#888'" style="font-size: 12px;">{{ t.isActive ? 'Active' : 'Inactive' }}</span>
+          </td>
+          <td style="padding: 6px; text-align: right; white-space: nowrap;">
+            <ng-container *ngIf="editingTypeId === t.id">
+              <button (click)="saveEditType(t)" style="padding: 4px 10px; font-size: 12px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+              <button (click)="editingTypeId = null" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">Cancel</button>
+            </ng-container>
+            <ng-container *ngIf="editingTypeId !== t.id">
+              <button (click)="startEditType(t)" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+              <button (click)="toggleTypeActive(t)" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">{{ t.isActive ? 'Deactivate' : 'Activate' }}</button>
+              <button (click)="deleteType(t)" style="padding: 4px 10px; font-size: 12px; background: #fdecea; color: #c0392b; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px;">Delete</button>
+            </ng-container>
+          </td>
+        </tr>
+        <tr *ngIf="types.length === 0"><td colspan="4" style="padding: 8px 6px; color: #888;">No C_Type yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
