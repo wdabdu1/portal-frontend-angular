@@ -19,6 +19,9 @@ export interface CPricingItemRow {
   currencyId: number | null;
   currencyCode: string | null;
   cp: number | null;
+  // Read-only reference value — the unit price actually agreed on the
+  // Purchase Order, converted to USD. Not editable here.
+  poUnitPriceUsd: number | null;
   isConfirmed: boolean;
 }
 
@@ -56,6 +59,8 @@ export interface CPricingHistoryRow {
   description: string | null;
   costPrice: number | null;
   currency: string | null;
+  // Date this item's CP was (most recently) saved from the C Pricing page.
+  approvalDate: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
