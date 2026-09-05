@@ -71,6 +71,37 @@
         <div><span style="color: #888;">Free Days:</span> <strong>{{ data.summaryFreeDays ?? '—' }}</strong></div>
       </div>
 
+      <!-- Pre-Arrival Document Chain (informational only) -->
+      <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Pre-Arrival Document Chain</p>
+        <p style="font-size: 12px; color: #999; margin: 0 0 10px;">Happens before the vessel arrives — informational only, not part of the Actual Arrival → Container Return total below.</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 6px;">Step</th>
+              <th style="padding: 6px;">Category</th>
+              <th style="padding: 6px;">{{ data.isSingleShipment ? 'Actual Days' : 'Avg. Actual Days' }}</th>
+              <th style="padding: 6px;">SLA Days</th>
+              <th style="padding: 6px;">Gap (+/-)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let g of data.documentChainSteps" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 6px;">{{ g.groupItem }}</td>
+              <td style="padding: 6px; color: #666;">{{ g.category }}</td>
+              <td style="padding: 6px;">{{ g.actualDaysTaken !== null ? (g.actualDaysTaken | number: '1.0-1') : '—' }}</td>
+              <td style="padding: 6px;">{{ g.targetDays !== null ? (g.targetDays | number: '1.0-1') : '—' }}</td>
+              <td style="padding: 6px;">
+                <span *ngIf="g.gap !== null" [style.color]="g.gap > 0 ? '#c0392b' : (g.gap < 0 ? '#1e7e34' : '#333')" style="font-weight: 600;">
+                  {{ g.gap > 0 ? '+' : '' }}{{ g.gap | number: '1.0-1' }}
+                </span>
+                <span *ngIf="g.gap === null">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- General Info -->
       <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
         <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">General Info</p>
@@ -95,6 +126,7 @@
           <thead>
             <tr style="text-align: left; border-bottom: 1px solid #ddd;">
               <th style="padding: 6px;">Clearance Step in Working Days</th>
+              <th style="padding: 6px;">Category</th>
               <th style="padding: 6px;">{{ data.isSingleShipment ? 'Actual Days' : 'Avg. Actual Days' }}</th>
               <th style="padding: 6px;">SLA Days</th>
               <th style="padding: 6px;">Gap (+/-)</th>
@@ -103,6 +135,7 @@
           <tbody>
             <tr *ngFor="let g of data.stepGaps" style="border-bottom: 1px solid #eee;">
               <td style="padding: 6px;">{{ g.groupItem }}</td>
+              <td style="padding: 6px; color: #666;">{{ g.category }}</td>
               <td style="padding: 6px;">{{ g.actualDaysTaken !== null ? (g.actualDaysTaken | number: '1.0-1') : '—' }}</td>
               <td style="padding: 6px;">{{ g.targetDays !== null ? (g.targetDays | number: '1.0-1') : '—' }}</td>
               <td style="padding: 6px;">
@@ -116,6 +149,7 @@
           <tfoot>
             <tr style="border-top: 2px solid #ccc; font-weight: 600;">
               <td style="padding: 6px;">Subtotal</td>
+              <td style="padding: 6px;"></td>
               <td style="padding: 6px;">{{ stepDaysSubtotal | number: '1.0-1' }}</td>
               <td style="padding: 6px;">{{ slaDaysSubtotal | number: '1.0-1' }}</td>
               <td style="padding: 6px;" [style.color]="gapSubtotal > 0 ? '#c0392b' : (gapSubtotal < 0 ? '#1e7e34' : '#333')">
@@ -124,21 +158,52 @@
             </tr>
             <tr style="color: #666;">
               <td style="padding: 6px;">Weekends</td>
+              <td style="padding: 6px;"></td>
               <td style="padding: 6px;">{{ data.weekendDays | number: '1.0-1' }}</td>
               <td style="padding: 6px;" colspan="2"></td>
             </tr>
             <tr style="color: #666;">
               <td style="padding: 6px;">Public Holidays</td>
+              <td style="padding: 6px;"></td>
               <td style="padding: 6px;">{{ data.holidayDays | number: '1.0-1' }}</td>
               <td style="padding: 6px;" colspan="2"></td>
             </tr>
             <tr style="border-top: 1px solid #ccc; font-weight: 600;">
               <td style="padding: 6px;">Total (should equal Actual Arrival → Container Return)</td>
+              <td style="padding: 6px;"></td>
               <td style="padding: 6px;">{{ grandTotalDays | number: '1.0-1' }}</td>
               <td style="padding: 6px;" colspan="2"></td>
             </tr>
           </tfoot>
         </table>
+      </div>
+
+      <!-- Accountability by Category -->
+      <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Accountability by Category</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 6px;">Category</th>
+              <th style="padding: 6px;">Actual Days</th>
+              <th style="padding: 6px;">SLA Days</th>
+              <th style="padding: 6px;">Gap (+/-)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of data.categoryRollups" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 6px;">{{ r.category }}</td>
+              <td style="padding: 6px;">{{ r.totalActualDays }}</td>
+              <td style="padding: 6px;">{{ r.totalTargetDays | number: '1.0-1' }}</td>
+              <td style="padding: 6px;">
+                <span [style.color]="r.totalGapDays > 0 ? '#c0392b' : (r.totalGapDays < 0 ? '#1e7e34' : '#333')" style="font-weight: 600;">
+                  {{ r.totalGapDays > 0 ? '+' : '' }}{{ r.totalGapDays | number: '1.0-1' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 11px; color: #999; margin: 8px 0 0;">Combines the Pre-Arrival Document Chain above and the Clearance Steps table — one view of who's actually accountable for the days lost.</p>
       </div>
 
       <!-- Charge Calculations -->
@@ -200,8 +265,21 @@
           Storage Total: <strong>{{ data.storageCostSdg | number: '1.0-0' }} SDG</strong>
         </p>
 
-        <div style="margin-top: 16px; padding-top: 12px; border-top: 2px solid #ccc; font-size: 15px;">
-          Total Amount: <strong style="color: #c0392b;">{{ data.totalSdg | number: '1.0-0' }} SDG</strong>
+        <div style="margin-top: 16px; padding-top: 12px; border-top: 2px solid #ccc; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 14px;">
+          <div>
+            Forecast <span style="color: #888; font-size: 11px;">(frozen at Truck &amp; Containers completion)</span><br>
+            <strong>{{ data.forecastTotalSdg !== null ? (data.forecastTotalSdg | number: '1.0-0') + ' SDG' : '—' }}</strong>
+          </div>
+          <div>
+            Actual Paid<br>
+            <strong>{{ data.actualTotalPaidSdg !== null ? (data.actualTotalPaidSdg | number: '1.0-0') + ' SDG' : '—' }}</strong>
+          </div>
+          <div>
+            Savings <span style="color: #888; font-size: 11px;">(Forecast − Actual)</span><br>
+            <strong [style.color]="data.savingsSdg === null ? '#333' : (data.savingsSdg > 0 ? '#1e7e34' : (data.savingsSdg < 0 ? '#c0392b' : '#333'))">
+              {{ data.savingsSdg !== null ? (data.savingsSdg > 0 ? '+' : '') + (data.savingsSdg | number: '1.0-0') + ' SDG' : '—' }}
+            </strong>
+          </div>
         </div>
       </div>
     </ng-container>
