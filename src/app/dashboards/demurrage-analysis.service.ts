@@ -14,6 +14,14 @@ export interface ClearanceStepGap {
   actualDaysTaken: number | null;
   targetDays: number | null;
   gap: number | null;
+  category: string;
+}
+
+export interface CategoryGapRollup {
+  category: string;
+  totalActualDays: number;
+  totalTargetDays: number;
+  totalGapDays: number;
 }
 
 export interface DemurrageAnalysisResult {
@@ -36,6 +44,8 @@ export interface DemurrageAnalysisResult {
   originalDocReceived: string | null;
   vesselArrivalOffsetDays: number | null;
   stepGaps: ClearanceStepGap[];
+  documentChainSteps: ClearanceStepGap[];
+  categoryRollups: CategoryGapRollup[];
   storageFreeDays: number;
   storageChargeableDays: number;
   storageBreakdown: TierBreakdownLine[];
@@ -45,6 +55,13 @@ export interface DemurrageAnalysisResult {
   demurrageBreakdown: TierBreakdownLine[];
   demurrageCostSdg: number;
   totalSdg: number;
+  forecastDemurrageSdg: number | null;
+  forecastStorageSdg: number | null;
+  forecastTotalSdg: number | null;
+  actualDemurragePaidSdg: number | null;
+  actualStoragePaidSdg: number | null;
+  actualTotalPaidSdg: number | null;
+  savingsSdg: number | null;
   warnings: string[];
 }
 
