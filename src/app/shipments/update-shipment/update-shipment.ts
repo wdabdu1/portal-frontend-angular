@@ -78,7 +78,7 @@ export class UpdateShipment implements OnInit {
   bankingForm = {
     senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
     receivingBankId: null as number | null, necessaryGoodType: false, collectionRefNo: '', collectionValue: null as number | null, collectionCurrencyId: null as number | null,
-    tenorId: null as number | null, addCbosAllowanceId: null as number | null
+    tenorId: null as number | null
   };
 
   constructor(private lookups: SettingsLookupService, private service: UpdateShipmentService, private lockService: SectionLockService) {}
@@ -126,7 +126,7 @@ export class UpdateShipment implements OnInit {
           senderBankId: detail.banking.senderBankId, osDocDispatchDate: detail.banking.osDocDispatchDate ?? '', osDocDispatchedViaId: detail.banking.osDocDispatchedViaId,
           osDocTrackingNumber: detail.banking.osDocTrackingNumber ?? '', receivingBankId: detail.banking.receivingBankId, necessaryGoodType: detail.banking.necessaryGoodType,
           collectionRefNo: detail.banking.collectionRefNo ?? '', collectionValue: detail.banking.collectionValue, collectionCurrencyId: detail.banking.collectionCurrencyId,
-          tenorId: detail.banking.tenorId, addCbosAllowanceId: detail.banking.addCbosAllowanceId
+          tenorId: detail.banking.tenorId
         };
 
         this.loading = false;
@@ -441,8 +441,7 @@ saveSsmo(andNext: boolean): void {
       osDocDispatchedViaId: this.bankingForm.osDocDispatchedViaId, osDocTrackingNumber: this.bankingForm.osDocTrackingNumber || null,
       receivingBankId: this.bankingForm.receivingBankId, necessaryGoodType: this.bankingForm.necessaryGoodType,
       collectionRefNo: this.bankingForm.collectionRefNo || null, collectionValue: this.bankingForm.collectionValue,
-      collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId,
-      addCbosAllowanceId: this.bankingForm.addCbosAllowanceId
+      collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId
     }), andNext);
   }
 

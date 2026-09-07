@@ -84,7 +84,6 @@ export interface ShipmentBanking {
   collectionValue: number | null;
   collectionCurrencyId: number | null;
   tenorId: number | null;
-  addCbosAllowanceId: number | null;
   receiverBankCharges: number | null;
 }
 export interface ErpColumn {
