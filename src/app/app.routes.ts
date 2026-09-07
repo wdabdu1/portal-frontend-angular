@@ -264,7 +264,10 @@ export const routes: Routes = [
     path: 'settings/tenors',
     component: SimpleLookup,
     canActivate: [authGuard, cPricingLockGuard],
-    data: { title: 'Tenors', resource: 'tenors', fields: [{ key: 'days', label: 'No of Days', type: 'number' }] }
+    data: { title: 'Tenors', resource: 'tenors', fields: [
+      { key: 'days', label: 'No of Days', type: 'number' },
+      { key: 'cbosAllowanceDays', label: 'CBOS Allowance (days)', type: 'number' }
+    ] }
   },
   {
     path: 'settings/sender-banks',
