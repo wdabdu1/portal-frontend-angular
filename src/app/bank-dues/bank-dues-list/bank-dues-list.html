@@ -26,8 +26,8 @@
           (dragstart)="onDragStart(i)"
           (dragover)="onDragOver($event)"
           (drop)="onDrop(i)"
-          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
         >
           <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
           <span (mousedown)="$event.stopPropagation()">
@@ -96,11 +96,11 @@
       <table style="width:100%; border-collapse:collapse; font-size:13px;">
         <thead>
           <tr style="text-align:left; border-bottom:1px solid #ddd;">
-            <th style="padding:5px;">Date</th>
-            <th style="padding:5px;">Currency</th>
-            <th style="padding:5px;">Value</th>
-            <th style="padding:5px;">Value (AED)</th>
-            <th style="padding:5px;"></th>
+            <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Date</th>
+            <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Currency</th>
+            <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Value</th>
+            <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Value (AED)</th>
+            <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;"></th>
           </tr>
         </thead>
         <tbody>
