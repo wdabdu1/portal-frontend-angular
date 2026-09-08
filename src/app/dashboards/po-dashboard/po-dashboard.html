@@ -29,15 +29,15 @@
             (dragstart)="onDragStart(i)"
             (dragover)="$event.preventDefault()"
             (drop)="onDrop(i)"
-            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-            style="padding: 8px 6px; cursor: grab; user-select: none;"
+            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
           >
             <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
             <span (mousedown)="$event.stopPropagation()">
               <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
             </span>
           </th>
-          <th style="padding: 8px 6px;"></th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;"></th>
         </tr>
       </thead>
       <tbody>
@@ -55,16 +55,16 @@
               <table *ngIf="po.shipments.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
                 <thead>
                   <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-                    <th style="padding: 5px;">BL No.</th>
-                    <th style="padding: 5px;">Cat</th>
-                    <th style="padding: 5px;">Model</th>
-                    <th style="padding: 5px;">Qty</th>
-                    <th style="padding: 5px;">Unit Price</th>
-                    <th style="padding: 5px;">Currency</th>
-                    <th style="padding: 5px;">Total</th>
-                    <th style="padding: 5px;">ETA</th>
-                    <th style="padding: 5px;">ETD</th>
-                    <th style="padding: 5px;">Expected Clearance Completion</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BL No.</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Cat</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Model</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Qty</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Unit Price</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Currency</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Total</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">ETA</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">ETD</th>
+                    <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Expected Clearance Completion</th>
                   </tr>
                 </thead>
                 <tbody>
