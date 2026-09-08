@@ -41,7 +41,7 @@
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th style="padding: 8px 6px; width: 30px;">
+          <th style="padding: 8px 6px; width: 30px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">
             <input type="checkbox" [checked]="customsRows.length > 0 && customsSelectedIds.size === customsRows.length" (change)="toggleCustomsSelectAll()" />
           </th>
           <th
@@ -50,8 +50,8 @@
             (dragstart)="onCustomsDragStart(i)"
             (dragover)="$event.preventDefault()"
             (drop)="onCustomsDrop(i)"
-            [style.background]="isCustomsColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-            style="padding: 8px 6px; cursor: grab; user-select: none;"
+            [style.background]="isCustomsColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
           >
             <span (click)="sortCustoms(col.key)" style="cursor: pointer;">{{ col.label }}</span>
             <span (mousedown)="$event.stopPropagation()">
@@ -114,8 +114,8 @@
             (dragstart)="onBankDragStart(i)"
             (dragover)="$event.preventDefault()"
             (drop)="onBankDrop(i)"
-            [style.background]="isBankColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-            style="padding: 8px 6px; cursor: grab; user-select: none;"
+            [style.background]="isBankColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
           >
             <span (click)="sortBank(col.key)" style="cursor: pointer;">{{ col.label }}</span>
             <span (mousedown)="$event.stopPropagation()">
@@ -167,9 +167,9 @@
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th style="padding: 8px 6px;">BU</th>
-          <th style="padding: 8px 6px;">Month</th>
-          <th style="padding: 8px 6px;">Total Due (USD)</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BU</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Month</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Total Due (USD)</th>
         </tr>
       </thead>
       <tbody>
@@ -193,8 +193,8 @@
             (dragstart)="onSupplierDragStart(i)"
             (dragover)="$event.preventDefault()"
             (drop)="onSupplierDrop(i)"
-            [style.background]="isSupplierColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-            style="padding: 8px 6px; cursor: grab; user-select: none;"
+            [style.background]="isSupplierColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
           >
             <span (click)="sortSupplier(col.key)" style="cursor: pointer;">{{ col.label }}</span>
             <span (mousedown)="$event.stopPropagation()">
