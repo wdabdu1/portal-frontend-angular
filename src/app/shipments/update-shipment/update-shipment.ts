@@ -7,9 +7,9 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
-import { CloseDealStatus, CustomerCollection, CustomerDue, ErpColumn, LastOffshoreDetails, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
+import { CloseDealStatus, CustomerCollection, CustomerDue, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
 
-type SectionKey = 'orderExecution' | 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'ssmo' | 'mot' | 'supplierFullSet' | 'paymentDue' | 'banking' | 'erpInfo' | 'lastOffshore';
+type SectionKey = 'orderExecution' | 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'supplierFullSet' | 'paymentDue' | 'banking';
 
 @Component({
   selector: 'app-update-shipment',
@@ -33,16 +33,11 @@ export class UpdateShipment implements OnInit {
   receiverBanks: LookupEntity[] = [];
   tenors: LookupEntity[] = [];
 
-  sectionOrder: SectionKey[] = ['orderExecution', 'shipOnBoard', 'acd', 'forwarder', 'draftDocuments', 'ssmo', 'mot', 'supplierFullSet', 'paymentDue', 'erpInfo', 'banking', 'lastOffshore'];
+  sectionOrder: SectionKey[] = ['orderExecution', 'shipOnBoard', 'acd', 'forwarder', 'draftDocuments', 'supplierFullSet', 'paymentDue', 'banking'];
   expandedSection: SectionKey | null = 'shipOnBoard';
   saving: Record<SectionKey, boolean> = {
-    orderExecution: false, shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, ssmo: false, mot: false, supplierFullSet: false, paymentDue: false, banking: false, erpInfo: false, lastOffshore: false
+    orderExecution: false, shipOnBoard: false, forwarder: false, acd: false, draftDocuments: false, supplierFullSet: false, paymentDue: false, banking: false
   };
-
-  erpColumns: ErpColumn[] = [];
-  erpForms: Record<number, { prNo: string; poNo: string; sa: string; billReg: string; grn: string; invoiceNo: string; inspectionNo: string; remarks: string }> = {};
-  savingErpColumn: Record<number, boolean> = {};
-  loadingErpInfo = false;
 
   locks: Record<string, SectionLockInfo | null> = {};
 
@@ -65,15 +60,8 @@ export class UpdateShipment implements OnInit {
 
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
   acdForm = { processDate: '', costSettledDate: '', refNumber: '' };
-  // Read-only here — C_Cat/C_Type/HS Code/Description/Currency/CP are now
-  // entered exclusively via the C Pricing working table (/c-pricing); this
-  // section just displays whatever's been saved there so far.
-  lastOffshoreData: LastOffshoreDetails | null = null;
-  loadingLastOffshore = false;
   savingHsCodes = false;
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
-  ssmoForm = { cocRequired: null as boolean | null, cocAvailable: null as boolean | null, applicationDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '' };
-  motForm = { processDate: '', cost: null as number | null, costSettledDate: '', refNumber: '', approvalDate: '', offshoreApprovedPiNumber: '' };
   supplierFullSetForm = { supplierInvoiceNo: '', supplierInvoiceDate: '', fsDispatchDate: '', fsDispatchedViaId: null as number | null, fsTrackingNumber: '', fsReceivedDate: '' };
   bankingForm = {
     senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
@@ -111,11 +99,6 @@ export class UpdateShipment implements OnInit {
           finalDraftReceivedDate: detail.draftDocuments.finalDraftReceivedDate ?? '',
           finalDraftConfirmedDate: detail.draftDocuments.finalDraftConfirmedDate ?? ''
         };
-        if (detail.ssmo) this.ssmoForm = { cocRequired: detail.ssmo.cocRequired ?? null, cocAvailable: detail.ssmo.cocAvailable ?? null, applicationDate: detail.ssmo.applicationDate ?? '', cost: detail.ssmo.cost, costSettledDate: detail.ssmo.costSettledDate ?? '', refNumber: detail.ssmo.refNumber ?? '', approvalDate: detail.ssmo.approvalDate ?? '' };
-        if (detail.mot) this.motForm = {
-          processDate: detail.mot.processDate ?? '', cost: detail.mot.cost, costSettledDate: detail.mot.costSettledDate ?? '', refNumber: detail.mot.refNumber ?? '',
-          approvalDate: detail.mot.approvalDate ?? '', offshoreApprovedPiNumber: detail.mot.offshoreApprovedPiNumber ?? ''
-        };
         if (detail.supplierFullSet) this.supplierFullSetForm = {
           supplierInvoiceNo: detail.supplierFullSet.supplierInvoiceNo ?? '', supplierInvoiceDate: detail.supplierFullSet.supplierInvoiceDate ?? '',
           fsDispatchDate: detail.supplierFullSet.fsDispatchDate ?? '', fsDispatchedViaId: detail.supplierFullSet.fsDispatchedViaId,
@@ -130,8 +113,6 @@ export class UpdateShipment implements OnInit {
         };
 
         this.loading = false;
-        this.loadErpInfo();
-        this.loadLastOffshoreDetails();
         if (detail.isDirectSales) {
           this.loadCustomerDues();
           this.loadCustomerCollections();
@@ -145,16 +126,6 @@ export class UpdateShipment implements OnInit {
         this.cdr.markForCheck();
       }
     });
-  }
-
-  // Every offshore now shows in this one section (including the last),
-  // each showing only the fields relevant to its actual position(s).
-  get allOffshoreColumns(): ErpColumn[] {
-    return this.erpColumns;
-  }
-
-  get lastOffshoreCompanyName(): string {
-    return this.erpColumns.find((c) => c.isLast)?.companyName ?? 'Last Offshore';
   }
 
   invoiceSummary: SupplierInvoiceSummary | null = null;
@@ -248,76 +219,10 @@ export class UpdateShipment implements OnInit {
     return this.totalDueUsd > this.invoiceSummary.invoiceValueUsd + 0.01;
   }
 
-  loadLastOffshoreDetails(): void {
-    this.loadingLastOffshore = true;
-    this.service.getLastOffshoreDetails(this.shipmentId).subscribe({
-      next: (d) => {
-        this.lastOffshoreData = d;
-        this.loadingLastOffshore = false;
-        this.cdr.markForCheck();
-      },
-      error: () => { this.loadingLastOffshore = false; this.error = 'Could not load Last Offshore Details.'; this.cdr.markForCheck(); }
-    });
-  }
-
   sectionStatus(key: SectionKey): 'Not Started' | 'Saved' {
     if (!this.detail) return 'Not Started';
     if (key === 'shipOnBoard') return this.detail.sobActualDate ? 'Saved' : 'Not Started';
-    if (key === 'erpInfo') return this.erpColumns.some((c) => this.hasAnyValue(c)) ? 'Saved' : 'Not Started';
     return (this.detail as any)[key] ? 'Saved' : 'Not Started';
-  }
-
-  private hasAnyValue(c: ErpColumn): boolean {
-    return !!(c.prNo || c.poNo || c.sa || c.billReg || c.grn || c.invoiceNo || c.inspectionNo || c.remarks);
-  }
-
-  loadErpInfo(): void {
-    this.loadingErpInfo = true;
-    this.service.getErpColumns(this.shipmentId).subscribe({
-      next: (columns) => {
-        this.erpColumns = columns;
-        this.erpForms = {};
-        for (const c of columns) {
-          this.erpForms[c.purchaseOrderOffshorePartnerId] = {
-            // The first offshore's PO No. always mirrors the order's own
-            // Offshore PO No. (set once at order creation) — not a
-            // separately-entered value, so it's sourced from there, not
-            // from whatever may have been saved on the ERP row before.
-            prNo: c.prNo ?? '', poNo: c.sequenceOrder === 1 ? (this.detail?.offshorePoNo ?? '') : (c.poNo ?? ''), sa: c.sa ?? '', billReg: c.billReg ?? '',
-            grn: c.grn ?? '', invoiceNo: c.invoiceNo ?? '', inspectionNo: c.inspectionNo ?? '', remarks: c.remarks ?? ''
-          };
-        }
-        this.loadingErpInfo = false;
-        this.cdr.markForCheck();
-      },
-      error: () => { this.loadingErpInfo = false; this.error = 'Could not load ERP Info.'; this.cdr.markForCheck(); }
-    });
-  }
-
-  saveErpColumn(offshorePartnerId: number, andNext: boolean): void {
-    const form = this.erpForms[offshorePartnerId];
-    this.savingErpColumn[offshorePartnerId] = true;
-    this.service.saveErpColumn(this.shipmentId, offshorePartnerId, {
-      prNo: form.prNo || null, poNo: form.poNo || null, sa: form.sa || null, billReg: form.billReg || null,
-      grn: form.grn || null, invoiceNo: form.invoiceNo || null, inspectionNo: form.inspectionNo || null, remarks: form.remarks || null
-    }).subscribe({
-      next: (updated) => {
-        this.savingErpColumn[offshorePartnerId] = false;
-        const idx = this.erpColumns.findIndex((c) => c.purchaseOrderOffshorePartnerId === offshorePartnerId);
-        if (idx >= 0) this.erpColumns[idx] = updated;
-        if (andNext) this.goToNext('erpInfo');
-        this.cdr.markForCheck();
-      },
-      error: () => { this.savingErpColumn[offshorePartnerId] = false; this.error = 'Could not save this ERP column.'; this.cdr.markForCheck(); }
-    });
-  }
-
-  // MOT relates to whichever offshore entity hands off directly to Onshore —
-  // i.e. the last one in the chain, regardless of how many offshore hops
-  // this particular PO has (1, 2, or more).
-  get motRelatedOffshoreName(): string {
-    const names = this.detail?.offshorePartnerNames ?? [];
-    return names.length > 0 ? names[names.length - 1] : 'Offshore';
   }
 
   get collectionCurrencyCode(): string {
@@ -407,23 +312,6 @@ export class UpdateShipment implements OnInit {
       initialDraftReceivedDate: this.draftDocumentsForm.initialDraftReceivedDate || null,
       finalDraftReceivedDate: this.draftDocumentsForm.finalDraftReceivedDate || null,
       finalDraftConfirmedDate: this.draftDocumentsForm.finalDraftConfirmedDate || null
-    }), andNext);
-  }
-
-saveSsmo(andNext: boolean): void {
-  this.genericSave('ssmo', () => this.service.saveSsmo(this.shipmentId, {
-    cocRequired: this.ssmoForm.cocRequired, cocAvailable: this.ssmoForm.cocAvailable,
-    applicationDate: this.ssmoForm.applicationDate || null, cost: this.ssmoForm.cost,
-    costSettledDate: this.ssmoForm.costSettledDate || null, refNumber: this.ssmoForm.refNumber || null,
-    approvalDate: this.ssmoForm.approvalDate || null
-  }), andNext);
-}
-
-  saveMot(andNext: boolean): void {
-    this.genericSave('mot', () => this.service.saveMot(this.shipmentId, {
-      processDate: this.motForm.processDate || null, cost: this.motForm.cost, costSettledDate: this.motForm.costSettledDate || null,
-      refNumber: this.motForm.refNumber || null, approvalDate: this.motForm.approvalDate || null,
-      offshoreApprovedPiNumber: this.motForm.offshoreApprovedPiNumber || null
     }), andNext);
   }
 
