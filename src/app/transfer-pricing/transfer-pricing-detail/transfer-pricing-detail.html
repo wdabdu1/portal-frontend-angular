@@ -14,32 +14,32 @@
     <table style="width: 100%; min-width: 1300px; border-collapse: collapse; font-size: 13px; margin-top: 1rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th style="padding: 8px 6px;">BU</th>
-          <th style="padding: 8px 6px;">BL No.</th>
-          <th style="padding: 8px 6px;">Product/Model</th>
-          <th style="padding: 8px 6px;">Supplier Total</th>
-          <th style="padding: 8px 6px;">Supplier Total (USD)</th>
-          <th style="padding: 8px 6px;">Supplier CNF (USD)</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BU</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BL No.</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Product/Model</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Supplier Total</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Supplier Total (USD)</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Supplier CNF (USD)</th>
           <ng-container *ngFor="let stage of items[0]?.stages">
-            <th *ngIf="!stage.isLast" style="padding: 8px 6px; background: #f7f7f7;" [attr.colspan]="2">{{ stage.companyName }}</th>
-            <th *ngIf="stage.isLast" style="padding: 8px 6px; background: #f0f6fb;" [attr.colspan]="3">{{ stage.companyName }} (Last)</th>
+            <th *ngIf="!stage.isLast" style="padding: 8px 6px; background: #f7f7f7; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;" [attr.colspan]="2">{{ stage.companyName }}</th>
+            <th *ngIf="stage.isLast" style="padding: 8px 6px; background: #f0f6fb; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;" [attr.colspan]="3">{{ stage.companyName }} (Last)</th>
           </ng-container>
-          <th style="padding: 8px 6px;"></th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;"></th>
         </tr>
         <tr style="text-align: left; border-bottom: 1px solid #ddd; font-size: 11px; color: #888;">
-          <th colspan="6"></th>
+          <th style="position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;" colspan="6"></th>
           <ng-container *ngFor="let stage of items[0]?.stages">
             <ng-container *ngIf="!stage.isLast">
-              <th style="padding: 4px 6px;">Currency / Markup %</th>
-              <th style="padding: 4px 6px;">Total (USD)</th>
+              <th style="padding: 4px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Currency / Markup %</th>
+              <th style="padding: 4px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Total (USD)</th>
             </ng-container>
             <ng-container *ngIf="stage.isLast">
-              <th style="padding: 4px 6px;">Currency</th>
-              <th style="padding: 4px 6px;">Total (USD)</th>
-              <th style="padding: 4px 6px;">Margin %</th>
+              <th style="padding: 4px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Currency</th>
+              <th style="padding: 4px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Total (USD)</th>
+              <th style="padding: 4px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Margin %</th>
             </ng-container>
           </ng-container>
-          <th></th>
+          <th style="position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;"></th>
         </tr>
       </thead>
       <tbody>
