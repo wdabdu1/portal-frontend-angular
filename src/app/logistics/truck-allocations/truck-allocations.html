@@ -27,7 +27,7 @@
       <span style="color: #0a3d62; font-size: 13px;">{{ expandedCity === group.city ? 'Close ▲' : 'Assign Truck ▼' }}</span>
     </div>
 
-    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+    <div style="max-height: 70vh; overflow-y: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 13px;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #eee; background: #fafafa;">
           <th style="padding: 6px 16px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Warehouse</th>
@@ -62,7 +62,7 @@
           </td>
         </tr>
       </tbody>
-    </table>
+    </table></div>
 
     <div *ngIf="expandedCity === group.city" style="padding: 16px; background: #f9f9f9; border-top: 1px solid #eee;">
       <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
