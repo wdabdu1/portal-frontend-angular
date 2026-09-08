@@ -31,8 +31,8 @@
                 (dragstart)="onAvailableDragStart(i)"
                 (dragover)="onAvailableDragOver($event)"
                 (drop)="onAvailableDrop(i)"
-                [style.background]="isAvailableColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-                style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+                [style.background]="isAvailableColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+                style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
               >
                 <span (click)="sortAvailableBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
                 <span (mousedown)="$event.stopPropagation()">
@@ -89,8 +89,8 @@
                 (dragstart)="onInTransitDragStart(i)"
                 (dragover)="onInTransitDragOver($event)"
                 (drop)="onInTransitDrop(i)"
-                [style.background]="isInTransitColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-                style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+                [style.background]="isInTransitColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+                style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
               >
                 <span (click)="sortInTransitBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
                 <span (mousedown)="$event.stopPropagation()">
@@ -177,11 +177,11 @@
     <table *ngIf="!loadingMovements && movements.length > 0" style="width:100%; max-width:700px; border-collapse:collapse; font-size:13px; margin-bottom: 12px;">
       <thead>
         <tr style="text-align:left; border-bottom:1px solid #ddd;">
-          <th style="padding:5px;">Date</th>
-          <th style="padding:5px;">From</th>
-          <th style="padding:5px;">To</th>
-          <th style="padding:5px;">Reason</th>
-          <th style="padding:5px;">Value</th>
+          <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Date</th>
+          <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">From</th>
+          <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">To</th>
+          <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Reason</th>
+          <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Value</th>
         </tr>
       </thead>
       <tbody>
