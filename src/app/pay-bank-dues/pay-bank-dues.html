@@ -40,15 +40,15 @@
             (dragstart)="onDragStart(i)"
             (dragover)="onDragOver($event)"
             (drop)="onDrop(i)"
-            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
           >
             <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
             <span (mousedown)="$event.stopPropagation()">
               <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
             </span>
           </th>
-          <th style="padding: 8px 6px;"></th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;"></th>
         </tr>
       </thead>
       <tbody>
@@ -115,16 +115,16 @@
       <table *ngIf="!loadingDues && dues.length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px;">
         <thead>
           <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #888;">
-            <th style="padding: 8px 6px;"></th>
-            <th style="padding: 8px 6px;">BL/AWB</th>
-            <th style="padding: 8px 6px;">Category</th>
-            <th style="padding: 8px 6px;">Collection Ref.</th>
-            <th style="padding: 8px 6px;">Due Date</th>
-            <th style="padding: 8px 6px;">CBOS Due</th>
-            <th style="padding: 8px 6px; text-align: right;">Value (AED)</th>
-            <th style="padding: 8px 6px; text-align: right;">Settled (AED)</th>
-            <th style="padding: 8px 6px; text-align: right;">Remaining (AED)</th>
-            <th style="padding: 8px 6px; text-align: right;">Payment Request (AED)</th>
+            <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;"></th>
+            <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BL/AWB</th>
+            <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Category</th>
+            <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Collection Ref.</th>
+            <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Due Date</th>
+            <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">CBOS Due</th>
+            <th style="padding: 8px 6px; text-align: right; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Value (AED)</th>
+            <th style="padding: 8px 6px; text-align: right; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Settled (AED)</th>
+            <th style="padding: 8px 6px; text-align: right; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Remaining (AED)</th>
+            <th style="padding: 8px 6px; text-align: right; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Payment Request (AED)</th>
           </tr>
         </thead>
         <tbody>
