@@ -1,0 +1,32 @@
+<div style="max-width: 700px; margin: 1.5rem auto 3rem; font-family: sans-serif; border: 1px solid #ddd; border-radius: 6px; padding: 16px;">
+  <h2 style="font-size: 15px; font-weight: 500; margin: 0 0 4px;">CBOS Tenor</h2>
+  <p style="color: #888; font-size: 12px; margin: 0 0 12px;">
+    One system-wide value, used to calculate CBOS Due Date in Bank Dues for every shipment. Changing it applies immediately to every currently open shipment — nothing is set per shipment.
+  </p>
+
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+
+  <div *ngIf="!loading" style="display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;">
+    <div>
+      <label style="display: block; font-size: 12px; color: #555;">Current CBOS Tenor</label>
+      <select [(ngModel)]="tenorId" [disabled]="!canEdit" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 160px;">
+        <option [ngValue]="null">-- none set --</option>
+        <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['days'] }} days</option>
+      </select>
+    </div>
+    <button *ngIf="canEdit" (click)="save()" [disabled]="saving" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      {{ saving ? 'Saving...' : 'Save' }}
+    </button>
+    <span *ngIf="saved" style="color: #1e7e34; font-size: 12px;">Saved.</span>
+  </div>
+
+  <p *ngIf="!loading && currentTenorDays !== null" style="color: #888; font-size: 12px; margin-top: 10px;">
+    Currently applied: {{ currentTenorDays }} days.
+  </p>
+  <p *ngIf="!loading && currentTenorDays === null" style="color: #a66a00; font-size: 12px; margin-top: 10px;">
+    No CBOS Tenor is set — CBOS Due Date won't show in Bank Dues until one is selected and saved here.
+  </p>
+
+  <p *ngIf="!canEdit" style="margin-top: 10px; color: #888; font-size: 13px;">Your role doesn't have permission to change this (Manager or SuperUser required).</p>
+</div>
