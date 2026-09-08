@@ -37,7 +37,7 @@
 
   <p *ngIf="loadingCustoms" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
 
-  <div *ngIf="!loadingCustoms" style="overflow-x: auto;">
+  <div *ngIf="!loadingCustoms" style="overflow-x: auto; max-height: 70vh; overflow-y: auto;">
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
@@ -104,7 +104,7 @@
 
   <p *ngIf="loadingBank" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
 
-  <div *ngIf="!loadingBank" style="overflow-x: auto;">
+  <div *ngIf="!loadingBank" style="overflow-x: auto; max-height: 70vh; overflow-y: auto;">
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
@@ -163,7 +163,7 @@
 
   <p *ngIf="loadingSupplier" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
 
-  <div *ngIf="!loadingSupplier && supplierView === 'Monthly'" style="overflow-x: auto;">
+  <div *ngIf="!loadingSupplier && supplierView === 'Monthly'" style="overflow-x: auto; max-height: 70vh; overflow-y: auto;">
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
@@ -183,7 +183,7 @@
     <p *ngIf="supplierMonthlyAccumulation.length === 0" style="color: #888; font-size: 13px; margin-top: 0.5rem;">No scheduled payments.</p>
   </div>
 
-  <div *ngIf="!loadingSupplier && supplierView !== 'Monthly'" style="overflow-x: auto;">
+  <div *ngIf="!loadingSupplier && supplierView !== 'Monthly'" style="overflow-x: auto; max-height: 70vh; overflow-y: auto;">
     <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
