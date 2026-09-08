@@ -17,10 +17,10 @@
   <table *ngIf="!loadingOffshore" style="width: 100%; max-width: 800px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 8px 6px;">Offshore Company</th>
-        <th style="padding: 8px 6px;">Accumulated Revenue (USD)</th>
-        <th style="padding: 8px 6px;">Accumulated Markup (USD)</th>
-        <th style="padding: 8px 6px;">Markup %</th>
+        <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Offshore Company</th>
+        <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Accumulated Revenue (USD)</th>
+        <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Accumulated Markup (USD)</th>
+        <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Markup %</th>
       </tr>
     </thead>
     <tbody>
@@ -51,17 +51,17 @@
     <table style="width: 100%; min-width: 900px; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem;">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-          <th style="padding: 8px 6px;">BU</th>
-          <th style="padding: 8px 6px;">Supplier CNF TTL (USD)</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BU</th>
+          <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Supplier CNF TTL (USD)</th>
           <ng-container *ngFor="let seq of allSequenceOrders">
-            <th style="padding: 8px 6px; background: #f7f7f7;" colspan="2">{{ stageLabel(seq) }}</th>
+            <th style="padding: 8px 6px; background: #f7f7f7; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;" colspan="2">{{ stageLabel(seq) }}</th>
           </ng-container>
         </tr>
         <tr style="text-align: left; border-bottom: 1px solid #ddd; font-size: 11px; color: #888;">
-          <th colspan="2"></th>
+          <th style="position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;" colspan="2"></th>
           <ng-container *ngFor="let seq of allSequenceOrders">
-            <th style="padding: 4px 6px;">Total (USD)</th>
-            <th style="padding: 4px 6px;">Markup %</th>
+            <th style="padding: 4px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Total (USD)</th>
+            <th style="padding: 4px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Markup %</th>
           </ng-container>
         </tr>
       </thead>
