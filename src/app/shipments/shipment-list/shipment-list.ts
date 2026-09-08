@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
@@ -46,13 +46,33 @@ export class ShipmentList implements OnInit {
 
   filters: Record<string, Set<string>> = {};
 
-  constructor(private shipmentsService: ShipmentsService, private router: Router, private tablePrefs: TablePreferencesService) {}
+  // This same component is reused, unmodified, for the "Additional" nav
+  // entry (/additional) — the only difference is where a row leads and
+  // what the page calls itself, both driven by the route's own `data` so
+  // the default `/shipments` route's behavior is unchanged when absent.
+  pageTitle = 'Shipments';
+  actionSegment = 'update';
+  actionLabel = 'Update';
+  private detailSegment: string | null = null;
+
+  constructor(
+    private shipmentsService: ShipmentsService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private tablePrefs: TablePreferencesService
+  ) {}
 
   viewDetails(id: number): void {
-    this.router.navigate(['/shipments', id]);
+    this.router.navigate(this.detailSegment ? ['/shipments', id, this.detailSegment] : ['/shipments', id]);
   }
 
   ngOnInit(): void {
+    const data = this.route.snapshot.data;
+    this.pageTitle = data['pageTitle'] ?? 'Shipments';
+    this.detailSegment = data['detailSegment'] ?? null;
+    this.actionSegment = data['actionSegment'] ?? 'update';
+    this.actionLabel = data['actionLabel'] ?? 'Update';
+
     this.tablePrefs.get('shipments').subscribe({
       next: (pref) => {
         if (pref) {

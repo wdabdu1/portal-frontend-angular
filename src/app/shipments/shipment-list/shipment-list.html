@@ -1,6 +1,6 @@
 <div style="max-width: 950px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h1 style="font-size: 20px; font-weight: 500;">Shipments</h1>
+    <h1 style="font-size: 20px; font-weight: 500;">{{ pageTitle }}</h1>
     <div style="display: flex; gap: 8px;">
       <button (click)="onExportClick()" style="padding: 8px 16px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
         Export to Excel
@@ -60,8 +60,8 @@
           <span *ngSwitchDefault>{{ s[col.key] }}</span>
         </td>
         <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
-          <a [routerLink]="['/shipments', s.id, 'update']" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border-radius: 4px; text-decoration: none;">
-            Update
+          <a [routerLink]="['/shipments', s.id, actionSegment]" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border-radius: 4px; text-decoration: none;">
+            {{ actionLabel }}
           </a>
         </td>
       </tr>
