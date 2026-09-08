@@ -13,14 +13,14 @@
         <input [(ngModel)]="poNumber" name="poNumber" [style.border]="fieldBorder('poNumber')" style="width:100%; padding:6px;" />
       </div>
       <div>
-        <label style="display:block; font-size:12px; color:#555;">Business Unit *</label>
+        <label style="display:block; font-size:12px; color:#555;">Categ. 1 *</label>
         <select [(ngModel)]="businessUnitId" name="businessUnitId" (change)="onBusinessUnitChange()" [style.border]="fieldBorder('businessUnitId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
         </select>
       </div>
       <div>
-        <label style="display:block; font-size:12px; color:#555;">Division *</label>
+        <label style="display:block; font-size:12px; color:#555;">Categ. 2 *</label>
         <select [(ngModel)]="divisionId" name="divisionId" [style.border]="fieldBorder('divisionId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
           <option *ngFor="let d of filteredDivisions" [ngValue]="d.id">{{ d.name }}</option>
@@ -160,17 +160,17 @@
     </div>
     <button type="button" (click)="addLineItem()" style="margin-top:4px; padding:5px 10px; font-size:13px;">+ Add line item</button>
 
-    <h3 style="font-size: 15px; margin-top: 1.5rem;">Offshore Chain (Supplier → Offshore(s) → Onshore)</h3>
+    <h3 style="font-size: 15px; margin-top: 1.5rem;">Prioritisation Layer</h3>
     <p style="font-size:12px; color:#888;">Order matters — first row receives directly from the Supplier.</p>
     <div *ngFor="let row of offshoreRows; let i = index" style="display:flex; gap:8px; margin-bottom:6px; align-items:center;">
       <span style="font-size:12px; color:#888; width:20px;">{{ i + 1 }}.</span>
       <select [(ngModel)]="row.businessPartnerId" [name]="'offshore'+i" style="padding:5px; flex:1;">
-        <option [ngValue]="null">-- select offshore company --</option>
+        <option [ngValue]="null">-- Select Priorities --</option>
         <option *ngFor="let o of offshoreEntities" [ngValue]="o.id">{{ o['name'] }}</option>
       </select>
       <button type="button" (click)="removeOffshoreRow(i)" style="color:#c0392b; background:none; border:none; cursor:pointer;">✕</button>
     </div>
-    <button type="button" (click)="addOffshoreRow()" style="margin-top:4px; padding:5px 10px; font-size:13px;">+ Add offshore partner</button>
+    <button type="button" (click)="addOffshoreRow()" style="margin-top:4px; padding:5px 10px; font-size:13px;">+ Add Another Priority Layer</button>
 
     <div style="margin-top: 2rem;">
       <button type="submit" [disabled]="saving" style="padding:10px 20px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">
