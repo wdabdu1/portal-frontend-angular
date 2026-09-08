@@ -96,16 +96,16 @@
         <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px;">
           <thead>
             <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-              <th style="padding: 6px;">Step</th>
-              <th style="padding: 6px;">Category</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Step</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Category</th>
               <ng-container *ngIf="data.isSingleShipment">
-                <th style="padding: 6px;">Forecast Start</th>
-                <th style="padding: 6px;">Forecast End</th>
-                <th style="padding: 6px;">Actual Start</th>
-                <th style="padding: 6px;">Actual End</th>
+                <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Forecast Start</th>
+                <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Forecast End</th>
+                <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Actual Start</th>
+                <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Actual End</th>
               </ng-container>
-              <th style="padding: 6px;">{{ data.isSingleShipment ? 'Execution Speed' : 'Avg. Execution Speed' }}</th>
-              <th style="padding: 6px;">{{ data.isSingleShipment ? 'Completion Date' : 'Avg. Completion Date' }}</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Execution Speed' : 'Avg. Execution Speed' }}</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Completion Date' : 'Avg. Completion Date' }}</th>
             </tr>
           </thead>
           <tbody>
@@ -141,10 +141,10 @@
         <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
           <thead>
             <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-              <th style="padding: 6px;">Category</th>
-              <th style="padding: 6px;">Avg. Execution Speed</th>
-              <th style="padding: 6px;">Avg. Completion Date Delta</th>
-              <th style="padding: 6px;">Step Instances</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Category</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Avg. Execution Speed</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Avg. Completion Date Delta</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Step Instances</th>
             </tr>
           </thead>
           <tbody>
