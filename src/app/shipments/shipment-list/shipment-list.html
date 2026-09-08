@@ -60,7 +60,7 @@
           <span *ngSwitchDefault>{{ s[col.key] }}</span>
         </td>
         <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
-          <a [routerLink]="['/shipments', s.id, actionSegment]" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border-radius: 4px; text-decoration: none;">
+          <a [routerLink]="['/shipments', s.id]" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border-radius: 4px; text-decoration: none;">
             {{ actionLabel }}
           </a>
         </td>
