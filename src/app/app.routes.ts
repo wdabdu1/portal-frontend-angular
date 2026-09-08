@@ -363,7 +363,7 @@ export const routes: Routes = [
   { path: 'shipments', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard],
     data: { detailSegment: 'update' } },
   { path: 'additional', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard],
-    data: { pageTitle: 'Additional', detailSegment: 'additional', actionSegment: 'additional', actionLabel: 'Open' } },
+    data: { pageTitle: 'Additional', detailSegment: 'additional' } },
   { path: 'shipments/new', component: NewShipment, canActivate: [authGuard, cPricingLockGuard] },
   { path: 'shipments/:id/update', component: UpdateShipment, canActivate: [authGuard, cPricingLockGuard] },
   { path: 'shipments/:id/additional', component: ShipmentAdditional, canActivate: [authGuard, cPricingLockGuard] },
