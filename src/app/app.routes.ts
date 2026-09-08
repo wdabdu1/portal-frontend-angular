@@ -21,12 +21,14 @@ import { SupplierDuesList } from './supplier-dues/supplier-dues-list/supplier-du
 import { BusinessUnits } from './settings/business-units/business-units';
 import { SettingsMenu } from './settings/settings-menu/settings-menu';
 import { SimpleLookup } from './settings/simple-lookup/simple-lookup';
+import { TenorsSettingsPage } from './settings/tenors-settings/tenors-settings';
 import { ReceiverBanks } from './settings/receiver-banks/receiver-banks';
 import { NewSupplierOrder } from './purchase-orders/new-supplier-order/new-supplier-order';
 import { OrderList } from './purchase-orders/order-list/order-list';
 import { NewShipment } from './shipments/new-shipment/new-shipment';
 import { ShipmentList } from './shipments/shipment-list/shipment-list';
 import { UpdateShipment } from './shipments/update-shipment/update-shipment';
+import { ShipmentAdditional } from './shipments/shipment-additional/shipment-additional';
 import { Divisions } from './settings/divisions/divisions';
 import { FxRates } from './settings/fx-rates/fx-rates';
 import { ClearanceList } from './clearance/clearance-list/clearance-list';
@@ -262,11 +264,10 @@ export const routes: Routes = [
   },
   {
     path: 'settings/tenors',
-    component: SimpleLookup,
+    component: TenorsSettingsPage,
     canActivate: [authGuard, cPricingLockGuard],
     data: { title: 'Tenors', resource: 'tenors', fields: [
-      { key: 'days', label: 'No of Days', type: 'number' },
-      { key: 'cbosAllowanceDays', label: 'CBOS Allowance (days)', type: 'number' }
+      { key: 'days', label: 'No of Days', type: 'number' }
     ] }
   },
   {
@@ -360,8 +361,11 @@ export const routes: Routes = [
   { path: 'orders/new', component: NewSupplierOrder, canActivate: [authGuard, cPricingLockGuard] },
   { path: 'orders/:id', component: OrderDetails, canActivate: [authGuard, cPricingLockGuard] },
   { path: 'shipments', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'additional', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard],
+    data: { pageTitle: 'Additional', detailSegment: 'additional', actionSegment: 'additional', actionLabel: 'Open' } },
   { path: 'shipments/new', component: NewShipment, canActivate: [authGuard, cPricingLockGuard] },
   { path: 'shipments/:id/update', component: UpdateShipment, canActivate: [authGuard, cPricingLockGuard] },
+  { path: 'shipments/:id/additional', component: ShipmentAdditional, canActivate: [authGuard, cPricingLockGuard] },
   { path: 'shipments/:id', component: ShipmentDetails, canActivate: [authGuard, cPricingLockGuard] },
 
   // C Pricing — these three are deliberately NOT given cPricingLockGuard

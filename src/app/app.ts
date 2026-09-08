@@ -49,6 +49,7 @@ const MENU_GROUPS: MenuGroup[] = [
     items: [
       { label: 'Orders', route: '/orders', canAccess: (a) => a.canSeeOrders() },
       { label: 'Shipments', route: '/shipments', canAccess: (a) => a.canSeeShipments() },
+      { label: 'Additional', route: '/additional', canAccess: (a) => a.canSeeShipments() },
       { label: 'Clearance', route: '/clearance', canAccess: () => true }
     ]
   },
