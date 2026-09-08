@@ -33,15 +33,15 @@
           (dragstart)="onDragStart(i)"
           (dragover)="onDragOver($event)"
           (drop)="onDrop(i)"
-          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
         >
           <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
           <span (mousedown)="$event.stopPropagation()">
             <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
           </span>
         </th>
-        <th style="padding: 8px 6px;">Status</th>
+        <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Status</th>
       </tr>
     </thead>
     <tbody>
