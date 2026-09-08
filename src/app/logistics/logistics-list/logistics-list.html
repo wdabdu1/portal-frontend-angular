@@ -29,8 +29,8 @@
             (dragstart)="onDragStart(i)"
             (dragover)="onDragOver($event)"
             (drop)="onDrop(i)"
-            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : 'transparent'"
-            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap;"
+            [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+            style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
           >
             <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
             <span (mousedown)="$event.stopPropagation()">
@@ -64,11 +64,11 @@
               <table *ngIf="!loadingAllocations && allocations.length > 0" style="width:100%; max-width:600px; border-collapse:collapse; font-size:13px; margin-bottom: 12px;">
                 <thead>
                   <tr style="text-align:left; border-bottom:1px solid #ddd;">
-                    <th style="padding:5px;">Warehouse</th>
-                    <th style="padding:5px;">City</th>
-                    <th style="padding:5px;">Qty</th>
-                    <th style="padding:5px;">Contact</th>
-                    <th style="padding:5px;"></th>
+                    <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Warehouse</th>
+                    <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">City</th>
+                    <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Qty</th>
+                    <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Contact</th>
+                    <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;"></th>
                   </tr>
                 </thead>
                 <tbody>
