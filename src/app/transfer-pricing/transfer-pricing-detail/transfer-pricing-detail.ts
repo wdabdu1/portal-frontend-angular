@@ -112,6 +112,20 @@ export class TransferPricingDetailComponent implements OnInit {
     return !!this.locks['transferPricing'];
   }
 
+  // Without this, every keystroke in the markup-% or currency inputs calls
+  // onDraftChange() -> reassigns liveStagesByItem[...] to a brand-new array
+  // of brand-new (spread-copied) stage objects. With no trackBy, Angular's
+  // default identity-based diffing sees "all new objects" and destroys +
+  // recreates every <select>/<input> in that row on every single keystroke
+  // — which drops DOM focus mid-type. That's the "type 1, then nothing
+  // happens, have to click back in to type 0" bug: the input the user was
+  // typing into no longer exists by the time the next keystroke arrives.
+  // Tracking by the stable partner id keeps the same DOM nodes across the
+  // re-render, so focus and cursor position survive every keystroke.
+  trackByPartnerId(_index: number, stage: TpStage): number {
+    return stage.purchaseOrderOffshorePartnerId;
+  }
+
   confirmAndLock(): void {
     this.confirming = true;
     this.lockService.confirm('Shipment', this.shipmentId, 'transferPricing').subscribe({
@@ -153,7 +167,7 @@ export class TransferPricingDetailComponent implements OnInit {
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: () => { this.error = 'Could not load Transfer Pricing data.'; this.loading = false; this.cdr.markForCheck(); }
+      error: () => { this.error = 'Could not load P Simulator data.'; this.loading = false; this.cdr.markForCheck(); }
     });
   }
 
