@@ -47,7 +47,7 @@
             {{ savingActualDropOff[drop.id] ? 'Saving...' : 'Save' }}
           </button>
         </div>
-        <table *ngIf="drop.items.length > 0" style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom: 12px;">
+        <div style="max-height: 70vh; overflow-y: auto;"><table *ngIf="drop.items.length > 0" style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom: 12px;">
           <thead>
             <tr style="text-align:left; border-bottom:1px solid #ddd;">
               <th style="padding:5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Product</th>
@@ -68,7 +68,7 @@
               <td style="padding:5px;"><a (click)="removeItem(item.id, drop.id)" style="color:#c0392b; cursor:pointer; font-size:12px;">Remove</a></td>
             </tr>
           </tbody>
-        </table>
+        </table></div>
 
         <h4 style="font-size: 13px; margin: 12px 0 8px; color: #333;">Add Item to This Drop</h4>
         <p *ngIf="loadingAllocationsFor === drop.id" style="color:#888; font-size:12px;">Loading available allocations...</p>
