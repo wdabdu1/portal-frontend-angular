@@ -50,9 +50,15 @@ export class ShipmentList implements OnInit {
   // entry (/additional) — the only difference is where a row leads and
   // what the page calls itself, both driven by the route's own `data` so
   // the default `/shipments` route's behavior is unchanged when absent.
+  //
+  // The far-right action button always opens the read-only summary page
+  // (the bare /shipments/:id route, ShipmentDetails) — that's what a row
+  // click used to do before `detailSegment` was introduced to send row
+  // clicks straight to the editable page instead. Now that both list
+  // pages route their rows to an editable page, the button's job is to
+  // be the one remaining way to reach that summary, labeled "Info".
   pageTitle = 'Shipments';
-  actionSegment = 'update';
-  actionLabel = 'Update';
+  actionLabel = 'Info';
   private detailSegment: string | null = null;
 
   constructor(
@@ -70,8 +76,6 @@ export class ShipmentList implements OnInit {
     const data = this.route.snapshot.data;
     this.pageTitle = data['pageTitle'] ?? 'Shipments';
     this.detailSegment = data['detailSegment'] ?? null;
-    this.actionSegment = data['actionSegment'] ?? 'update';
-    this.actionLabel = data['actionLabel'] ?? 'Update';
 
     this.tablePrefs.get('shipments').subscribe({
       next: (pref) => {
