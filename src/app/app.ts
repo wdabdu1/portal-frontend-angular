@@ -50,29 +50,45 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Orders', route: '/orders', canAccess: (a) => a.canSeeOrders() },
       { label: 'Shipments', route: '/shipments', canAccess: (a) => a.canSeeShipments() },
       { label: 'Additional', route: '/additional', canAccess: (a) => a.canSeeShipments() },
-      { label: 'Clearance', route: '/clearance', canAccess: () => true }
+      // Logistics/Coordinator are walled off from Clearance entirely
+      // (Withdrawal detail and the FZ Deposit/Route 2-3 screens live
+      // there) — everything they need instead lives in the Logistics
+      // box below.
+      { label: 'Clearance', route: '/clearance', canAccess: (a) => !a.hasRole('LogisticsOfficer') && !a.hasRole('Coordinator') }
     ]
   },
   {
+    // Exclusive home for Logistics + Coordinator (route-guarded by
+    // logisticsBoxGuard, not just hidden here) — Manager/SuperUser keep
+    // access too, same as every other module in this app.
     label: 'Logistics',
     items: [
-      { label: 'Shipments for Dispatch', route: '/logistics', canAccess: () => true },
-      { label: 'Truck Availability', route: '/logistics/truck-availability', canAccess: () => true },
-      { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: () => true },
-      { label: 'Cargo Under Delivery', route: '/dashboards/goods-in-transit', canAccess: () => true }
+      { label: 'Shipments for Dispatch', route: '/logistics', canAccess: (a) => a.canSeeLogisticsBox() },
+      { label: 'Truck Availability', route: '/logistics/truck-availability', canAccess: (a) => a.canSeeLogisticsBox() },
+      { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: (a) => a.canSeeLogisticsBox() },
+      // "Cargo Under Delivery" deliberately removed from this group for
+      // now — it pointed at the full item-level Goods in Transit
+      // dashboard, which Logistics/Coordinator can no longer reach
+      // (logisticsLockGuard blocks it, correctly). A confidentiality-
+      // filtered version living inside this box is planned for a later
+      // phase, once LogisticsController's own filtering logic exists.
+      { label: 'Reveal Settings', route: '/logistics/settings', canAccess: (a) => a.canSeeLogisticsBox() }
     ]
   },
   {
+    // Logistics/Coordinator must not know FZ warehouse content at all —
+    // this group is deliberately excluded from canSeeLogisticsBox's
+    // roles, not just left open like it was before.
     label: 'Free Zone',
     items: [
-      { label: 'FZ Inventory', route: '/fz-inventory', canAccess: () => true },
-      { label: 'Withdrawals', route: '/fz-inventory', canAccess: () => true }
+      { label: 'FZ Inventory', route: '/fz-inventory', canAccess: (a) => !a.hasRole('LogisticsOfficer') && !a.hasRole('Coordinator') },
+      { label: 'Withdrawals', route: '/fz-inventory', canAccess: (a) => !a.hasRole('LogisticsOfficer') && !a.hasRole('Coordinator') }
     ]
   },
   {
     label: 'Finance',
     items: [
-      { label: 'Transfer Pricing', route: '/transfer-pricing', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Manager') || a.hasRole('SuperUser') },
+      { label: 'P Simulator', route: '/transfer-pricing', canAccess: (a) => a.hasRole('CorpFinance') || a.hasRole('Manager') || a.hasRole('SuperUser') },
       { label: 'Supplier Dues', route: '/supplier-dues', canAccess: (a) => a.canSeeSupplierDues() },
       { label: 'Bank Dues', route: '/bank-dues', canAccess: (a) => a.canSeeBankDues() },
       { label: 'Direct Sales', route: '/direct-sales', canAccess: (a) => a.canSeeBankDues() },
