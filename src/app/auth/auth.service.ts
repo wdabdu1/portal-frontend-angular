@@ -119,4 +119,25 @@ export class AuthService {
   isCPricingOnly(): boolean {
     return this.hasRole('CPricing') && !this.hasRole('Manager') && !this.hasRole('SuperUser');
   }
+
+  // Logistics module confidentiality redesign: LogisticsOfficer and
+  // Coordinator are both hard-locked to the Logistics box only (same
+  // "isCPricingOnly" pattern as above) — a Manager/SuperUser who also
+  // happens to hold one of these roles keeps their normal full access.
+  isLogisticsBoxOnly(): boolean {
+    return (this.hasRole('LogisticsOfficer') || this.hasRole('Coordinator'))
+      && !this.hasRole('Manager') && !this.hasRole('SuperUser');
+  }
+
+  // Who may open the Logistics box at all (route guard + menu gating).
+  canSeeLogisticsBox(): boolean {
+    return this.hasAnyRole(['LogisticsOfficer', 'Coordinator', 'Manager', 'SuperUser']);
+  }
+
+  // Who may edit the Logistics reveal-timing settings (the arrival lead
+  // time / pre-clearance Cat-Qty reveal / post-delivery re-hide days) —
+  // Coordinator can, LogisticsOfficer only ever sees them read-only.
+  canEditLogisticsRevealSettings(): boolean {
+    return this.hasAnyRole(['Coordinator', 'Manager', 'SuperUser']);
+  }
 }
