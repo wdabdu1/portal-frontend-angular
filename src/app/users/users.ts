@@ -6,7 +6,11 @@ import { RouterLink } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../settings/settings-lookup.service';
 import { BuAccessInput, UserSummary, UsersService } from './users.service';
 
-const ROLES = ['IP_User', 'IP_Supervisor', 'CLR_Usr', 'CLR_Supervisor', 'BU', 'Treasury', 'CorpFinance', 'Manager', 'SuperUser', 'CPricing'];
+// LogisticsOfficer and Coordinator added here — LogisticsOfficer was
+// previously missing from this array entirely (a pre-existing gap: the
+// role existed in the backend but could never actually be assigned to a
+// user from this screen), fixed alongside adding the new Coordinator role.
+const ROLES = ['IP_User', 'IP_Supervisor', 'CLR_Usr', 'CLR_Supervisor', 'BU', 'Treasury', 'CorpFinance', 'Manager', 'SuperUser', 'LogisticsOfficer', 'CPricing', 'Coordinator'];
 const BU_SCOPED_ROLES = ['IP_User', 'IP_Supervisor', 'BU'];
 
 interface NewBuRow {
