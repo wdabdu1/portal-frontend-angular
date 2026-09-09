@@ -59,7 +59,10 @@ export class SettingsMenu {
         { label: 'Logistics Cities', path: '/settings/logistics-cities' },
         { label: 'Drivers', path: '/settings/drivers' },
         { label: 'Trucks', path: '/settings/trucks' },
-        { label: 'Warehouses', path: '/settings/warehouses' }
+        { label: 'Warehouses', path: '/settings/warehouses' },
+        // Also reachable from the Logistics menu group itself (Coordinator
+        // can reach it there — they're locked out of /settings generally).
+        { label: 'Logistics — Reveal Settings', path: '/logistics/settings' }
       ]
     },
     {
