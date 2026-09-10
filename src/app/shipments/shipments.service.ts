@@ -5,6 +5,7 @@ import { API_URL } from '../api-config';
 export interface ShipmentLineItemRequest {
   purchaseOrderLineItemId: number;
   qtyInBl: number;
+  hsCode: string | null;
 }
 
 export interface CreateShipmentRequest {
