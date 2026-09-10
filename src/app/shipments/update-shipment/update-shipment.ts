@@ -7,7 +7,7 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
-import { CloseDealStatus, CustomerCollection, CustomerDue, PaymentDue, ShipmentDetail, ShipmentLineItemHsCode, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
+import { CloseDealStatus, CustomerCollection, CustomerDue, PaymentDue, ShipmentDetail, SupplierInvoiceSummary, UpdateShipmentService } from './update-shipment.service';
 
 type SectionKey = 'orderExecution' | 'shipOnBoard' | 'forwarder' | 'acd' | 'draftDocuments' | 'supplierFullSet' | 'paymentDue' | 'banking';
 
@@ -60,12 +60,6 @@ export class UpdateShipment implements OnInit {
 
   forwarderForm = { forwarderId: null as number | null, actualShippingCost: null as number | null, currencyId: null as number | null, amountSaved: null as number | null, marineInsurance: false };
   acdForm = { processDate: '', costSettledDate: '', refNumber: '' };
-  // HS Codes: keyed by line item id, not part of the SectionKey/accordion
-  // pattern above — it's per-line-item rather than one record per
-  // shipment, so it gets its own small always-visible block instead
-  // (same reasoning as Payment Due Schedule and Customer Dues).
-  hsCodeForm: Record<number, string> = {};
-  savingHsCodes = false;
   draftDocumentsForm = { initialDraftReceivedDate: '', finalDraftReceivedDate: '', finalDraftConfirmedDate: '' };
   supplierFullSetForm = { supplierInvoiceNo: '', supplierInvoiceDate: '', fsDispatchDate: '', fsDispatchedViaId: null as number | null, fsTrackingNumber: '', fsReceivedDate: '' };
   bankingForm = {
@@ -110,8 +104,6 @@ export class UpdateShipment implements OnInit {
           fsTrackingNumber: detail.supplierFullSet.fsTrackingNumber ?? '', fsReceivedDate: detail.supplierFullSet.fsReceivedDate ?? ''
         };
         this.shipOnBoardForm = { sobActualDate: detail.sobActualDate ?? '' };
-        this.hsCodeForm = {};
-        for (const li of detail.lineItemHsCodes) this.hsCodeForm[li.lineItemId] = li.hsCode ?? '';
         if (detail.banking) this.bankingForm = {
           senderBankId: detail.banking.senderBankId, osDocDispatchDate: detail.banking.osDocDispatchDate ?? '', osDocDispatchedViaId: detail.banking.osDocDispatchedViaId,
           osDocTrackingNumber: detail.banking.osDocTrackingNumber ?? '', receivingBankId: detail.banking.receivingBankId, necessaryGoodType: detail.banking.necessaryGoodType,
@@ -338,25 +330,6 @@ export class UpdateShipment implements OnInit {
       collectionRefNo: this.bankingForm.collectionRefNo || null, collectionValue: this.bankingForm.collectionValue,
       collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId
     }), andNext);
-  }
-
-  // --- HS Codes ---
-  saveHsCodes(): void {
-    if (!this.detail) return;
-    this.savingHsCodes = true;
-    const payload: ShipmentLineItemHsCode[] = this.detail.lineItemHsCodes.map((li) => ({
-      lineItemId: li.lineItemId,
-      modelProduct: li.modelProduct,
-      hsCode: (this.hsCodeForm[li.lineItemId] ?? '').trim() || null
-    }));
-    this.service.saveHsCodes(this.shipmentId, payload).subscribe({
-      next: () => {
-        this.savingHsCodes = false;
-        if (this.detail) this.detail = { ...this.detail, lineItemHsCodes: payload };
-        this.cdr.markForCheck();
-      },
-      error: () => { this.savingHsCodes = false; this.error = 'Could not save HS Codes.'; this.cdr.markForCheck(); }
-    });
   }
 
   // --- Direct Sales: Customer Agreed Payment / Customer Collected Payment ---
