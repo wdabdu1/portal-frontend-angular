@@ -30,7 +30,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'blAwbNo', label: 'BL/AWB No.' },
   { key: 'poNumber', label: 'PO Number' },
   { key: 'supplierName', label: 'Supplier' },
-  { key: 'supplierValueUsd', label: 'CNF Value (USD)' },
+  { key: 'supplierValueUsd', label: 'TTL Value (USD)' },
   { key: 'eta', label: 'ETA' },
   { key: 'categorisations', label: 'Categorisations' },
   { key: 'statusLabel', label: 'Status' }

@@ -47,7 +47,7 @@
     <tbody>
       <tr *ngFor="let o of orders" (click)="openOrder(o.shipmentId)" style="border-bottom: 1px solid #eee; cursor: pointer;">
         <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
-          <span *ngSwitchCase="'createdAt'" style="color: #888; white-space: nowrap;">{{ o.createdAt | date: 'MMM d, y' }}</span>
+          <span *ngSwitchCase="'createdAt'" style="color: #888; white-space: nowrap;">{{ o.createdAt | date: 'dd/MM/yyyy' }}</span>
           <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ o.blAwbNo }}</span>
           <span *ngSwitchCase="'supplierValueUsd'">{{ o.supplierValueUsd | number: '1.2-2' }}</span>
           <span *ngSwitchCase="'eta'" style="color: #888; white-space: nowrap;">{{ o.eta ? (o.eta | date: 'dd/MM/yyyy') : '—' }}</span>
