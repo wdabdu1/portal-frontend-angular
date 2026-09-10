@@ -4,6 +4,7 @@ import { API_URL } from '../../api-config';
 
 export interface ShipmentLineItemDetail {
   productCategory: string;
+  productType: string;
   modelProduct: string;
   qtyInBl: number;
   unitOfMeasure: string | null;
@@ -30,6 +31,7 @@ export interface ShipmentFullDetail {
   supplier: string | null;
   consignee: string;
   category: string;
+  type: string;
   shippingLine: string | null;
   vesselName: string | null;
   fcl20Count: number;

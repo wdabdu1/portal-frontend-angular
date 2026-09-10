@@ -19,7 +19,7 @@
         </p>
       </div>
       <a *ngIf="auth.hasRole('CorpFinance') || auth.hasRole('Manager') || auth.hasRole('SuperUser')" [routerLink]="['/transfer-pricing', shipmentId]" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; white-space: nowrap; margin-right: 8px;">
-        Transfer Pricing
+        P Simulator
       </a>
       <a [routerLink]="['/shipments', shipmentId, 'update']" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px; white-space: nowrap;">
         Update
@@ -32,6 +32,7 @@
         <thead>
           <tr style="text-align: left; border-bottom: 1px solid #ddd;">
             <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Category</th>
+            <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Type</th>
             <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Model/Product</th>
             <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">HS Code</th>
             <th style="padding: 5px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Qty in BL</th>
@@ -40,6 +41,7 @@
         <tbody>
           <tr *ngFor="let li of detail.lineItems" style="border-bottom: 1px solid #eee;">
             <td style="padding: 5px;">{{ li.productCategory }}</td>
+            <td style="padding: 5px;">{{ li.productType || '—' }}</td>
             <td style="padding: 5px;">{{ li.modelProduct }}</td>
             <td style="padding: 5px;">{{ li.hsCode || '—' }}</td>
             <td style="padding: 5px;">{{ li.qtyInBl | number: '1.0-2' }} {{ li.unitOfMeasure }}</td>
