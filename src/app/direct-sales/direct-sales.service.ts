@@ -9,6 +9,7 @@ export interface DirectSalesDueRow {
   consignee: string;
   blAwbNo: string;
   category: string;
+  eta: string | null;
   dueDate: string;
   dueAmount: number;
   dueCurrency: string;
@@ -16,6 +17,8 @@ export interface DirectSalesDueRow {
   collectedUsd: number;
   remainingUsd: number;
   settled: boolean;
+  documentsHanded: boolean;
+  paymentCollected: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
