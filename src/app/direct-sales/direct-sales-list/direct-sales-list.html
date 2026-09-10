@@ -48,11 +48,14 @@
       <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee;">
         <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
           <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ r.blAwbNo }}</span>
-          <span *ngSwitchCase="'dueDate'" style="color: #888;">{{ r.dueDate | date: 'MMM d, y' }}</span>
+          <span *ngSwitchCase="'eta'" style="color: #888;">{{ r.eta ? (r.eta | date: 'dd/MM/yyyy') : '—' }}</span>
+          <span *ngSwitchCase="'dueDate'" style="color: #888;">{{ r.dueDate | date: 'dd/MM/yyyy' }}</span>
           <span *ngSwitchCase="'dueAmount'">{{ r.dueAmount | number: '1.2-2' }}</span>
           <span *ngSwitchCase="'dueAmountUsd'">{{ r.dueAmountUsd | number: '1.2-2' }}</span>
           <span *ngSwitchCase="'collectedUsd'" style="color:#1e7e34;">{{ r.collectedUsd | number: '1.2-2' }}</span>
           <span *ngSwitchCase="'remainingUsd'" [style.color]="r.remainingUsd > 0 ? '#c0392b' : '#1e7e34'" style="font-weight: 600;">{{ r.remainingUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'documentsHanded'" [style.color]="r.documentsHanded ? '#1e7e34' : '#888'" style="font-weight: 600;">{{ r.documentsHanded ? 'Yes' : 'No' }}</span>
+          <span *ngSwitchCase="'paymentCollected'" [style.color]="r.paymentCollected ? '#1e7e34' : '#888'" style="font-weight: 600;">{{ r.paymentCollected ? 'Yes' : 'No' }}</span>
           <span *ngSwitchDefault>{{ r[col.key] || '—' }}</span>
         </td>
         <td style="padding: 8px 6px;">

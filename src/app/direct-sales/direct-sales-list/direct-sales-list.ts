@@ -15,12 +15,19 @@ interface ColumnDef {
   label: string;
 }
 
+// documentsHanded/paymentCollected are placed before the financial columns
+// (not appended at the end) because the table footer hardcodes its last 3
+// cells as the dueAmountUsd/collectedUsd/remainingUsd totals — keeping
+// those three last here preserves that alignment in the default view.
 const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'businessUnit', label: 'BU' },
   { key: 'division', label: 'Division' },
   { key: 'consignee', label: 'Consignee' },
   { key: 'blAwbNo', label: 'BL/AWB' },
   { key: 'category', label: 'Cat' },
+  { key: 'eta', label: 'ETA' },
+  { key: 'documentsHanded', label: 'Original Documents Handed' },
+  { key: 'paymentCollected', label: 'Full Payment Collected' },
   { key: 'dueDate', label: 'Due Date' },
   { key: 'dueAmount', label: 'Due Amount' },
   { key: 'dueCurrency', label: 'Currency' },
