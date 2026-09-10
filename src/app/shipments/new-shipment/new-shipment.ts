@@ -13,6 +13,10 @@ interface LineItemSelection extends LineItemRemaining {
   // column only once more than one PO is combined into the shipment.
   purchaseOrderId: number;
   poNumber: string;
+  // Captured here, against the product actually being selected, rather
+  // than as a separate step after the shipment exists. Optional — can be
+  // left blank and filled in later from Update Shipment's HS Codes block.
+  hsCode: string | null;
 }
 
 @Component({
@@ -134,7 +138,8 @@ export class NewShipment implements OnInit {
           selected: false,
           qtyToShip: null,
           purchaseOrderId: order.id,
-          poNumber: order.poNumber
+          poNumber: order.poNumber,
+          hsCode: null
         }));
         this.lineItems = [...this.lineItems, ...tagged];
         this.loadingLineItems = false;
@@ -196,7 +201,11 @@ export class NewShipment implements OnInit {
         blFreeDays: this.blFreeDays ?? undefined,
         isDirectSales: this.isDirectSales,
         consigneeName: this.isDirectSales ? this.consigneeName : null,
-        lineItems: selectedItems.map((li) => ({ purchaseOrderLineItemId: li.id, qtyInBl: li.qtyToShip! }))
+        lineItems: selectedItems.map((li) => ({
+          purchaseOrderLineItemId: li.id,
+          qtyInBl: li.qtyToShip!,
+          hsCode: (li.hsCode || '').trim() || null
+        }))
       })
       .subscribe({
         next: () => {

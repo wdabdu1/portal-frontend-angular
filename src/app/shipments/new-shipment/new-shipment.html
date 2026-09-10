@@ -105,6 +105,7 @@
           <th style="padding:6px; position:sticky; top:0; background:#fff; box-shadow:0 1px 0 #ddd; z-index:2;"></th>
           <th *ngIf="selectedOrders.length > 1" style="padding:6px; position:sticky; top:0; background:#fff; box-shadow:0 1px 0 #ddd; z-index:2;">PO</th>
           <th style="padding:6px; position:sticky; top:0; background:#fff; box-shadow:0 1px 0 #ddd; z-index:2;">Product</th>
+          <th style="padding:6px; position:sticky; top:0; background:#fff; box-shadow:0 1px 0 #ddd; z-index:2;">HS Code</th>
           <th style="padding:6px; position:sticky; top:0; background:#fff; box-shadow:0 1px 0 #ddd; z-index:2;">Ordered</th>
           <th style="padding:6px; position:sticky; top:0; background:#fff; box-shadow:0 1px 0 #ddd; z-index:2;">Remaining</th>
           <th style="padding:6px; position:sticky; top:0; background:#fff; box-shadow:0 1px 0 #ddd; z-index:2;">Qty to Ship</th>
@@ -115,6 +116,9 @@
           <td style="padding:6px;"><input type="checkbox" [(ngModel)]="li.selected" [name]="'sel'+li.id" /></td>
           <td *ngIf="selectedOrders.length > 1" style="padding:6px; color:#888;">{{ li.poNumber }}</td>
           <td style="padding:6px;">{{ li.modelProduct }} ({{ li.productCategory }})</td>
+          <td style="padding:6px;">
+            <input type="text" [(ngModel)]="li.hsCode" [name]="'hscode'+li.id" style="width:110px; padding:4px;" />
+          </td>
           <td style="padding:6px; color:#888;">{{ li.qty }} {{ li.unitOfMeasure }}</td>
           <td style="padding:6px;" [style.color]="li.qtyRemaining === 0 ? '#c0392b' : '#2a7d2a'">
             {{ li.qtyRemaining }} {{ li.unitOfMeasure }}
