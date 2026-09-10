@@ -20,8 +20,12 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'businessUnit', label: 'BU' },
   { key: 'consignee', label: 'Consignee' },
   { key: 'category', label: 'Cat' },
-  { key: 'modelProduct', label: 'Product/Model' },
+  // 'modelProduct' deliberately removed — the backend no longer sends a
+  // real value for it (confidentiality: Category + Qty only, never
+  // Model/Product, per the reveal design), so showing the column would
+  // just be a permanent blank.
   { key: 'blAwbNo', label: 'BL No.' },
+  { key: 'arrivalDate', label: 'Arrival Date' },
   { key: 'plannedCompletionDate', label: 'Planned Completion' },
   { key: 'actualCompletionDate', label: 'Actual Completion' },
   { key: 'qty', label: 'Qty' },
