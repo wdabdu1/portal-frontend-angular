@@ -19,10 +19,11 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'businessUnit', label: 'BU' },
   { key: 'blAwbNo', label: 'BL/AWB No.' },
   { key: 'poNumber', label: 'PO Number' },
-  { key: 'shippingLine', label: 'Shipping Line' },
+  { key: 'supplier', label: 'Supplier' },
   { key: 'lineItemCount', label: 'Line Items' },
   { key: 'eta', label: 'ETA' },
   { key: 'status', label: 'Status' },
+  { key: 'slaStatus', label: 'SLA Status' },
   { key: 'createdAt', label: 'Created' }
 ];
 

@@ -57,6 +57,16 @@
               {{ s.status }}
             </span>
           </span>
+          <span *ngSwitchCase="'slaStatus'">
+            <span *ngIf="s.slaStatus === '—'" style="color: #ccc;">—</span>
+            <span *ngIf="s.slaStatus !== '—'" style="display: inline-flex; align-items: center; gap: 5px; font-size: 12px;">
+              <span
+                [style.background]="s.slaLight === 'Red' ? '#c0392b' : (s.slaLight === 'Amber' ? '#c98a00' : '#2a7d2a')"
+                style="display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink: 0;"
+              ></span>
+              <span style="color: #444;">{{ s.slaStatus }}</span>
+            </span>
+          </span>
           <span *ngSwitchDefault>{{ s[col.key] }}</span>
         </td>
         <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
