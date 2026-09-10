@@ -16,15 +16,16 @@ interface ColumnDef {
 }
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
+  { key: 'slaPercent', label: 'SLA Progress' },
   { key: 'businessUnit', label: 'BU' },
+  { key: 'supplier', label: 'Supplier' },
   { key: 'blAwbNo', label: 'BL/AWB No.' },
   { key: 'poNumber', label: 'PO Number' },
-  { key: 'supplier', label: 'Supplier' },
   { key: 'lineItemCount', label: 'Line Items' },
   { key: 'eta', label: 'ETA' },
   { key: 'status', label: 'Status' },
-  { key: 'slaStatus', label: 'SLA Status' },
-  { key: 'createdAt', label: 'Created' }
+  { key: 'createdAt', label: 'Created' },
+  { key: 'slaStatus', label: 'SLA Status' }
 ];
 
 @Component({
