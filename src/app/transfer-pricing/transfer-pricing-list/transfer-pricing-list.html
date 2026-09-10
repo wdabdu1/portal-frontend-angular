@@ -1,4 +1,4 @@
-<div style="max-width: 900px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1200px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 style="font-size: 20px; font-weight: 500;">P Simulator — Orders</h1>
     <div style="display: flex; gap: 8px;">
@@ -10,6 +10,7 @@
       </a>
     </div>
   </div>
+  <p style="color: #888; font-size: 13px;">Drag a column header to reorder it. Click the ▼ arrow to filter. Click a row to open it.</p>
 
   <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
     <select [(ngModel)]="statusFilter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
@@ -24,32 +25,39 @@
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 1rem;">{{ error }}</p>
 
   <div style="overflow-x: auto; max-height: 70vh; overflow-y: auto;">
-  <table *ngIf="!loading" style="width: 100%; min-width: 1100px; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+  <table *ngIf="!loading" style="width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Created</th>
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BU</th>
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">BL/AWB No.</th>
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">PO Number</th>
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Supplier</th>
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Supplier Value (USD)</th>
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Route</th>
-        <th style="padding: 8px 6px; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Status</th>
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let o of orders" (click)="openOrder(o.shipmentId)" style="border-bottom: 1px solid #eee; cursor: pointer;">
-        <td style="padding: 8px 6px; color: #888; white-space: nowrap;">{{ o.createdAt | date: 'MMM d, y' }}</td>
-        <td style="padding: 8px 6px;">{{ o.businessUnit }}</td>
-        <td style="padding: 8px 6px; font-family: monospace;">{{ o.blAwbNo }}</td>
-        <td style="padding: 8px 6px;">{{ o.poNumber }}</td>
-        <td style="padding: 8px 6px;">{{ o.supplierName }}</td>
-        <td style="padding: 8px 6px;">{{ o.supplierValueUsd | number: '1.2-2' }}</td>
-        <td style="padding: 8px 6px; font-size: 12px; color: #555; white-space: nowrap;">{{ o.routeCompanyNames.join(' → ') }} → Onshore</td>
-        <td style="padding: 8px 6px;">
-          <span [style.background]="o.isConfirmed ? '#e6f4ea' : '#fff4e5'" [style.color]="o.isConfirmed ? '#1e7e34' : '#a66a00'" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
-            {{ o.isConfirmed ? 'Confirmed' : 'Pending' }}
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'createdAt'" style="color: #888; white-space: nowrap;">{{ o.createdAt | date: 'MMM d, y' }}</span>
+          <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ o.blAwbNo }}</span>
+          <span *ngSwitchCase="'supplierValueUsd'">{{ o.supplierValueUsd | number: '1.2-2' }}</span>
+          <span *ngSwitchCase="'eta'" style="color: #888; white-space: nowrap;">{{ o.eta ? (o.eta | date: 'dd/MM/yyyy') : '—' }}</span>
+          <span *ngSwitchCase="'categorisations'" style="font-size: 12px; color: #555; white-space: nowrap;">{{ o.categorisations }}</span>
+          <span *ngSwitchCase="'statusLabel'">
+            <span [style.background]="o.isConfirmed ? '#e6f4ea' : '#fff4e5'" [style.color]="o.isConfirmed ? '#1e7e34' : '#a66a00'" style="padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              {{ o.statusLabel }}
+            </span>
           </span>
+          <span *ngSwitchDefault>{{ o[col.key] }}</span>
         </td>
       </tr>
     </tbody>
