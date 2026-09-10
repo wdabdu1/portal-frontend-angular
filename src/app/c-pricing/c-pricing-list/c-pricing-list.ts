@@ -11,7 +11,6 @@ import { CPricingCategory, CPricingItemRow, CPricingService, CPricingType, SaveC
 interface RowEdit {
   cPricingCategoryId: number | null;
   cPricingTypeId: number | null;
-  hsCode: string;
   description: string;
   currencyId: number | null;
   cp: number | null;
@@ -146,7 +145,6 @@ export class CPricingList implements OnInit {
           this.edits[item.shipmentLineItemId] = {
             cPricingCategoryId: item.cPricingCategoryId,
             cPricingTypeId: item.cPricingTypeId,
-            hsCode: item.hsCode ?? '',
             description: item.description ?? '',
             currencyId: item.currencyId,
             cp: item.cp
@@ -243,7 +241,6 @@ export class CPricingList implements OnInit {
     const req: SaveCPricingItemRequest = {
       cPricingCategoryId: edit.cPricingCategoryId,
       cPricingTypeId: edit.cPricingTypeId,
-      hsCode: edit.hsCode || null,
       description: edit.description || null,
       currencyId: edit.currencyId,
       cp: edit.cp

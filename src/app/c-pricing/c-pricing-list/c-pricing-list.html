@@ -67,7 +67,7 @@
             <option *ngFor="let t of typesFor(edits[row.shipmentLineItemId].cPricingCategoryId)" [ngValue]="t.id">{{ t.name }}</option>
           </select>
 
-          <input *ngSwitchCase="'hsCode'" [(ngModel)]="edits[row.shipmentLineItemId].hsCode" style="width: 90px; padding: 4px;" />
+          <span *ngSwitchCase="'hsCode'" style="color: #555;" title="Entered on the Update Shipment page">{{ row.hsCode || '—' }}</span>
           <input *ngSwitchCase="'description'" [(ngModel)]="edits[row.shipmentLineItemId].description" style="width: 130px; padding: 4px;" />
 
           <select *ngSwitchCase="'currencyCode'" [(ngModel)]="edits[row.shipmentLineItemId].currencyId" style="width: 80px; padding: 4px;">
