@@ -124,6 +124,7 @@ export interface ClearanceShipmentSummary {
   etaHasArrived: boolean;
   demurrageFreeDaysRemaining: number | null;
   originalShipmentSetReceivedDate: string | null;
+  type: string;
 }
 
 export interface ClearanceDetail {
