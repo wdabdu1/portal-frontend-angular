@@ -51,8 +51,9 @@
                 style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
               >{{ r.currentStatus }}</span>
             </span>
-            <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo }}</span>
+            <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ r.blAwbNo || '—' }}</span>
             <span *ngSwitchCase="'qty'">{{ r.qty | number: '1.0-2' }}</span>
+            <span *ngSwitchCase="'remainingQty'" [style.color]="r.remainingQty ? '#a66a00' : '#ccc'" [style.font-weight]="r.remainingQty ? '600' : 'normal'">{{ r.remainingQty !== null ? (r.remainingQty | number: '1.0-2') : '—' }}</span>
             <span *ngSwitchCase="'unitPrice'">{{ r.unitPrice | number: '1.2-2' }}</span>
             <span *ngSwitchCase="'total'">{{ r.total | number: '1.2-2' }}</span>
             <span *ngSwitchCase="'paidUsd'" style="color: #1e7e34;">{{ r.paidUsd | number: '1.2-2' }}</span>

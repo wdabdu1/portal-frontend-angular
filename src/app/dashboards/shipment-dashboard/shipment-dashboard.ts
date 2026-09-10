@@ -18,6 +18,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'category', label: 'Cat' },
   { key: 'modelProduct', label: 'Model' },
   { key: 'qty', label: 'Qty' },
+  { key: 'remainingQty', label: 'Remaining Qty' },
   { key: 'unitPrice', label: 'Unit Price' },
   { key: 'currency', label: 'Currency' },
   { key: 'total', label: 'Total' },
