@@ -56,7 +56,7 @@
         </td>
         <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
           <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</span>
-          <span *ngSwitchCase="'eta'" [style.color]="!s.eta ? '#888' : (s.etaHasArrived ? '#c0392b' : '#1e7e34')" [style.fontWeight]="s.eta ? '600' : 'normal'">{{ s.eta ? (s.eta | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'eta'" [style.color]="!s.eta ? '#888' : (s.etaHasArrived ? '#c0392b' : '#1e7e34')" [style.fontWeight]="s.eta ? '600' : 'normal'">{{ s.eta ? (s.eta | date: 'dd/MM/yyyy') : '—' }}</span>
           <span *ngSwitchCase="'demurrageFreeDaysRemaining'">
             <span *ngIf="s.demurrageFreeDaysRemaining === null" style="color: #888;">—</span>
             <span *ngIf="s.demurrageFreeDaysRemaining !== null" [style.color]="s.demurrageFreeDaysRemaining < 0 ? '#c0392b' : (s.demurrageFreeDaysRemaining <= 3 ? '#a66a00' : '#1e7e34')" style="font-weight: 600;">
@@ -64,7 +64,7 @@
             </span>
           </span>
           <span *ngSwitchCase="'declarationNo'">{{ s.declarationNo || '—' }}</span>
-          <span *ngSwitchCase="'originalShipmentSetReceivedDate'">{{ s.originalShipmentSetReceivedDate ? (s.originalShipmentSetReceivedDate | date: 'MMM d, y') : '—' }}</span>
+          <span *ngSwitchCase="'originalShipmentSetReceivedDate'">{{ s.originalShipmentSetReceivedDate ? (s.originalShipmentSetReceivedDate | date: 'dd/MM/yyyy') : '—' }}</span>
           <span *ngSwitchCase="'routeStatus'" style="font-size: 12px; color: #666;">{{ routeLabel(s.routeStatus) }}</span>
           <div *ngSwitchCase="'slaPercent'" style="display:flex; align-items:center; gap:6px;">
             <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
