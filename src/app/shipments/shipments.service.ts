@@ -34,11 +34,12 @@ export interface ShipmentSummary {
   lineItemCount: number;
   createdAt: string;
   isClearanceCompleted: boolean;
-  // "—" / "" (blank light) when there's no live clearance workflow yet
-  // (Draft, Cancelled) — otherwise the current bottleneck step, or
+  // "—" / "" (blank light) / 0 when there's no live clearance workflow
+  // yet (Draft, Cancelled) — otherwise the current bottleneck step, or
   // "Cleared" once the shipment's route has actually completed.
   slaStatus: string;
   slaLight: string;
+  slaPercent: number;
 }
 
 // Raw ids included so the New Shipment page can work out client-side
