@@ -25,10 +25,11 @@ export interface CPricingItemRow {
   isConfirmed: boolean;
 }
 
+// HsCode is intentionally not part of this request — it's entered once on
+// the Update Shipment page and shown read-only here (see CPricingItemRow).
 export interface SaveCPricingItemRequest {
   cPricingCategoryId: number | null;
   cPricingTypeId: number | null;
-  hsCode: string | null;
   description: string | null;
   currencyId: number | null;
   cp: number | null;
