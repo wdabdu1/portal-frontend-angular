@@ -80,12 +80,13 @@ export const routes: Routes = [
     data: { title: 'Clearance Charge Types', resource: 'clearance-charge-types', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   { path: 'settings', component: SettingsMenu, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  // Deliberately no logisticsLockGuard here — every user, regardless of
-  // role, has a "User Profile" sidebar link and should be able to open
-  // it. (Note: cPricingLockGuard still applies and has the same effect
-  // for CPricing-only users — a pre-existing behavior from before this
-  // change, left as-is since it wasn't part of what was asked here.)
-  { path: 'profile', component: Profile, canActivate: [authGuard, cPricingLockGuard] },
+  // Deliberately no cPricingLockGuard or logisticsLockGuard here — every
+  // user, regardless of role, has a "User Profile" sidebar link and
+  // should always be able to open it. (cPricingLockGuard's exclusion here
+  // fixes a pre-existing issue that predates this round's work — a
+  // CPricing-only user was being bounced away from their own Profile
+  // page too, same bug as logisticsLockGuard's, just older.)
+  { path: 'profile', component: Profile, canActivate: [authGuard] },
   { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/divisions', component: Divisions, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
