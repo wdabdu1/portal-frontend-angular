@@ -35,7 +35,9 @@ export interface TpOrderSummary {
   supplierName: string;
   supplierValueUsd: number;
   createdAt: string;
+  eta: string | null;
   routeCompanyNames: string[];
+  consigneeName: string;
   isConfirmed: boolean;
 }
 
