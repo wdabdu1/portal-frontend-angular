@@ -19,6 +19,9 @@ export interface ShipmentDashboardRow {
   eta: string | null;
   etd: string | null;
   clearanceCompletionDate: string | null;
+  // Only set on the "Draft PO" rows — the still-unshipped portion of a PO
+  // line item that has no BL yet (or not a full one).
+  remainingQty: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
