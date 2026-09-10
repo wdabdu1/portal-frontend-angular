@@ -10,6 +10,7 @@ export interface LogisticsItemRow {
   category: string;
   modelProduct: string;
   blAwbNo: string;
+  arrivalDate: string | null;
   plannedCompletionDate: string | null;
   actualCompletionDate: string | null;
   qty: number;
