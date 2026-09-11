@@ -11,10 +11,10 @@
         <label style="display:block; font-size:12px; color:#555;">Purchase Order (Confirmed only) *</label>
         <select [(ngModel)]="purchaseOrderId" name="purchaseOrderId" (change)="onOrderChange()" [style.border]="fieldBorder('purchaseOrderId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
-          <option *ngFor="let po of confirmedOrders" [ngValue]="po.id">{{ po.poNumber }} — {{ po.supplier }}</option>
+          <option *ngFor="let po of confirmedOrders" [ngValue]="po.id">{{ po.poNumber }} — {{ po.supplier }} — {{ po.openCategories }}</option>
         </select>
         <p *ngIf="confirmedOrders.length === 0" style="font-size:12px; color:#a66a00; margin-top:4px;">
-          No confirmed purchase orders available yet.
+          No confirmed purchase orders with remaining balance available yet.
         </p>
       </div>
       <div>
@@ -81,12 +81,12 @@
       <div style="display:flex; gap:8px; align-items:center;">
         <select [(ngModel)]="additionalPurchaseOrderId" name="additionalPurchaseOrderId" style="flex:1; padding:6px;">
           <option [ngValue]="null">-- select another PO to combine --</option>
-          <option *ngFor="let po of additionalOrderOptions" [ngValue]="po.id">{{ po.poNumber }} — {{ po.supplier }}</option>
+          <option *ngFor="let po of additionalOrderOptions" [ngValue]="po.id">{{ po.poNumber }} — {{ po.supplier }} — {{ po.openCategories }}</option>
         </select>
         <button type="button" (click)="addOrder()" [disabled]="!additionalPurchaseOrderId" style="padding:6px 12px; background:#eee; border:none; border-radius:4px; cursor:pointer;">Add</button>
       </div>
       <p *ngIf="additionalOrderOptions.length === 0" style="font-size:12px; color:#888; margin-top:6px; margin-bottom:0;">
-        No other confirmed orders share this PO's Supplier, Business Unit, and Division — that's required to combine orders into one shipment.
+        No other confirmed orders with remaining balance share this PO's Supplier, Business Unit, and Division — that's required to combine orders into one shipment.
       </p>
       <p *ngIf="selectedOrders.length > 1" style="font-size:12px; color:#888; margin-top:6px; margin-bottom:0;">
         This shipment will combine {{ selectedOrders.length }} purchase orders. Their Offshore Partner chain must also match — this is checked when you save.
