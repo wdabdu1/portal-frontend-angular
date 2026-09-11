@@ -56,6 +56,11 @@ export interface ConfirmedOrderOption {
   businessUnitId: number;
   supplierId: number;
   divisionId: number;
+  // Distinct Product Categories among this PO's still-open (not yet fully
+  // shipped) line items — comma-joined, shown in the New Shipment picker to
+  // help tell orders apart. This endpoint already only returns POs with at
+  // least one open line, so this is never empty.
+  openCategories: string;
 }
 
 export interface LineItemRemaining {
