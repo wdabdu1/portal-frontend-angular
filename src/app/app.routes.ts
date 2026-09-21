@@ -90,14 +90,25 @@ export const routes: Routes = [
   { path: 'settings/business-units', component: BusinessUnits, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/divisions', component: Divisions, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/fx-rates', component: FxRates, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  // 'clearance' and 'clearance/:id' deliberately NOT given cPricingLockGuard
+  // (every other route below is, except the C Pricing routes themselves):
+  // CPricing users now have view access to the Clearance screen (backend
+  // AppRoles.ClearanceViewers includes CPricing), so the lock guard must let
+  // them actually reach the list and drill into a shipment's detail — the
+  // list's row click navigates to 'clearance/:id', so both need the
+  // exclusion or the detail view would bounce them straight back to
+  // /c-pricing. 'clearance/:id/estimate-items' (the separate Update Estimate
+  // Breakdown *edit* page, linked from the detail screen) is intentionally
+  // left locked — CPricing stays a Clearance viewer, not an editor, and the
+  // estimate total is already visible read-only on the detail screen.
+  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, logisticsLockGuard] },
   { path: 'bank-dues', component: BankDuesList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'direct-sales', component: DirectSalesList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   // 'price-history' route removed — superseded by 'c-pricing/history' below;
   // its backend endpoint moved from api/price-history to api/c-pricing/history.
   { path: 'pay-bank-dues', component: PayBankDues, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard, logisticsLockGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/offshore-markup-defaults', component: OffshoreMarkupDefaults, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
@@ -122,14 +133,20 @@ export const routes: Routes = [
   { path: 'transfer-pricing', component: TransferPricingList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'transfer-pricing/accumulated', component: TransferPricingAccumulated, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  // Duplicate of the 'clearance' route defined above (dead entry — Angular
+  // resolves the first match), left as-is but without cPricingLockGuard for
+  // consistency rather than reintroducing the lockout via a shadowed route.
+  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, logisticsLockGuard] },
   { path: 'dashboards/clearance-readiness', component: ClearanceReadiness, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'mobile/pipeline-health', component: PipelineHealthMobile, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/cashflow', component: CashflowDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/purchase-orders', component: PoDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/fz', component: FzDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/shipments', component: ShipmentDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  { path: 'dashboards/under-clearance', component: UnderClearanceDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  // Clearance Dashboard — CPricing now a Clearance viewer (see the ClearanceViewers
+  // comment in ApplicationUser.cs), so this needs the same cPricingLockGuard
+  // exclusion as the 'clearance' routes above.
+  { path: 'dashboards/under-clearance', component: UnderClearanceDashboard, canActivate: [authGuard, logisticsLockGuard] },
   { path: 'dashboards/goods-in-transit', component: GoodsInTransitDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/department-performance', component: DepartmentPerformance, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/demurrage-analysis', component: DemurrageAnalysis, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
