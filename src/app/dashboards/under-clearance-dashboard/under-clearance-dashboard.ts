@@ -34,6 +34,11 @@ export class UnderClearanceDashboard implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   loading = true;
+  // Surfaced on a failed load instead of silently rendering an empty table —
+  // previously any error here (403, 500, network) looked identical to a
+  // genuinely empty result set ("No shipments found."), which made a real
+  // access/auth problem indistinguishable from there just being no data.
+  error: string | null = null;
   allRows: (ClearanceDashboardRow & { fcl: string })[] = [];
   columns: ColumnDef[] = [...DEFAULT_COLUMNS];
   filters: Record<string, Set<string>> = {};
@@ -56,7 +61,13 @@ export class UnderClearanceDashboard implements OnInit {
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      error: (err) => {
+        this.error = err?.status === 403
+          ? 'You do not have permission to view the Under Clearance Dashboard.'
+          : 'Could not load the Under Clearance Dashboard.';
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
 
     this.tablePrefs.getColumnOrder('under-clearance-dashboard').subscribe({
