@@ -111,6 +111,13 @@ export class AuthService {
     return this.hasAnyRole(['CPricing', 'Manager', 'SuperUser']);
   }
 
+  // MOT Certificates dashboard — IP + Clearance roles (the ask), plus
+  // Manager/SuperUser per the usual admin escape hatch. Mirrors backend
+  // AppRoles.MotCertificateViewers exactly.
+  canSeeMotCertificates(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'CLR_Usr', 'CLR_Supervisor', 'Manager', 'SuperUser']);
+  }
+
   // True only for a user whose *sole* access is the CPricing role — a
   // Manager or SuperUser who also happens to hold CPricing keeps their
   // normal full access, since they're broad roles first. This is what the
