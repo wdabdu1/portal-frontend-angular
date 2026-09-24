@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { API_URL } from '../../api-config';
 import { AuthService } from '../../auth/auth.service';
 
@@ -13,7 +14,7 @@ interface MotCertificateSettingsDto {
 
 @Component({
   selector: 'app-mot-certificate-settings',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './mot-certificate-settings.html'
 })
 export class MotCertificateSettings implements OnInit {
