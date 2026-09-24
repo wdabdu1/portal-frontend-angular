@@ -1,0 +1,39 @@
+<div style="max-width: 640px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">MOT Certificate Expiry</h1>
+  <p style="color: #888; font-size: 13px;">
+    How many days after MOT approval (Approval Date on the Shipment's Additional/MOT section) a certificate is
+    considered valid before the MOT Certificates dashboard flags it as expiring. Applies to every shipment — there's
+    no per-BU or per-category override yet.
+  </p>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <div *ngIf="!loading && settings" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 16px;">
+    <div>
+      <label style="display: block; font-size: 13px; color: #555; margin-bottom: 4px;">Expiry window (days)</label>
+      <input
+        type="number"
+        min="1"
+        [(ngModel)]="settings.expiryDays"
+        [disabled]="!canEdit"
+        style="width: 120px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+      />
+    </div>
+
+    <p *ngIf="!canEdit" style="color: #888; font-size: 12px; margin: 0;">
+      Read-only — only Manager or SuperUser can change this value.
+    </p>
+
+    <div *ngIf="canEdit" style="display: flex; align-items: center; gap: 10px;">
+      <button
+        (click)="save()"
+        [disabled]="saving"
+        style="padding: 6px 16px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;"
+      >
+        {{ saving ? 'Saving...' : 'Save' }}
+      </button>
+      <span *ngIf="saved" style="color: #2a7d2a; font-size: 12px;">Saved ✓</span>
+    </div>
+  </div>
+</div>
