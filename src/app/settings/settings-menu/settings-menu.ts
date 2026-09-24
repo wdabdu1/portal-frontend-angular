@@ -56,6 +56,7 @@ export class SettingsMenu {
         { label: 'Public Holidays', path: '/settings/public-holidays' },
         { label: 'Process SLA', path: '/settings/clearance-sla' },
         { label: 'Clearance Charge Types', path: '/settings/clearance-charge-types' },
+        { label: 'MOT Certificate Expiry', path: '/settings/mot-certificate' },
         { label: 'Logistics Cities', path: '/settings/logistics-cities' },
         { label: 'Drivers', path: '/settings/drivers' },
         { label: 'Trucks', path: '/settings/trucks' },
