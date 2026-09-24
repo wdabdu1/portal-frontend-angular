@@ -61,6 +61,8 @@ import { DepartmentPerformance } from './dashboards/department-performance/depar
 import { DemurrageAnalysis } from './dashboards/demurrage-analysis/demurrage-analysis';
 import { SupplierDelay } from './dashboards/supplier-delay/supplier-delay';
 import { ProcessPerformance } from './dashboards/process-performance/process-performance';
+import { MotCertificatesDashboard } from './dashboards/mot-certificates-dashboard/mot-certificates-dashboard';
+import { MotCertificateSettings } from './settings/mot-certificate-settings/mot-certificate-settings';
 
 
 export const routes: Routes = [
@@ -152,6 +154,8 @@ export const routes: Routes = [
   { path: 'dashboards/demurrage-analysis', component: DemurrageAnalysis, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/supplier-delay', component: SupplierDelay, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/process-performance', component: ProcessPerformance, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  { path: 'dashboards/mot-certificates', component: MotCertificatesDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  { path: 'settings/mot-certificate', component: MotCertificateSettings, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
 
   {
     path: 'settings/business-partners',

@@ -34,7 +34,8 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Department Performance', route: '/dashboards/department-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IP_Supervisor') },
       { label: 'Demurrage Analysis', route: '/dashboards/demurrage-analysis', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('CorpFinance') || a.hasRole('IP_Supervisor') },
       { label: 'Supplier Delay Watch', route: '/dashboards/supplier-delay', canAccess: () => true },
-      { label: 'Process Performance', route: '/dashboards/process-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IP_Supervisor') }
+      { label: 'Process Performance', route: '/dashboards/process-performance', canAccess: (a) => a.hasRole('Manager') || a.hasRole('SuperUser') || a.hasRole('IP_Supervisor') },
+      { label: 'MOT Certificates', route: '/dashboards/mot-certificates', canAccess: (a) => a.canSeeMotCertificates() }
     ]
   },
   {
