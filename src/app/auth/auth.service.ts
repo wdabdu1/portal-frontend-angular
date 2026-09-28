@@ -118,6 +118,12 @@ export class AuthService {
     return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'CLR_Usr', 'CLR_Supervisor', 'Manager', 'SuperUser']);
   }
 
+  // Marine Insurance dashboard — "Finance & IP Users" per the request.
+  // Mirrors backend AppRoles.MarineInsuranceViewers exactly.
+  canSeeMarineInsurance(): boolean {
+    return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'Treasury', 'CorpFinance', 'Manager', 'SuperUser']);
+  }
+
   // True only for a user whose *sole* access is the CPricing role — a
   // Manager or SuperUser who also happens to hold CPricing keeps their
   // normal full access, since they're broad roles first. This is what the
