@@ -3,23 +3,23 @@ import { Injectable } from '@angular/core';
 import { API_URL } from '../api-config';
 
 export interface ClearanceRoute1Details {
-  moveRequestDate: string | null; billAmountSdg: number | null; billSettlementDate: string | null;
-  ssmoFileRequestDate: string | null; ssmoInspectionAmountSdg: number | null; ssmoFeesSettlementDate: string | null;
-  custExamStartDate: string | null; custExamCompletedDate: string | null;
-  customsLabRequired: boolean; customsLabFeesSdg: number | null; labFeesPaymentDate: string | null; labResultIssuanceDate: string | null;
-  ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null;
-  custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null;
-  spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null;
-  truckPortEntryPermitDate: string | null; containersReturnedDate: string | null; clearanceActualCompletedDate: string | null;
+  moveRequestDate: string | null; billAmountSdg: number | null; billSettlementDate: string | null; containersMoveProcessComments: string | null;
+  ssmoFileRequestDate: string | null; ssmoInspectionAmountSdg: number | null; ssmoFeesSettlementDate: string | null; ssmoFileProcessComments: string | null;
+  custExamStartDate: string | null; custExamCompletedDate: string | null; customsExaminationComments: string | null;
+  customsLabRequired: boolean; customsLabFeesSdg: number | null; labFeesPaymentDate: string | null; labResultIssuanceDate: string | null; customsLabComments: string | null;
+  ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null; ssmoExaminationComments: string | null;
+  custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null; customsEvaluationComments: string | null;
+  spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null; spcBillComments: string | null;
+  truckPortEntryPermitDate: string | null; containersReturnedDate: string | null; clearanceActualCompletedDate: string | null; truckContainersComments: string | null;
 }
 
 export interface ClearanceRoute2Details {
   depositRequestDate: string | null; requestApprovalDate: string | null;
-  depositRefNo: string | null; fzInvoiceNo: string | null; destinationId: number | null;
-  inspectionDate: string | null;
-  spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null; policeSecurityAppointedDate: string | null;
+  depositRefNo: string | null; fzInvoiceNo: string | null; destinationId: number | null; fzDepositRequestComments: string | null;
+  inspectionDate: string | null; customsInspectionComments: string | null;
+  spcBillRequestDate: string | null; spcBillValueSdg: number | null; spcBillSettlementDate: string | null; policeSecurityAppointedDate: string | null; spcBillComments: string | null;
   truckPortEntryPermitDate: string | null; containersReceivedAtFzDate: string | null; containersReturnedDate: string | null;
-  clearanceActualCompletedDate: string | null;
+  clearanceActualCompletedDate: string | null; truckContainersComments: string | null;
 }
 
 export interface ActualCharges {
@@ -28,6 +28,7 @@ export interface ActualCharges {
   shippingLineDepositReturnDate: string | null; amountReturnedFromDeposit: number | null;
   plannedCompletionDate: string | null;
   depositPaidSdg: number | null;
+  comments: string | null;
 }
 
 export interface WithdrawalLineInput {
@@ -38,13 +39,13 @@ export interface WithdrawalLineInput {
 export interface ClearanceRoute3Details {
   depositShipmentId: number | null;
   withdrawals: WithdrawalLineInput[] | null;
-  certificateEntryDate: string | null; scudaDeclarationNo: string | null;
-  ssmoFileRequestDate: string | null; ssmoInspectionAmountSdg: number | null; ssmoFeesSettlementDate: string | null;
-  custExamStartDate: string | null; custExamCompletedDate: string | null;
-  customsLabRequired: boolean; customsLabFeesSdg: number | null; labFeesPaymentDate: string | null; labResultIssuanceDate: string | null;
-  ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null;
-  custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null;
-  truckPortEntryPermitDate: string | null; clearanceActualCompletedDate: string | null;
+  certificateEntryDate: string | null; scudaDeclarationNo: string | null; certificateEntryComments: string | null;
+  ssmoFileRequestDate: string | null; ssmoInspectionAmountSdg: number | null; ssmoFeesSettlementDate: string | null; ssmoFileProcessComments: string | null;
+  custExamStartDate: string | null; custExamCompletedDate: string | null; customsExaminationComments: string | null;
+  customsLabRequired: boolean; customsLabFeesSdg: number | null; labFeesPaymentDate: string | null; labResultIssuanceDate: string | null; customsLabComments: string | null;
+  ssmoExamStartDate: string | null; ssmoCertIssuanceDate: string | null; ssmoExaminationComments: string | null;
+  custEvaluationDate: string | null; customsDutySdg: number | null; customsSettlementDate: string | null; releaseExitPassDate: string | null; customsEvaluationComments: string | null;
+  truckPortEntryPermitDate: string | null; clearanceActualCompletedDate: string | null; truckContainersComments: string | null;
 }
 
 export interface FzDepositOption {
@@ -82,10 +83,12 @@ export interface FzInventoryItemRow {
 export interface ClearanceDeliveryOrder {
   copyOfDoCollectedDate: string | null; receiveDoDate: string | null; actualArrivalDate: string | null;
   depositRequired: boolean; doActualFeesSdg: number | null; doFeesSettledDate: string | null; doReceivedDate: string | null;
+  comments: string | null;
 }
 
 export interface ClearanceCostEstimate {
   estimateDate: string | null; notifyBuDate: string | null; amountSettledDate: string | null;
+  comments: string | null;
 }
 
 export interface CostEstimateResponse {
@@ -103,6 +106,7 @@ export interface ClearanceEstimateLineItem {
 
 export interface ClearanceCertificateEntry {
   certificateEntryDate: string | null; scudaDeclarationNo: string | null;
+  comments: string | null;
 }
 
 export interface ClearanceShipmentSummary {
@@ -125,6 +129,9 @@ export interface ClearanceShipmentSummary {
   demurrageFreeDaysRemaining: number | null;
   originalShipmentSetReceivedDate: string | null;
   type: string;
+  doComments: string | null;
+  ssmoExaminationComments: string | null;
+  customsEvaluationComments: string | null;
 }
 
 export interface ClearanceDetail {
