@@ -63,6 +63,7 @@ import { SupplierDelay } from './dashboards/supplier-delay/supplier-delay';
 import { ProcessPerformance } from './dashboards/process-performance/process-performance';
 import { MotCertificatesDashboard } from './dashboards/mot-certificates-dashboard/mot-certificates-dashboard';
 import { MotCertificateSettings } from './settings/mot-certificate-settings/mot-certificate-settings';
+import { MarineInsuranceDashboard } from './dashboards/marine-insurance-dashboard/marine-insurance-dashboard';
 
 
 export const routes: Routes = [
@@ -156,6 +157,7 @@ export const routes: Routes = [
   { path: 'dashboards/process-performance', component: ProcessPerformance, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/mot-certificates', component: MotCertificatesDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/mot-certificate', component: MotCertificateSettings, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  { path: 'dashboards/marine-insurance', component: MarineInsuranceDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
 
   {
     path: 'settings/business-partners',
@@ -203,6 +205,12 @@ export const routes: Routes = [
     component: SimpleLookup,
     canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
     data: { title: 'Origin Countries', resource: 'origin-countries', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
+  },
+  {
+    path: 'settings/ports',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
+    data: { title: 'Ports', resource: 'ports', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
     path: 'settings/units-of-measure',
