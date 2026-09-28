@@ -29,6 +29,8 @@ export interface CreatePurchaseOrderRequest {
   supplierPiDate?: string;
   supplierPaymentTermId: number;
   incotermId: number;
+  portOfLoadingId?: number;
+  portOfDischargeId?: number;
   originCountryId: number;
   buShippingBudget?: number;
   shipmentModeId: number;
