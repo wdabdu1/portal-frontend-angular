@@ -50,6 +50,7 @@ export class NewSupplierOrder implements OnInit {
   approvalTypes: LookupEntity[] = [];
   paymentTerms: LookupEntity[] = [];
   incoterms: LookupEntity[] = [];
+  ports: LookupEntity[] = [];
   originCountries: LookupEntity[] = [];
   shipmentModes: LookupEntity[] = [];
   currencies: LookupEntity[] = [];
@@ -69,6 +70,8 @@ export class NewSupplierOrder implements OnInit {
   supplierPiDate = '';
   supplierPaymentTermId: number | null = null;
   incotermId: number | null = null;
+  portOfLoadingId: number | null = null;
+  portOfDischargeId: number | null = null;
   originCountryId: number | null = null;
   buShippingBudget: number | null = null;
   shipmentModeId: number | null = null;
@@ -96,6 +99,7 @@ export class NewSupplierOrder implements OnInit {
       approvalTypes: this.lookups.getAll<LookupEntity>('approval-types'),
       paymentTerms: this.lookups.getAll<LookupEntity>('payment-terms'),
       incoterms: this.lookups.getAll<LookupEntity>('incoterms'),
+      ports: this.lookups.getAll<LookupEntity>('ports'),
       originCountries: this.lookups.getAll<LookupEntity>('origin-countries'),
       shipmentModes: this.lookups.getAll<LookupEntity>('shipment-modes'),
       currencies: this.lookups.getAll<LookupEntity>('currencies'),
@@ -208,6 +212,8 @@ export class NewSupplierOrder implements OnInit {
         supplierPiDate: this.supplierPiDate || undefined,
         supplierPaymentTermId: this.supplierPaymentTermId!,
         incotermId: this.incotermId!,
+        portOfLoadingId: this.portOfLoadingId ?? undefined,
+        portOfDischargeId: this.portOfDischargeId ?? undefined,
         originCountryId: this.originCountryId!,
         buShippingBudget: this.buShippingBudget ?? undefined,
         shipmentModeId: this.shipmentModeId!,

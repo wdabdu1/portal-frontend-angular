@@ -81,6 +81,20 @@
         </select>
       </div>
       <div>
+        <label style="display:block; font-size:12px; color:#555;">Port of Loading</label>
+        <select [(ngModel)]="portOfLoadingId" name="portOfLoadingId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let p of ports" [ngValue]="p.id">{{ p['name'] }}</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; font-size:12px; color:#555;">Port of Discharge</label>
+        <select [(ngModel)]="portOfDischargeId" name="portOfDischargeId" style="width:100%; padding:6px;">
+          <option [ngValue]="null">-- select --</option>
+          <option *ngFor="let p of ports" [ngValue]="p.id">{{ p['name'] }}</option>
+        </select>
+      </div>
+      <div>
         <label style="display:block; font-size:12px; color:#555;">Origin Country</label>
         <select [(ngModel)]="originCountryId" name="originCountryId" [style.border]="fieldBorder('originCountryId')" style="width:100%; padding:6px;">
           <option [ngValue]="null">-- select --</option>
