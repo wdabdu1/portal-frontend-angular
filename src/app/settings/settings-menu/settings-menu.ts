@@ -35,6 +35,7 @@ export class SettingsMenu {
         { label: 'Approval Types', path: '/settings/approval-types' },
         { label: 'Payment Terms', path: '/settings/payment-terms' },
         { label: 'Incoterms', path: '/settings/incoterms' },
+        { label: 'Ports', path: '/settings/ports' },
         { label: 'Origin Countries', path: '/settings/origin-countries' },
         { label: 'Units of Measure', path: '/settings/units-of-measure' },
         { label: 'Shipment Modes', path: '/settings/shipment-modes' },
