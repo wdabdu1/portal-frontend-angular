@@ -30,6 +30,8 @@ export interface PurchaseOrderDetail {
   brandManufacturer: string;
   consignee: string;
   incoterm: string;
+  portOfLoading: string | null;
+  portOfDischarge: string | null;
   paymentTerm: string;
   approvalType: string;
   totalOrderValueUsd: number | null;

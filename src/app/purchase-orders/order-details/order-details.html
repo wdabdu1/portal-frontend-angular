@@ -15,6 +15,8 @@
         <div><span style="color:#888;">Brand/Manufacturer:</span> {{ order.brandManufacturer }}</div>
         <div><span style="color:#888;">Consignee:</span> {{ order.consignee }}</div>
         <div><span style="color:#888;">Incoterm:</span> {{ order.incoterm }}</div>
+        <div *ngIf="order.portOfLoading"><span style="color:#888;">Port of Loading:</span> {{ order.portOfLoading }}</div>
+        <div *ngIf="order.portOfDischarge"><span style="color:#888;">Port of Discharge:</span> {{ order.portOfDischarge }}</div>
         <div><span style="color:#888;">Payment Term:</span> {{ order.paymentTerm }}</div>
         <div><span style="color:#888;">Approval Type:</span> {{ order.approvalType }}</div>
       </div>
