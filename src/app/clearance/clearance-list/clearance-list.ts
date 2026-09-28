@@ -30,7 +30,10 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'qty', label: 'Qty' },
   { key: 'unit', label: 'Units' },
   { key: 'routeStatus', label: 'Route' },
-  { key: 'slaPercent', label: 'SLA Progress' }
+  { key: 'slaPercent', label: 'SLA Progress' },
+  { key: 'doComments', label: 'DO Comments' },
+  { key: 'ssmoExaminationComments', label: 'SSMO Examination Comments' },
+  { key: 'customsEvaluationComments', label: 'Customs Clearance Comments' }
 ];
 
 const ROUTE_LABELS: Record<string, string> = {
