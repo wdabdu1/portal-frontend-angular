@@ -50,13 +50,13 @@ export class ClearanceDetailComponent implements OnInit {
   generalInfoForm = {
     copyOfBlReceivedDate: '', originalShipmentSetReceivedDate: '', shipmentEta: '',
     lcNo: '', imFormNo: '', imFormDate: '',
-    withdrawalRequestDate: '', withdrawalRequestRefNo: ''
+    withdrawalRequestDate: '', withdrawalRequestRefNo: '', notes: ''
   };
 
-  deliveryOrderForm: ClearanceDeliveryOrder = { copyOfDoCollectedDate: null, receiveDoDate: null, actualArrivalDate: null, depositRequired: false, doActualFeesSdg: null, doFeesSettledDate: null, doReceivedDate: null };
-  costEstimateForm: ClearanceCostEstimate = { estimateDate: null, notifyBuDate: null, amountSettledDate: null };
+  deliveryOrderForm: ClearanceDeliveryOrder = { copyOfDoCollectedDate: null, receiveDoDate: null, actualArrivalDate: null, depositRequired: false, doActualFeesSdg: null, doFeesSettledDate: null, doReceivedDate: null, comments: null };
+  costEstimateForm: ClearanceCostEstimate = { estimateDate: null, notifyBuDate: null, amountSettledDate: null, comments: null };
   estimateTotalSdg = 0;
-  certificateEntryForm: ClearanceCertificateEntry = { certificateEntryDate: null, scudaDeclarationNo: null };
+  certificateEntryForm: ClearanceCertificateEntry = { certificateEntryDate: null, scudaDeclarationNo: null, comments: null };
 
   route1Form: ClearanceRoute1Details = this.emptyRoute1();
   route2Form: ClearanceRoute2Details = this.emptyRoute2();
@@ -163,25 +163,25 @@ export class ClearanceDetailComponent implements OnInit {
 
   emptyRoute1(): ClearanceRoute1Details {
     return {
-      moveRequestDate: null, billAmountSdg: null, billSettlementDate: null,
-      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null,
-      custExamStartDate: null, custExamCompletedDate: null,
-      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null,
-      ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
-      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
-      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null,
-      truckPortEntryPermitDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null
+      moveRequestDate: null, billAmountSdg: null, billSettlementDate: null, containersMoveProcessComments: null,
+      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null, ssmoFileProcessComments: null,
+      custExamStartDate: null, custExamCompletedDate: null, customsExaminationComments: null,
+      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null, customsLabComments: null,
+      ssmoExamStartDate: null, ssmoCertIssuanceDate: null, ssmoExaminationComments: null,
+      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null, customsEvaluationComments: null,
+      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, spcBillComments: null,
+      truckPortEntryPermitDate: null, containersReturnedDate: null, clearanceActualCompletedDate: null, truckContainersComments: null
     };
   }
 
   emptyRoute2(): ClearanceRoute2Details {
     return {
       depositRequestDate: null, requestApprovalDate: null,
-      depositRefNo: null, fzInvoiceNo: null, destinationId: null,
-      inspectionDate: null,
-      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, policeSecurityAppointedDate: null,
+      depositRefNo: null, fzInvoiceNo: null, destinationId: null, fzDepositRequestComments: null,
+      inspectionDate: null, customsInspectionComments: null,
+      spcBillRequestDate: null, spcBillValueSdg: null, spcBillSettlementDate: null, policeSecurityAppointedDate: null, spcBillComments: null,
       truckPortEntryPermitDate: null, containersReceivedAtFzDate: null, containersReturnedDate: null,
-      clearanceActualCompletedDate: null
+      clearanceActualCompletedDate: null, truckContainersComments: null
     };
   }
 
@@ -190,20 +190,20 @@ export class ClearanceDetailComponent implements OnInit {
       forecastDemurrageSdg: null, forecastStorageSdg: null, forecastCapturedAt: null,
       actualDemurragePaidSdg: null, actualStoragePaidSdg: null,
       shippingLineDepositReturnDate: null, amountReturnedFromDeposit: null,
-      plannedCompletionDate: null, depositPaidSdg: null
+      plannedCompletionDate: null, depositPaidSdg: null, comments: null
     };
   }
 
   emptyRoute3(): ClearanceRoute3Details {
     return {
       depositShipmentId: null, withdrawals: null,
-      certificateEntryDate: null, scudaDeclarationNo: null,
-      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null,
-      custExamStartDate: null, custExamCompletedDate: null,
-      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null,
-      ssmoExamStartDate: null, ssmoCertIssuanceDate: null,
-      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null,
-      truckPortEntryPermitDate: null, clearanceActualCompletedDate: null
+      certificateEntryDate: null, scudaDeclarationNo: null, certificateEntryComments: null,
+      ssmoFileRequestDate: null, ssmoInspectionAmountSdg: null, ssmoFeesSettlementDate: null, ssmoFileProcessComments: null,
+      custExamStartDate: null, custExamCompletedDate: null, customsExaminationComments: null,
+      customsLabRequired: false, customsLabFeesSdg: null, labFeesPaymentDate: null, labResultIssuanceDate: null, customsLabComments: null,
+      ssmoExamStartDate: null, ssmoCertIssuanceDate: null, ssmoExaminationComments: null,
+      custEvaluationDate: null, customsDutySdg: null, customsSettlementDate: null, releaseExitPassDate: null, customsEvaluationComments: null,
+      truckPortEntryPermitDate: null, clearanceActualCompletedDate: null, truckContainersComments: null
     };
   }
 
@@ -220,7 +220,8 @@ export class ClearanceDetailComponent implements OnInit {
           imFormNo: detail.imFormNo ?? '',
           imFormDate: detail.imFormDate ?? '',
           withdrawalRequestDate: detail.withdrawalRequestDate ?? '',
-          withdrawalRequestRefNo: detail.withdrawalRequestRefNo ?? ''
+          withdrawalRequestRefNo: detail.withdrawalRequestRefNo ?? '',
+          notes: detail.notes ?? ''
         };
         this.loading = false;
         this.loadGeneralSubSections();
@@ -318,12 +319,13 @@ export class ClearanceDetailComponent implements OnInit {
       imFormDate: this.generalInfoForm.imFormDate || null,
       shipmentEta: this.generalInfoForm.shipmentEta || null,
       withdrawalRequestDate: this.generalInfoForm.withdrawalRequestDate || null,
-      withdrawalRequestRefNo: this.generalInfoForm.withdrawalRequestRefNo || null
+      withdrawalRequestRefNo: this.generalInfoForm.withdrawalRequestRefNo || null,
+      notes: this.generalInfoForm.notes || null
     } as any).subscribe({
       next: () => {
         this.savingGeneralInfo = false;
         if (this.detail) {
-          this.detail = { ...this.detail, eta: this.generalInfoForm.shipmentEta || null };
+          this.detail = { ...this.detail, eta: this.generalInfoForm.shipmentEta || null, notes: this.generalInfoForm.notes || null };
         }
         this.loadSchedule();
         if (andNext) this.expanded = 'costEstimate';

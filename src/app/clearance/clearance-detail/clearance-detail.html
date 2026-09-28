@@ -95,6 +95,7 @@
           <div><label style="display:block; font-size:12px; color:#555;">L/C No.</label><input [(ngModel)]="generalInfoForm.lcNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           <div><label style="display:block; font-size:12px; color:#555;">IM Form Ref. No.</label><input [(ngModel)]="generalInfoForm.imFormNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
           <div><label style="display:block; font-size:12px; color:#555;">IM Form Date</label><input type="date" [(ngModel)]="generalInfoForm.imFormDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+          <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="generalInfoForm.notes" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
         </div>
         <div style="margin-top:16px; display:flex; gap:8px;">
           <button (click)="saveGeneralInfo(false)" [disabled]="savingGeneralInfo || isLocked('generalInfo')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -129,6 +130,7 @@
             </div>
             <div><label style="display:block; font-size:12px; color:#555;">Notify BU Date</label><input type="date" [(ngModel)]="costEstimateForm.notifyBuDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Amount Settled Date</label><input type="date" [(ngModel)]="costEstimateForm.amountSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="costEstimateForm.comments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveCostEstimate(false)" [disabled]="savingCostEstimate || isLocked('costEstimate')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -161,6 +163,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">DO Actual Fees (SDG)</label><input type="text" appThousands [(ngModel)]="deliveryOrderForm.doActualFeesSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">DO Fees Settled Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doFeesSettledDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">DO Received Date</label><input type="date" [(ngModel)]="deliveryOrderForm.doReceivedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="deliveryOrderForm.comments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveDeliveryOrder(false)" [disabled]="savingDeliveryOrder || isLocked('deliveryOrder')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -186,6 +189,7 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Certificate Entry Date</label><input type="date" [(ngModel)]="certificateEntryForm.certificateEntryDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SCUDA Declaration No.</label><input [(ngModel)]="certificateEntryForm.scudaDeclarationNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="certificateEntryForm.comments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveCertificateEntry(false)" [disabled]="savingCertificateEntry || isLocked('certificateEntry')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -211,6 +215,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Move Request Date</label><input type="date" [(ngModel)]="route1Form.moveRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Bill Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.billAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.billSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.containersMoveProcessComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -233,6 +238,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">SSMO File Request Date</label><input type="date" [(ngModel)]="route1Form.ssmoFileRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Inspection Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.ssmoInspectionAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="route1Form.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.ssmoFileProcessComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1SsmoFileProcess')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -254,6 +260,7 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Start Date</label><input type="date" [(ngModel)]="route1Form.custExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route1Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.customsExaminationComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1CustomsExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -277,6 +284,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsLabFeesSdg" [disabled]="!route1Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route1Form.labFeesPaymentDate" [disabled]="!route1Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route1Form.labResultIssuanceDate" [disabled]="!route1Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.customsLabComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1CustomsLab')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -298,6 +306,7 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Exam. Start Date</label><input type="date" [(ngModel)]="route1Form.ssmoExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route1Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.ssmoExaminationComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1SsmoExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -321,6 +330,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Customs Duty (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.customsDutySdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Customs Settlement Date</label><input type="date" [(ngModel)]="route1Form.customsSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route1Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.customsEvaluationComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1CustomsEvaluation')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -343,6 +353,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Request Date</label><input type="date" [(ngModel)]="route1Form.spcBillRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Value (SDG)</label><input type="text" appThousands [(ngModel)]="route1Form.spcBillValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Settlement Date</label><input type="date" [(ngModel)]="route1Form.spcBillSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.spcBillComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route1SpcBill')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -365,6 +376,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route1Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route1Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route1Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route1Form.truckContainersComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route2TruckContainers')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -404,6 +416,7 @@
                 </span>
               </span>
             </div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="actualChargesForm.comments" rows="2" [disabled]="isLocked('route2ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
 
           <p *ngIf="!actualChargesForm.forecastCapturedAt" style="color:#a66a00; font-size:12px; background:#fff4e5; padding:8px; border-radius:4px;">
@@ -448,6 +461,7 @@
                 <option *ngFor="let d of freeZoneDestinations" [ngValue]="d.id">{{ d['name'] }}</option>
               </select>
             </div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route2Form.fzDepositRequestComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route2')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -468,6 +482,7 @@
         <div *ngIf="expanded === 'Customs Inspection'" style="padding: 16px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Inspection Date</label><input type="date" [(ngModel)]="route2Form.inspectionDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route2Form.customsInspectionComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route2CustomsInspection')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -491,6 +506,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Value (SDG)</label><input type="text" appThousands [(ngModel)]="route2Form.spcBillValueSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SPC Bill Settlement Date</label><input type="date" [(ngModel)]="route2Form.spcBillSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Police Security Appointed Date</label><input type="date" [(ngModel)]="route2Form.policeSecurityAppointedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route2Form.spcBillComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route2SpcBill')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -514,6 +530,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Cargo offloaded in FZ</label><input type="date" [(ngModel)]="route2Form.containersReceivedAtFzDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Containers Returned Date</label><input type="date" [(ngModel)]="route2Form.containersReturnedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route2Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route2Form.truckContainersComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route2TruckContainers')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -553,6 +570,7 @@
                 </span>
               </span>
             </div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="actualChargesForm.comments" rows="2" [disabled]="isLocked('route1ActualCharges')" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
 
           <p *ngIf="!actualChargesForm.forecastCapturedAt" style="color:#a66a00; font-size:12px; background:#fff4e5; padding:8px; border-radius:4px;">
@@ -617,6 +635,7 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Certificate Entry Date</label><input type="date" [(ngModel)]="route3Form.certificateEntryDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SCUDA Declaration No.</label><input [(ngModel)]="route3Form.scudaDeclarationNo" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route3Form.certificateEntryComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -639,6 +658,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">SSMO File Request Date</label><input type="date" [(ngModel)]="route3Form.ssmoFileRequestDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Inspection Amount (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.ssmoInspectionAmountSdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Fees Settlement Date</label><input type="date" [(ngModel)]="route3Form.ssmoFeesSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route3Form.ssmoFileProcessComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3SsmoFileProcess')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -660,6 +680,7 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Start Date</label><input type="date" [(ngModel)]="route3Form.custExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Cust. Exam. Completed Date</label><input type="date" [(ngModel)]="route3Form.custExamCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route3Form.customsExaminationComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3CustomsExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -683,6 +704,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Customs Lab Fees (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsLabFeesSdg" [disabled]="!route3Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Lab Fees Payment Date</label><input type="date" [(ngModel)]="route3Form.labFeesPaymentDate" [disabled]="!route3Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Lab Result Issuance Date</label><input type="date" [(ngModel)]="route3Form.labResultIssuanceDate" [disabled]="!route3Form.customsLabRequired" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route3Form.customsLabComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3CustomsLab')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -704,6 +726,7 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Exam. Start Date</label><input type="date" [(ngModel)]="route3Form.ssmoExamStartDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">SSMO Certificate Issuance Date</label><input type="date" [(ngModel)]="route3Form.ssmoCertIssuanceDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route3Form.ssmoExaminationComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3SsmoExamination')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -727,6 +750,7 @@
             <div><label style="display:block; font-size:12px; color:#555;">Customs Duty (SDG)</label><input type="text" appThousands [(ngModel)]="route3Form.customsDutySdg" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Customs Settlement Date</label><input type="date" [(ngModel)]="route3Form.customsSettlementDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Release & Exit Pass Date</label><input type="date" [(ngModel)]="route3Form.releaseExitPassDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route3Form.customsEvaluationComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px; display:flex; gap:8px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3CustomsEvaluation')" style="padding:6px 14px; background:#eee; color:#333; border:none; border-radius:4px; cursor:pointer;">Save</button>
@@ -748,6 +772,7 @@
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div><label style="display:block; font-size:12px; color:#555;">Truck Port Entry Permit Date</label><input type="date" [(ngModel)]="route3Form.truckPortEntryPermitDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
             <div><label style="display:block; font-size:12px; color:#555;">Clearance Actual Completed Date</label><input type="date" [(ngModel)]="route3Form.clearanceActualCompletedDate" style="width:100%; padding:6px; box-sizing:border-box;" /></div>
+            <div style="grid-column: span 2;"><label style="display:block; font-size:12px; color:#555;">Comments</label><textarea [(ngModel)]="route3Form.truckContainersComments" rows="2" style="width:100%; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></div>
           </div>
           <div style="margin-top:16px;">
             <button (click)="saveRouteDetail(false, null)" [disabled]="savingRouteDetail || isLocked('route3TruckContainers')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
