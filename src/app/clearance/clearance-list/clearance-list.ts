@@ -32,8 +32,9 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'routeStatus', label: 'Route' },
   { key: 'slaPercent', label: 'SLA Progress' },
   { key: 'doComments', label: 'DO Comments' },
+  { key: 'customsExaminationComments', label: 'Customs Examination Comments' },
   { key: 'ssmoExaminationComments', label: 'SSMO Examination Comments' },
-  { key: 'customsEvaluationComments', label: 'Customs Clearance Comments' }
+  { key: 'truckContainersComments', label: 'Truck & Containers Comments' }
 ];
 
 const ROUTE_LABELS: Record<string, string> = {
