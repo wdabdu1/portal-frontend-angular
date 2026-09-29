@@ -130,8 +130,9 @@ export interface ClearanceShipmentSummary {
   originalShipmentSetReceivedDate: string | null;
   type: string;
   doComments: string | null;
+  customsExaminationComments: string | null;
   ssmoExaminationComments: string | null;
-  customsEvaluationComments: string | null;
+  truckContainersComments: string | null;
 }
 
 export interface ClearanceDetail {
