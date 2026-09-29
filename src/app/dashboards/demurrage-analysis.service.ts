@@ -15,6 +15,9 @@ export interface ClearanceStepGap {
   targetDays: number | null;
   gap: number | null;
   category: string;
+  // Single-shipment mode only — the matching Clearance accordion group's
+  // Comments field. Always null in group mode (free text isn't averaged).
+  comment: string | null;
 }
 
 export interface CategoryGapRollup {
