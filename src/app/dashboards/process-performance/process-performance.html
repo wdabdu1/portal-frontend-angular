@@ -1,6 +1,6 @@
 <div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Process Performance</h1>
-  <p style="color: #888; font-size: 13px;">Every step from Supplier to Container Return, with Execution Speed (that step's own pace) and Completion Date delta (how far off the final forecast, even if the step itself ran well) — positive is always better throughout.</p>
+  <p style="color: #888; font-size: 13px;">Every step from Supplier to Container Return, with Execution Speed (that step's own pace) and Completion Date delta (how far off the final forecast, even if the step itself ran well) — positive is always better for these two. The Actual/Target/Gap columns use the opposite convention on purpose (same as Demurrage Analysis's Gap column): Gap is Actual minus Target, so an overrun is positive/Red and coming in ahead of target is negative/Green.</p>
 
   <!-- Filters -->
   <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center; background: #f7f7f7; padding: 12px; border-radius: 6px;">
@@ -21,31 +21,31 @@
 
     <select [(ngModel)]="businessUnitId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All BUs</option>
-      <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu['name'] }}</option>
+      <option *ngFor="let bu of businessUnits" [ngValue]="bu.id">{{ bu.name }}</option>
     </select>
     <select [(ngModel)]="categoryId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Categories</option>
-      <option *ngFor="let c of categories" [ngValue]="c.id">{{ c['name'] }}</option>
+      <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
     </select>
     <select [(ngModel)]="consigneeId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Consignees</option>
-      <option *ngFor="let c of consignees" [ngValue]="c.id">{{ c['name'] }}</option>
+      <option *ngFor="let c of consignees" [ngValue]="c.id">{{ c.name }}</option>
     </select>
     <select [(ngModel)]="supplierId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Suppliers</option>
-      <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s['name'] }}</option>
+      <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s.name }}</option>
     </select>
     <select [(ngModel)]="shippingLineId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Shipping Lines</option>
-      <option *ngFor="let s of shippingLines" [ngValue]="s.id">{{ s['name'] }}</option>
+      <option *ngFor="let s of shippingLines" [ngValue]="s.id">{{ s.name }}</option>
     </select>
     <select [(ngModel)]="senderBankId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Sender Banks</option>
-      <option *ngFor="let b of senderBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+      <option *ngFor="let b of senderBanks" [ngValue]="b.id">{{ b.name }}</option>
     </select>
     <select [(ngModel)]="receiverBankId" (ngModelChange)="onFilterChange()" [disabled]="!!selectedShipmentId" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       <option [ngValue]="null">All Receiver Banks</option>
-      <option *ngFor="let b of receiverBanks" [ngValue]="b.id">{{ b['name'] }}</option>
+      <option *ngFor="let b of receiverBanks" [ngValue]="b.id">{{ b.name }}</option>
     </select>
   </div>
 
@@ -91,6 +91,24 @@
         Averaged across {{ data.shipmentCount }} shipment(s) matching the current filters.
       </p>
 
+      <!-- Charge-hit summary — narrow any filter (Bank, Shipping Line, Supplier...) and watch this move to see where charges are likely coming from -->
+      <div style="display: flex; gap: 24px; align-items: center; background: #fff6ea; border: 1px solid #f0dcb0; border-radius: 8px; padding: 14px 16px; margin-top: 1rem; font-size: 13px; flex-wrap: wrap;">
+        <div>
+          <span style="color: #888;">Shipments with a charge hit:</span>
+          <strong style="margin-left: 6px;">{{ data.hitShipmentCount }} of {{ data.shipmentCount }}</strong>
+          <span *ngIf="hitRatePercent !== null" style="color: #888; margin-left: 4px;">({{ hitRatePercent | number: '1.0-1' }}%)</span>
+        </div>
+        <div>
+          <span style="color: #888;">Amount paid (Demurrage + Storage):</span>
+          <strong style="margin-left: 6px; color: #c0392b;">{{ data.hitShipmentAmountSdg | number: '1.0-0' }} SDG</strong>
+        </div>
+        <div *ngIf="bottleneckStepName" style="margin-left: auto;">
+          <span style="background: #c0392b; color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 10px;">BOTTLENECK</span>
+          <strong style="margin-left: 6px;">{{ bottleneckStepName }}</strong>
+          <span style="color: #888;"> — worst average overrun vs. target</span>
+        </div>
+      </div>
+
       <!-- Step table -->
       <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem; overflow-x: auto; max-height: 70vh; overflow-y: auto;">
         <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px;">
@@ -106,11 +124,17 @@
               </ng-container>
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Execution Speed' : 'Avg. Execution Speed' }}</th>
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Completion Date' : 'Avg. Completion Date' }}</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Actual Days' : 'Avg. Actual Days' }}</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Target Days</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;" title="Actual − Target. Overrun is Red, ahead of target is Green — opposite sign from Execution Speed/Completion Date above.">Gap (+/-)</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let s of data.steps" style="border-bottom: 1px solid #eee;">
-              <td style="padding: 6px; font-weight: 600;">{{ s.stepName }}</td>
+              <td style="padding: 6px; font-weight: 600;">
+                {{ s.stepName }}
+                <span *ngIf="s.stepName === bottleneckStepName" style="background: #c0392b; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 8px; margin-left: 6px; vertical-align: middle;">BOTTLENECK</span>
+              </td>
               <td style="padding: 6px; color: #666;">{{ s.category }}</td>
               <ng-container *ngIf="data.isSingleShipment">
                 <td style="padding: 6px; color: #888;">{{ s.forecastStart ? (s.forecastStart | date: 'MMM d') : '—' }}</td>
@@ -129,6 +153,19 @@
                   {{ s.completionDateDeltaDays! > 0 ? '+' : '' }}{{ s.completionDateDeltaDays | number: '1.0-1' }}
                 </span>
                 <span *ngIf="s.completionDateDeltaDays === null" style="color: #ccc;">—</span>
+              </td>
+              <td style="padding: 6px;">
+                <span *ngIf="s.actualDaysTaken !== null">{{ s.actualDaysTaken | number: '1.0-1' }}</span>
+                <span *ngIf="s.actualDaysTaken === null" style="color: #ccc;">—</span>
+              </td>
+              <td style="padding: 6px; color: #888;">
+                {{ s.targetDays !== null ? (s.targetDays | number: '1.0-1') : '—' }}
+              </td>
+              <td style="padding: 6px;">
+                <span *ngIf="s.gap !== null" [style.color]="gapColor(s.gap)" style="font-weight: 600;">
+                  {{ s.gap! > 0 ? '+' : '' }}{{ s.gap | number: '1.0-1' }}
+                </span>
+                <span *ngIf="s.gap === null" style="color: #ccc;">—</span>
               </td>
             </tr>
           </tbody>
