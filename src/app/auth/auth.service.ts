@@ -148,9 +148,14 @@ export class AuthService {
   }
 
   // Who may edit the Logistics reveal-timing settings (the arrival lead
-  // time / pre-clearance Cat-Qty reveal / post-delivery re-hide days) —
-  // Coordinator can, LogisticsOfficer only ever sees them read-only.
+  // time / pre-clearance Cat-Qty reveal / post-delivery re-hide days).
+  // This screen now lives in the general Settings module, not the
+  // Logistics box, so it follows the same Manager/SuperUser-only rule as
+  // every other Settings edit. Coordinator previously had a special-case
+  // edit grant here, which was the actual bug: it let Coordinator widen
+  // their own reveal window and see shipments earlier than the
+  // visibility design intends — removed rather than carried over.
   canEditLogisticsRevealSettings(): boolean {
-    return this.hasAnyRole(['Coordinator', 'Manager', 'SuperUser']);
+    return this.hasAnyRole(['Manager', 'SuperUser']);
   }
 }
