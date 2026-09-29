@@ -1,6 +1,6 @@
 <div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <h1 style="font-size: 20px; font-weight: 500;">Process Performance</h1>
-  <p style="color: #888; font-size: 13px;">Every step from Supplier to Container Return, with Execution Speed (that step's own pace) and Completion Date delta (how far off the final forecast, even if the step itself ran well) — positive is always better for these two. The Actual/Target/Gap columns use the opposite convention on purpose (same as Demurrage Analysis's Gap column): Gap is Actual minus Target, so an overrun is positive/Red and coming in ahead of target is negative/Green.</p>
+  <p style="color: #888; font-size: 13px;">Every step from Supplier to Container Return, with Actual Days, Target Days, and the Gap between them (same convention as Demurrage Analysis's Gap column) — an overrun is positive/Red, coming in ahead of target is negative/Green.</p>
 
   <!-- Filters -->
   <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center; background: #f7f7f7; padding: 12px; border-radius: 6px;">
@@ -122,11 +122,9 @@
                 <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Actual Start</th>
                 <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Actual End</th>
               </ng-container>
-              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Execution Speed' : 'Avg. Execution Speed' }}</th>
-              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Completion Date' : 'Avg. Completion Date' }}</th>
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Actual Days' : 'Avg. Actual Days' }}</th>
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Target Days</th>
-              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;" title="Actual − Target. Overrun is Red, ahead of target is Green — opposite sign from Execution Speed/Completion Date above.">Gap (+/-)</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;" title="Actual − Target. Overrun is Red, ahead of target is Green.">Gap (+/-)</th>
             </tr>
           </thead>
           <tbody>
@@ -142,18 +140,6 @@
                 <td style="padding: 6px;">{{ s.actualStart ? (s.actualStart | date: 'MMM d') : '—' }}</td>
                 <td style="padding: 6px;">{{ s.actualEnd ? (s.actualEnd | date: 'MMM d') : '—' }}</td>
               </ng-container>
-              <td style="padding: 6px;">
-                <span *ngIf="s.executionSpeedDays !== null" [style.color]="lightColor(s.executionSpeedDays)" style="font-weight: 600;">
-                  {{ s.executionSpeedDays! > 0 ? '+' : '' }}{{ s.executionSpeedDays | number: '1.0-1' }}
-                </span>
-                <span *ngIf="s.executionSpeedDays === null" style="color: #ccc;">—</span>
-              </td>
-              <td style="padding: 6px;">
-                <span *ngIf="s.completionDateDeltaDays !== null" [style.color]="lightColor(s.completionDateDeltaDays)" style="font-weight: 600;">
-                  {{ s.completionDateDeltaDays! > 0 ? '+' : '' }}{{ s.completionDateDeltaDays | number: '1.0-1' }}
-                </span>
-                <span *ngIf="s.completionDateDeltaDays === null" style="color: #ccc;">—</span>
-              </td>
               <td style="padding: 6px;">
                 <span *ngIf="s.actualDaysTaken !== null">{{ s.actualDaysTaken | number: '1.0-1' }}</span>
                 <span *ngIf="s.actualDaysTaken === null" style="color: #ccc;">—</span>
@@ -179,22 +165,20 @@
           <thead>
             <tr style="text-align: left; border-bottom: 1px solid #ddd;">
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Category</th>
-              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Avg. Execution Speed</th>
-              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Avg. Completion Date Delta</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Avg. Actual Days</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Avg. Target Days</th>
+              <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Avg. Gap (+/-)</th>
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Step Instances</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let r of data.categoryRollups" style="border-bottom: 1px solid #eee;">
               <td style="padding: 6px; font-weight: 600;">{{ r.category }}</td>
+              <td style="padding: 6px;">{{ r.avgActualDays | number: '1.0-1' }}</td>
+              <td style="padding: 6px; color: #888;">{{ r.avgTargetDays | number: '1.0-1' }}</td>
               <td style="padding: 6px;">
-                <span [style.color]="lightColor(r.avgExecutionSpeedDays)" style="font-weight: 600;">
-                  {{ r.avgExecutionSpeedDays > 0 ? '+' : '' }}{{ r.avgExecutionSpeedDays | number: '1.0-1' }}
-                </span>
-              </td>
-              <td style="padding: 6px;">
-                <span [style.color]="lightColor(r.avgCompletionDateDeltaDays)" style="font-weight: 600;">
-                  {{ r.avgCompletionDateDeltaDays > 0 ? '+' : '' }}{{ r.avgCompletionDateDeltaDays | number: '1.0-1' }}
+                <span [style.color]="gapColor(r.avgGapDays)" style="font-weight: 600;">
+                  {{ r.avgGapDays > 0 ? '+' : '' }}{{ r.avgGapDays | number: '1.0-1' }}
                 </span>
               </td>
               <td style="padding: 6px; color: #888;">{{ r.stepInstanceCount }}</td>

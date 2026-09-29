@@ -183,21 +183,9 @@ export class ProcessPerformance implements OnInit {
     this.loadFilterOptions();
   }
 
-  // Positive = faster/ahead (green), negative = slower/behind (red) —
-  // consistent everywhere in this dashboard (Execution Speed /
-  // Completion Date Delta columns).
-  lightColor(value: number | null): string {
-    if (value === null) return '#888';
-    if (value > 0) return '#1e7e34';
-    if (value < 0) return '#c0392b';
-    return '#333';
-  }
-
-  // Opposite sign from lightColor() above, deliberately — this is the
   // Demurrage-Analysis-style Gap (Actual − Target): overrun is
-  // positive/Red, ahead of target is negative/Green. Used only for the
-  // new Actual/Target/Gap columns, never for Execution Speed/Completion
-  // Date Delta.
+  // positive/Red, ahead of target is negative/Green. Used for the
+  // step table's Gap column and the Category Rollup's Avg Gap column.
   gapColor(value: number | null): string {
     if (value === null) return '#888';
     if (value > 0) return '#c0392b';
