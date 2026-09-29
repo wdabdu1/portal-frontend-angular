@@ -62,9 +62,12 @@ export class SettingsMenu {
         { label: 'Drivers', path: '/settings/drivers' },
         { label: 'Trucks', path: '/settings/trucks' },
         { label: 'Warehouses', path: '/settings/warehouses' },
-        // Also reachable from the Logistics menu group itself (Coordinator
-        // can reach it there — they're locked out of /settings generally).
-        { label: 'Logistics — Reveal Settings', path: '/logistics/settings' }
+        // Moved out of the Logistics box on purpose: Coordinator could
+        // previously reach and edit this from inside /logistics itself,
+        // letting them widen their own reveal window. It now lives here
+        // only, behind the same Manager/SuperUser-only Settings gate as
+        // everything else in this menu.
+        { label: 'Logistics — Reveal Settings', path: '/settings/logistics-visibility' }
       ]
     },
     {
