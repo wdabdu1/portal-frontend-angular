@@ -11,6 +11,13 @@ export interface ProcessStepDetail {
   actualEnd: string | null;
   executionSpeedDays: number | null;
   completionDateDeltaDays: number | null;
+  // Actual/Target/Gap using Demurrage Analysis's OWN sign convention
+  // (Gap = Actual − Target; overrun = positive = Red), deliberately the
+  // opposite sign from executionSpeedDays/completionDateDeltaDays above
+  // — both are shown on the page, labeled separately.
+  actualDaysTaken: number | null;
+  targetDays: number | null;
+  gap: number | null;
 }
 
 export interface CategoryRollup {
@@ -31,6 +38,12 @@ export interface ProcessPerformanceResult {
   actualArrivalDate: string | null;
   steps: ProcessStepDetail[];
   categoryRollups: CategoryRollup[];
+  // How many of the shipments matching the current filters had a
+  // genuine Demurrage/Storage charge hit, and how much was paid on
+  // those — lets a filter (Bank, Shipping Line, Supplier...) be
+  // narrowed to see where charges are likely coming from.
+  hitShipmentCount: number;
+  hitShipmentAmountSdg: number;
 }
 
 export interface ShipmentSearchResult {
@@ -53,6 +66,21 @@ export interface ProcessPerformanceFilters {
   receiverBankId?: number;
 }
 
+export interface FilterOption {
+  id: number;
+  name: string;
+}
+
+export interface ProcessPerformanceFilterOptions {
+  businessUnits: FilterOption[];
+  consignees: FilterOption[];
+  categories: FilterOption[];
+  suppliers: FilterOption[];
+  shippingLines: FilterOption[];
+  senderBanks: FilterOption[];
+  receiverBanks: FilterOption[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProcessPerformanceService {
   constructor(private http: HttpClient) {}
@@ -61,7 +89,7 @@ export class ProcessPerformanceService {
     return this.http.get<ShipmentSearchResult[]>(`${API_URL}/dashboards/process-performance/search-shipments?term=${encodeURIComponent(term)}`);
   }
 
-  get(filters: ProcessPerformanceFilters) {
+  private buildParams(filters: ProcessPerformanceFilters): string {
     const parts: string[] = [];
     if (filters.shipmentId) parts.push(`shipmentId=${filters.shipmentId}`);
     if (filters.etaFrom) parts.push(`etaFrom=${filters.etaFrom}`);
@@ -73,7 +101,18 @@ export class ProcessPerformanceService {
     if (filters.shippingLineId) parts.push(`shippingLineId=${filters.shippingLineId}`);
     if (filters.senderBankId) parts.push(`senderBankId=${filters.senderBankId}`);
     if (filters.receiverBankId) parts.push(`receiverBankId=${filters.receiverBankId}`);
-    const query = parts.length > 0 ? '?' + parts.join('&') : '';
-    return this.http.get<ProcessPerformanceResult>(`${API_URL}/dashboards/process-performance${query}`);
+    return parts.length > 0 ? '?' + parts.join('&') : '';
+  }
+
+  get(filters: ProcessPerformanceFilters) {
+    return this.http.get<ProcessPerformanceResult>(`${API_URL}/dashboards/process-performance${this.buildParams(filters)}`);
+  }
+
+  // Cascading filter-option lists — pass the OTHER filters currently
+  // selected (shipmentId is irrelevant here and not sent) so each
+  // dropdown only offers values that actually appear among matching
+  // ongoing shipments.
+  getFilterOptions(filters: ProcessPerformanceFilters) {
+    return this.http.get<ProcessPerformanceFilterOptions>(`${API_URL}/dashboards/process-performance/filter-options${this.buildParams(filters)}`);
   }
 }
