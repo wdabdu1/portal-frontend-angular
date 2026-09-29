@@ -130,6 +130,7 @@
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ data.isSingleShipment ? 'Actual Days' : 'Avg. Actual Days' }}</th>
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">SLA Days</th>
               <th style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Gap (+/-)</th>
+              <th *ngIf="data.isSingleShipment" style="padding: 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Comments</th>
             </tr>
           </thead>
           <tbody>
@@ -144,6 +145,7 @@
                 </span>
                 <span *ngIf="g.gap === null">—</span>
               </td>
+              <td *ngIf="data.isSingleShipment" style="padding: 6px; color: #555; max-width: 240px; white-space: normal;">{{ g.comment || '—' }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -155,24 +157,25 @@
               <td style="padding: 6px;" [style.color]="gapSubtotal > 0 ? '#c0392b' : (gapSubtotal < 0 ? '#1e7e34' : '#333')">
                 {{ gapSubtotal > 0 ? '+' : '' }}{{ gapSubtotal | number: '1.0-1' }}
               </td>
+              <td *ngIf="data.isSingleShipment" style="padding: 6px;"></td>
             </tr>
             <tr style="color: #666;">
               <td style="padding: 6px;">Weekends</td>
               <td style="padding: 6px;"></td>
               <td style="padding: 6px;">{{ data.weekendDays | number: '1.0-1' }}</td>
-              <td style="padding: 6px;" colspan="2"></td>
+              <td style="padding: 6px;" [attr.colspan]="data.isSingleShipment ? 3 : 2"></td>
             </tr>
             <tr style="color: #666;">
               <td style="padding: 6px;">Public Holidays</td>
               <td style="padding: 6px;"></td>
               <td style="padding: 6px;">{{ data.holidayDays | number: '1.0-1' }}</td>
-              <td style="padding: 6px;" colspan="2"></td>
+              <td style="padding: 6px;" [attr.colspan]="data.isSingleShipment ? 3 : 2"></td>
             </tr>
             <tr style="border-top: 1px solid #ccc; font-weight: 600;">
               <td style="padding: 6px;">Total (should equal Actual Arrival → Container Return)</td>
               <td style="padding: 6px;"></td>
               <td style="padding: 6px;">{{ grandTotalDays | number: '1.0-1' }}</td>
-              <td style="padding: 6px;" colspan="2"></td>
+              <td style="padding: 6px;" [attr.colspan]="data.isSingleShipment ? 3 : 2"></td>
             </tr>
           </tfoot>
         </table>
