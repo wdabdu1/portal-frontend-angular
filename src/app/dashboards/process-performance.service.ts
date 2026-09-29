@@ -9,12 +9,9 @@ export interface ProcessStepDetail {
   forecastEnd: string | null;
   actualStart: string | null;
   actualEnd: string | null;
-  executionSpeedDays: number | null;
-  completionDateDeltaDays: number | null;
-  // Actual/Target/Gap using Demurrage Analysis's OWN sign convention
-  // (Gap = Actual − Target; overrun = positive = Red), deliberately the
-  // opposite sign from executionSpeedDays/completionDateDeltaDays above
-  // — both are shown on the page, labeled separately.
+  // Actual/Target/Gap using Demurrage Analysis's own sign convention
+  // (Gap = Actual − Target; overrun = positive = Red, ahead = negative
+  // = Green) — the page's only day-count figure.
   actualDaysTaken: number | null;
   targetDays: number | null;
   gap: number | null;
@@ -22,8 +19,9 @@ export interface ProcessStepDetail {
 
 export interface CategoryRollup {
   category: string;
-  avgExecutionSpeedDays: number;
-  avgCompletionDateDeltaDays: number;
+  avgActualDays: number;
+  avgTargetDays: number;
+  avgGapDays: number;
   stepInstanceCount: number;
 }
 
