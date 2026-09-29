@@ -67,14 +67,19 @@ const MENU_GROUPS: MenuGroup[] = [
     items: [
       { label: 'Shipments for Dispatch', route: '/logistics', canAccess: (a) => a.canSeeLogisticsBox() },
       { label: 'Truck Availability', route: '/logistics/truck-availability', canAccess: (a) => a.canSeeLogisticsBox() },
-      { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: (a) => a.canSeeLogisticsBox() },
+      { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: (a) => a.canSeeLogisticsBox() }
       // "Cargo Under Delivery" deliberately removed from this group for
       // now — it pointed at the full item-level Goods in Transit
       // dashboard, which Logistics/Coordinator can no longer reach
       // (logisticsLockGuard blocks it, correctly). A confidentiality-
       // filtered version living inside this box is planned for a later
       // phase, once LogisticsController's own filtering logic exists.
-      { label: 'Reveal Settings', route: '/logistics/settings', canAccess: (a) => a.canSeeLogisticsBox() }
+      //
+      // "Reveal Settings" also deliberately removed from this group —
+      // it moved into the general Settings module (Settings > Shipping &
+      // Logistics). Coordinator could reach and edit it here, which let
+      // them widen their own reveal window and see shipments earlier
+      // than intended; only Manager/SuperUser can reach it now.
     ]
   },
   {

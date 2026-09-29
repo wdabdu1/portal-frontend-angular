@@ -114,6 +114,14 @@ export const routes: Routes = [
   { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard, logisticsLockGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/offshore-markup-defaults', component: OffshoreMarkupDefaults, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  // Reveal-timing settings: moved into the general Settings module (was
+  // previously reachable at /logistics/settings, inside the Logistics box
+  // itself, so Coordinator — who is meant to be a subject of this control,
+  // not an administrator of it — could widen the reveal window and see
+  // shipments earlier than the visibility design intends). Now gated the
+  // same as every other Settings route: Coordinator/LogisticsOfficer are
+  // locked out by logisticsLockGuard like anywhere else outside the box.
+  { path: 'settings/logistics-visibility', component: LogisticsVisibility, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'supplier-dues', component: SupplierDuesList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'users', component: Users, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'data-migration', component: DataMigration, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
@@ -129,10 +137,6 @@ export const routes: Routes = [
   { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'logistics/truck-availability', component: TruckAvailability, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'logistics/truck-allocations', component: TruckAllocations, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
-  // Reveal-timing settings: lives outside /settings/* on purpose so
-  // Coordinator (locked out of the general Settings module) can still
-  // reach and edit it — same box, same guard as the rest above.
-  { path: 'logistics/settings', component: LogisticsVisibility, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'transfer-pricing', component: TransferPricingList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'transfer-pricing/accumulated', component: TransferPricingAccumulated, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
