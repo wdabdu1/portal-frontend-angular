@@ -148,18 +148,37 @@
 
     <h3 style="font-size: 15px; margin-top: 1.5rem;">Line Items *</h3>
     <div *ngFor="let li of lineItems; let i = index" style="display:grid; grid-template-columns: repeat(7, 1fr) auto; gap:6px; margin-bottom:6px; align-items:center;">
-      <select [(ngModel)]="li.productCategoryId" [name]="'cat'+i" style="padding:5px;">
-        <option [ngValue]="null">Category</option>
-        <option *ngFor="let c of productCategories" [ngValue]="c.id">{{ c['name'] }}</option>
-      </select>
-      <select [(ngModel)]="li.modelProductId" [name]="'model'+i" style="padding:5px;">
-        <option [ngValue]="null">Model/Product</option>
-        <option *ngFor="let m of modelProducts" [ngValue]="m.id">{{ m['name'] }}</option>
-      </select>
-      <select [(ngModel)]="li.productTypeId" [name]="'type'+i" style="padding:5px;">
-        <option [ngValue]="null">Type</option>
-        <option *ngFor="let t of productTypes" [ngValue]="t.id">{{ t['name'] }}</option>
-      </select>
+      <!-- Type-to-filter boxes: native input+datalist, so typing a few
+           letters narrows the (potentially long) list the browser shows
+           below the box, instead of scrolling a plain <select>. Each row
+           needs its own datalist id so rows don't share filter state. -->
+      <span>
+        <input type="text" [attr.list]="'catList'+i" [(ngModel)]="li.productCategoryText" (ngModelChange)="onCategoryInput(li)"
+          [name]="'cat'+i" placeholder="Category" autocomplete="off"
+          [style.border]="(!li.productCategoryId && li.productCategoryText) ? '1px solid #c0392b' : '1px solid #ccc'"
+          style="padding:5px; width:100%; box-sizing:border-box;" />
+        <datalist [id]="'catList'+i">
+          <option *ngFor="let c of productCategories" [value]="c['name']"></option>
+        </datalist>
+      </span>
+      <span>
+        <input type="text" [attr.list]="'modelList'+i" [(ngModel)]="li.modelProductText" (ngModelChange)="onModelProductInput(li)"
+          [name]="'model'+i" placeholder="Model/Product" autocomplete="off"
+          [style.border]="(!li.modelProductId && li.modelProductText) ? '1px solid #c0392b' : '1px solid #ccc'"
+          style="padding:5px; width:100%; box-sizing:border-box;" />
+        <datalist [id]="'modelList'+i">
+          <option *ngFor="let m of modelProducts" [value]="m['name']"></option>
+        </datalist>
+      </span>
+      <span>
+        <input type="text" [attr.list]="'typeList'+i" [(ngModel)]="li.productTypeText" (ngModelChange)="onProductTypeInput(li)"
+          [name]="'type'+i" placeholder="Type" autocomplete="off"
+          [style.border]="(!li.productTypeId && li.productTypeText) ? '1px solid #c0392b' : '1px solid #ccc'"
+          style="padding:5px; width:100%; box-sizing:border-box;" />
+        <datalist [id]="'typeList'+i">
+          <option *ngFor="let t of productTypes" [value]="t['name']"></option>
+        </datalist>
+      </span>
       <input type="text" appThousands [(ngModel)]="li.qty" [name]="'qty'+i" placeholder="Qty" style="padding:5px;" />
       <select [(ngModel)]="li.unitOfMeasureId" [name]="'unit'+i" style="padding:5px;">
         <option [ngValue]="null">Unit</option>

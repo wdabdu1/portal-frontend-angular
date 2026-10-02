@@ -14,8 +14,17 @@ interface Division extends LookupEntity {
 
 interface LineItemRow {
   productCategoryId: number | null;
+  // *Text holds whatever the user has typed into the Category/Model-
+  // Product/Type typeahead box; the matching *Id is resolved from it on
+  // every keystroke (onCategoryInput/onModelProductInput/onProductTypeInput)
+  // by looking up an exact (case-insensitive) name match against the
+  // option list backing each box's <datalist>. The Id, not the text, is
+  // what submit() validates and sends.
+  productCategoryText: string;
   modelProductId: number | null;
+  modelProductText: string;
   productTypeId: number | null;
+  productTypeText: string;
   qty: number | null;
   unitOfMeasureId: number | null;
   unitPrice: number | null;
@@ -129,13 +138,39 @@ export class NewSupplierOrder implements OnInit {
   emptyLineItem(): LineItemRow {
     return {
       productCategoryId: null,
+      productCategoryText: '',
       modelProductId: null,
+      modelProductText: '',
       productTypeId: null,
+      productTypeText: '',
       qty: null,
       unitOfMeasureId: null,
       unitPrice: null,
       currencyId: null
     };
+  }
+
+  // Typeahead resolvers for the Category/Model-Product/Type line-item
+  // boxes: an exact (case-insensitive) name match sets the real Id;
+  // anything else (still typing, a typo, no match) clears it, which
+  // submit()'s validation already treats as an incomplete row.
+  private findIdByName(list: LookupEntity[], text: string): number | null {
+    const needle = text.trim().toLowerCase();
+    if (!needle) return null;
+    const match = list.find((item) => String(item['name'] ?? '').toLowerCase() === needle);
+    return match ? match.id : null;
+  }
+
+  onCategoryInput(row: LineItemRow): void {
+    row.productCategoryId = this.findIdByName(this.productCategories, row.productCategoryText);
+  }
+
+  onModelProductInput(row: LineItemRow): void {
+    row.modelProductId = this.findIdByName(this.modelProducts, row.modelProductText);
+  }
+
+  onProductTypeInput(row: LineItemRow): void {
+    row.productTypeId = this.findIdByName(this.productTypes, row.productTypeText);
   }
 
   addLineItem(): void {
@@ -188,9 +223,18 @@ export class NewSupplierOrder implements OnInit {
       return;
     }
 
-    const validLineItems = this.lineItems.filter(
-      (li) => li.productCategoryId && li.modelProductId && li.productTypeId && li.qty && li.unitOfMeasureId && li.unitPrice && li.currencyId
-    );
+    const validLineItems = this.lineItems
+      .filter((li) => li.productCategoryId && li.modelProductId && li.productTypeId && li.qty && li.unitOfMeasureId && li.unitPrice && li.currencyId)
+      // Strip the *Text typeahead fields — only the resolved Ids go to the backend.
+      .map((li) => ({
+        productCategoryId: li.productCategoryId,
+        modelProductId: li.modelProductId,
+        productTypeId: li.productTypeId,
+        qty: li.qty,
+        unitOfMeasureId: li.unitOfMeasureId,
+        unitPrice: li.unitPrice,
+        currencyId: li.currencyId
+      }));
 
     if (validLineItems.length === 0) {
       this.error = 'At least one complete line item is required.';
