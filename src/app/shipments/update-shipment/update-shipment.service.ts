@@ -84,6 +84,8 @@ export interface ShipmentBanking {
   collectionValue: number | null;
   collectionCurrencyId: number | null;
   tenorId: number | null;
+  senderToReceiverDispatchViaId: number | null;
+  senderToReceiverTrackingNumber: string | null;
   receiverBankCharges: number | null;
 }
 export interface ErpColumn {

@@ -65,7 +65,7 @@ export class UpdateShipment implements OnInit {
   bankingForm = {
     senderBankId: null as number | null, osDocDispatchDate: '', osDocDispatchedViaId: null as number | null, osDocTrackingNumber: '',
     receivingBankId: null as number | null, necessaryGoodType: false, collectionRefNo: '', collectionValue: null as number | null, collectionCurrencyId: null as number | null,
-    tenorId: null as number | null
+    tenorId: null as number | null, senderToReceiverDispatchViaId: null as number | null, senderToReceiverTrackingNumber: ''
   };
 
   constructor(private lookups: SettingsLookupService, private service: UpdateShipmentService, private lockService: SectionLockService) {}
@@ -108,7 +108,8 @@ export class UpdateShipment implements OnInit {
           senderBankId: detail.banking.senderBankId, osDocDispatchDate: detail.banking.osDocDispatchDate ?? '', osDocDispatchedViaId: detail.banking.osDocDispatchedViaId,
           osDocTrackingNumber: detail.banking.osDocTrackingNumber ?? '', receivingBankId: detail.banking.receivingBankId, necessaryGoodType: detail.banking.necessaryGoodType,
           collectionRefNo: detail.banking.collectionRefNo ?? '', collectionValue: detail.banking.collectionValue, collectionCurrencyId: detail.banking.collectionCurrencyId,
-          tenorId: detail.banking.tenorId
+          tenorId: detail.banking.tenorId, senderToReceiverDispatchViaId: detail.banking.senderToReceiverDispatchViaId,
+          senderToReceiverTrackingNumber: detail.banking.senderToReceiverTrackingNumber ?? ''
         };
 
         this.loading = false;
@@ -328,7 +329,9 @@ export class UpdateShipment implements OnInit {
       osDocDispatchedViaId: this.bankingForm.osDocDispatchedViaId, osDocTrackingNumber: this.bankingForm.osDocTrackingNumber || null,
       receivingBankId: this.bankingForm.receivingBankId, necessaryGoodType: this.bankingForm.necessaryGoodType,
       collectionRefNo: this.bankingForm.collectionRefNo || null, collectionValue: this.bankingForm.collectionValue,
-      collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId
+      collectionCurrencyId: this.bankingForm.collectionCurrencyId, tenorId: this.bankingForm.tenorId,
+      senderToReceiverDispatchViaId: this.bankingForm.senderToReceiverDispatchViaId,
+      senderToReceiverTrackingNumber: this.bankingForm.senderToReceiverTrackingNumber || null
     }), andNext);
   }
 

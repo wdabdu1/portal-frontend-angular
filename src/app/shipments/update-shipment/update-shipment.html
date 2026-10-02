@@ -397,6 +397,17 @@
               <option *ngFor="let t of tenors" [ngValue]="t.id">{{ t['days'] }} days</option>
             </select>
           </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Sender&rarr;Receiver Dispatch Via</label>
+            <select [(ngModel)]="bankingForm.senderToReceiverDispatchViaId" style="width:100%; padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let c of couriers" [ngValue]="c.id">{{ c['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Sender&rarr;Receiver Tracking Number</label>
+            <input [(ngModel)]="bankingForm.senderToReceiverTrackingNumber" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
         </div>
         <p *ngIf="detail.banking?.senderBankCharges !== null && detail.banking?.senderBankCharges !== undefined" style="font-size:12px; color:#666; margin-top:8px;">Sender charges: {{ detail.banking!.senderBankCharges | number: '1.2-2' }} {{ collectionCurrencyCode }} — Receiver charges: {{ detail.banking!.receiverBankCharges | number: '1.2-2' }} SDG</p>
 
