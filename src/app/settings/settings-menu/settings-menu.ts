@@ -42,7 +42,9 @@ export class SettingsMenu {
         { label: 'Product Categories', path: '/settings/product-categories' },
         { label: 'Tariff Groups', path: '/settings/tariff-groups' },
         { label: 'Product Types', path: '/settings/product-types' },
-        { label: 'Model/Product', path: '/settings/model-products' },
+        // Model/Product moved out of Settings — it now lives at the end
+        // of the "Update Order" top menu, restricted to Manager/
+        // IP_Supervisor/SuperUser. See app.ts and app.routes.ts.
         { label: 'Currencies', path: '/settings/currencies' },
         { label: 'FX Rates', path: '/settings/fx-rates' }
       ]
