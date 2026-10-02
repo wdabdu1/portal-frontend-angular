@@ -3,6 +3,7 @@ import { authGuard } from './auth/auth.guard';
 import { cPricingLockGuard } from './auth/c-pricing-lock.guard';
 import { logisticsLockGuard } from './auth/logistics-lock.guard';
 import { logisticsBoxGuard } from './auth/logistics-box.guard';
+import { modelProductsAccessGuard } from './auth/model-products-access.guard';
 import { LogisticsVisibility } from './settings/logistics-visibility/logistics-visibility';
 import { CPricingList } from './c-pricing/c-pricing-list/c-pricing-list';
 import { CPricingHistory } from './c-pricing/c-pricing-history/c-pricing-history';
@@ -248,12 +249,6 @@ export const routes: Routes = [
     data: { title: 'Product Types', resource: 'product-types', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
   },
   {
-    path: 'settings/model-products',
-    component: SimpleLookup,
-    canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
-    data: { title: 'Model/Product', resource: 'model-products', fields: [{ key: 'name', label: 'Name', type: 'text' }] }
-  },
-  {
     path: 'settings/currencies',
     component: SimpleLookup,
     canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
@@ -409,6 +404,26 @@ export const routes: Routes = [
 
   { path: 'orders', component: OrderList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'orders/new', component: NewSupplierOrder, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  // Model/Product management — moved out of Settings and into Update
+  // Order (end of that menu group) per request, with access narrowed to
+  // Manager/IP_Supervisor/SuperUser via modelProductsAccessGuard (instead
+  // of the old Settings-wide Manager/SuperUser gate). backRoute/backLabel
+  // and editRoles in `data` tell SimpleLookup to point its back link at
+  // Update Order instead of Settings, and to compute canEdit from this
+  // wider role set instead of its Manager/SuperUser default.
+  {
+    path: 'orders/model-products',
+    component: SimpleLookup,
+    canActivate: [authGuard, modelProductsAccessGuard, cPricingLockGuard, logisticsLockGuard],
+    data: {
+      title: 'Model/Product',
+      resource: 'model-products',
+      fields: [{ key: 'name', label: 'Name', type: 'text' }],
+      backRoute: '/orders',
+      backLabel: 'Back to Update Order',
+      editRoles: ['Manager', 'IP_Supervisor', 'SuperUser']
+    }
+  },
   { path: 'orders/:id', component: OrderDetails, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'shipments', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
     data: { detailSegment: 'update' } },

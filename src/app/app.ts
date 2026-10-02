@@ -56,7 +56,10 @@ const MENU_GROUPS: MenuGroup[] = [
       // (Withdrawal detail and the FZ Deposit/Route 2-3 screens live
       // there) — everything they need instead lives in the Logistics
       // box below.
-      { label: 'Clearance', route: '/clearance', canAccess: (a) => !a.hasRole('LogisticsOfficer') && !a.hasRole('Coordinator') }
+      { label: 'Clearance', route: '/clearance', canAccess: (a) => !a.hasRole('LogisticsOfficer') && !a.hasRole('Coordinator') },
+      // Moved out of Settings per request — now the last item here,
+      // restricted to Manager/IP_Supervisor/SuperUser.
+      { label: 'Model/Product', route: '/orders/model-products', canAccess: (a) => a.canManageModelProducts() }
     ]
   },
   {
