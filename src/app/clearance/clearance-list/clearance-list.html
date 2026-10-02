@@ -7,6 +7,13 @@
   </div>
   <p style="color: #888; font-size: 13px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column. Click a row to continue Clearance data entry.</p>
 
+  <div *ngIf="latestSpcRate" [style.background]="spcRateIsStale ? '#fdecea' : '#eef6ee'" [style.border]="spcRateIsStale ? '1px solid #f5c6c0' : '1px solid #cde5cd'"
+    style="border-radius: 4px; padding: 8px 12px; margin-top: 0.75rem; font-size: 13px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+    <span><strong>SPC Euro Rate:</strong> {{ latestSpcRate.euroToSdgRate | number: '1.2-4' }}</span>
+    <span><strong>Last updated:</strong> {{ latestSpcRate.effectiveDate | date: 'dd/MM/yyyy' }} ({{ spcRateAgeDays }} day{{ spcRateAgeDays === 1 ? '' : 's' }} ago)</span>
+    <span *ngIf="spcRateIsStale" style="color: #c0392b; font-weight: 600;">⚠ This rate may be outdated — please check with admin.</span>
+  </div>
+
   <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
     <select [(ngModel)]="statusFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
       <option value="Pending">Pending</option>

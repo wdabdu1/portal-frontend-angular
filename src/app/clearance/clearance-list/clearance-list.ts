@@ -7,6 +7,7 @@ import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { exportToExcel } from '../../shared/excel-export.util';
 import { ClearanceService, ClearanceShipmentSummary } from '../clearance.service';
+import { SettingsLookupService } from '../../settings/settings-lookup.service';
 
 type SortColumn = keyof ClearanceShipmentSummary;
 
@@ -69,9 +70,25 @@ export class ClearanceList implements OnInit {
 
   filters: Record<string, Set<string>> = {};
 
-  constructor(private service: ClearanceService, private router: Router, private tablePrefs: TablePreferencesService) {}
+  // SPC Euro Rate banner — so every user landing on Clearance can see at
+  // a glance whether the rate behind SPC storage-fee calculations is
+  // current, without having to open Settings. Reuses the same
+  // GET api/settings/spc-rates endpoint Settings > FX Rates already
+  // calls; no backend change needed since it's open to any authenticated
+  // user. latestSpcRate stays null while loading/on error — the banner
+  // template just omits itself in that case.
+  latestSpcRate: { euroToSdgRate: number; effectiveDate: string } | null = null;
+
+  constructor(
+    private service: ClearanceService,
+    private router: Router,
+    private tablePrefs: TablePreferencesService,
+    private lookups: SettingsLookupService
+  ) {}
 
   ngOnInit(): void {
+    this.loadSpcRate();
+
     this.tablePrefs.get('clearance').subscribe({
       next: (pref) => {
         if (pref) {
@@ -124,6 +141,36 @@ export class ClearanceList implements OnInit {
       next: (r) => { this.allShipments = r; this.loading = false; this.cdr.markForCheck(); },
       error: () => { this.error = 'Could not load shipments.'; this.loading = false; this.cdr.markForCheck(); }
     });
+  }
+
+  private loadSpcRate(): void {
+    this.lookups.getAll<{ id: number; euroToSdgRate: number; effectiveDate: string }>('spc-rates').subscribe({
+      next: (rates) => {
+        // Same "latest by EffectiveDate" rule as every other rate lookup
+        // in this app (e.g. Transfer Pricing's FX-rate resolution) —
+        // sort descending and take the first rather than trusting insertion order.
+        this.latestSpcRate = rates.length
+          ? [...rates].sort((a, b) => (a.effectiveDate < b.effectiveDate ? 1 : -1))[0]
+          : null;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.latestSpcRate = null; this.cdr.markForCheck(); }
+    });
+  }
+
+  // Days between the rate's effective date and today. Used to flag a
+  // rate that looks like it hasn't been refreshed in a while so users
+  // know to double check with admin — not an enforced business rule,
+  // just a 30-day heuristic (adjustable if the actual update cadence
+  // turns out to be different).
+  get spcRateAgeDays(): number {
+    if (!this.latestSpcRate) return 0;
+    const ms = Date.now() - new Date(this.latestSpcRate.effectiveDate).getTime();
+    return Math.floor(ms / (1000 * 60 * 60 * 24));
+  }
+
+  get spcRateIsStale(): boolean {
+    return this.spcRateAgeDays > 30;
   }
 
   onSearchChange(): void {
