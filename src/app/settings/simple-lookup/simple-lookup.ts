@@ -30,6 +30,14 @@ export class SimpleLookup implements OnInit {
   resource = '';
   fields: FieldConfig[] = [];
 
+  // Defaults preserve the original Settings behavior (back to /settings,
+  // Manager/SuperUser can edit) for every route that doesn't override
+  // them. Model/Product (moved under Update Order) is the first route to
+  // pass backRoute/backLabel/editRoles via route `data`.
+  backRoute = '/settings';
+  backLabel = 'Back to Settings';
+  private editRoles: string[] | null = null;
+
   items: LookupEntity[] = [];
   newItem: Record<string, unknown> = {};
   loading = true;
@@ -45,7 +53,12 @@ export class SimpleLookup implements OnInit {
   constructor(private lookups: SettingsLookupService, public auth: AuthService) {}
 
   get canEdit(): boolean {
+    if (this.editRoles) return this.auth.hasAnyRole(this.editRoles);
     return this.auth.hasRole('Manager') || this.auth.hasRole('SuperUser');
+  }
+
+  get editRolesLabel(): string {
+    return (this.editRoles ?? ['Manager', 'SuperUser']).join(' or ');
   }
 
   get editableFields(): FieldConfig[] {
@@ -57,6 +70,9 @@ export class SimpleLookup implements OnInit {
     this.title = data['title'];
     this.resource = data['resource'];
     this.fields = data['fields'];
+    this.backRoute = data['backRoute'] ?? this.backRoute;
+    this.backLabel = data['backLabel'] ?? this.backLabel;
+    this.editRoles = data['editRoles'] ?? null;
     this.resetNewItem();
     this.load();
 
