@@ -158,4 +158,12 @@ export class AuthService {
   canEditLogisticsRevealSettings(): boolean {
     return this.hasAnyRole(['Manager', 'SuperUser']);
   }
+
+  // Model/Product management — moved out of Settings into the end of the
+  // "Update Order" menu, restricted to Manager/IP_Supervisor/SuperUser
+  // (mirrors modelProductsAccessGuard and ModelProductsController's
+  // Create/Update/Delete role set on the backend).
+  canManageModelProducts(): boolean {
+    return this.hasAnyRole(['Manager', 'IP_Supervisor', 'SuperUser']);
+  }
 }
