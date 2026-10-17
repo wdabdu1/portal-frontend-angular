@@ -1,4 +1,4 @@
-<div style="max-width: 950px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+<div style="max-width: 1400px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1 style="font-size: 20px; font-weight: 500;">{{ pageTitle }}</h1>
     <div style="display: flex; gap: 8px;">
@@ -12,6 +12,10 @@
   </div>
   <p style="color: #888; font-size: 12px; margin-top: 8px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column.</p>
 
+  <select [(ngModel)]="buFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 4px; margin-right: 8px;">
+    <option value="">All BUs</option>
+    <option *ngFor="let bu of buOptions" [value]="bu">{{ bu }}</option>
+  </select>
   <input [(ngModel)]="searchTerm" placeholder="Search BL/AWB No. or PO Number" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 240px; margin-top: 4px;" />
   <select [(ngModel)]="statusFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 4px; margin-left: 8px;">
     <option value="Open">Open</option>
@@ -22,7 +26,11 @@
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
 
-  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+  <!-- Scroll wrapper (same pattern as the other list screens): the table can
+       grow as wide as the Status text needs, with a sliding bar to the right
+       when it exceeds the screen; the capped height keeps header rows sticky. -->
+  <div *ngIf="!loading" style="overflow-x: auto; max-height: 70vh; overflow-y: auto; margin-top: 1rem;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
         <th
@@ -44,7 +52,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let s of shipments" (click)="viewDetails(s.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
-        <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [style.white-space]="col.key === 'slaStatus' ? 'nowrap' : null" [ngSwitch]="col.key">
           <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</span>
          <span *ngSwitchCase="'eta'" style="color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'dd/MM/yyyy') : '—' }}</span>
           <span *ngSwitchCase="'createdAt'" style="color: #888; font-size: 12px;">{{ s.createdAt | date: 'dd/MM/yyyy' }}</span>
@@ -86,6 +94,7 @@
       </tr>
     </tbody>
   </table>
+  </div>
 
   <p *ngIf="!loading && shipments.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
     No shipments yet.

@@ -16,7 +16,7 @@ interface ColumnDef {
 }
 
 const DEFAULT_COLUMNS: ColumnDef[] = [
-  { key: 'slaPercent', label: 'SLA Progress' },
+  { key: 'slaPercent', label: 'Progress' },
   { key: 'businessUnit', label: 'BU' },
   { key: 'supplier', label: 'Supplier' },
   { key: 'blAwbNo', label: 'BL/AWB No.' },
@@ -25,7 +25,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'eta', label: 'ETA' },
   { key: 'status', label: 'Status' },
   { key: 'createdAt', label: 'Created' },
-  { key: 'slaStatus', label: 'SLA Status' }
+  { key: 'slaStatus', label: 'Status' }
 ];
 
 @Component({
@@ -166,12 +166,23 @@ export class ShipmentList implements OnInit {
 
   searchTerm = '';
 
+  // Quick Business Unit dropdown, sitting just before the search box.
+  // Empty string = all BUs. Options are the distinct BUs present in the
+  // already-loaded list (which the backend has already scoped to the
+  // user's own BUs), and it combines with the per-column ▼ filters.
+  buFilter = '';
+
+  get buOptions(): string[] {
+    return [...new Set(this.allShipments.map((r) => r.businessUnit).filter((b) => !!b))].sort((a, b) => a.localeCompare(b));
+  }
+
   // Defaults to Open so users land on their actual work queue, same
   // pattern as the Clearance list.
   statusFilter: 'Open' | 'Cleared' | 'All' = 'Open';
 
   get shipments(): ShipmentSummary[] {
     let filtered = applyFilters(this.allShipments, this.filters, (r, col) => this.getValue(r, col));
+    if (this.buFilter) filtered = filtered.filter((r) => r.businessUnit === this.buFilter);
     if (this.statusFilter === 'Open') filtered = filtered.filter((r) => !r.isClearanceCompleted);
     if (this.statusFilter === 'Cleared') filtered = filtered.filter((r) => r.isClearanceCompleted);
     if (this.searchTerm.trim()) {
