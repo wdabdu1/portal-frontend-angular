@@ -20,6 +20,10 @@
       <option value="Confirmed">Confirmed</option>
       <option value="All">All</option>
     </select>
+    <select [(ngModel)]="buFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="">All BUs</option>
+      <option *ngFor="let bu of buOptions" [value]="bu">{{ bu }}</option>
+    </select>
     <input
       [(ngModel)]="searchText"
       (ngModelChange)="onSearchChange()"

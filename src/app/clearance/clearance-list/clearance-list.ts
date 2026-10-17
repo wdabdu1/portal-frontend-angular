@@ -62,6 +62,17 @@ export class ClearanceList implements OnInit {
   // pattern as TP Orders — Confirmed (completed) clearances are still one
   // click away.
   statusFilter: 'Pending' | 'Confirmed' | 'All' = 'Pending';
+
+  // Quick Business Unit dropdown, sitting just before the search box.
+  // Empty string = all BUs. Options are the distinct BUs in the loaded
+  // list (already scoped by the backend to the user's access); it
+  // combines with the per-column ▼ filters and the status dropdown.
+  buFilter = '';
+
+  get buOptions(): string[] {
+    return [...new Set(this.allShipments.map((r) => r.businessUnit).filter((b) => !!b))].sort((a, b) => a.localeCompare(b));
+  }
+
   sortColumn: SortColumn = 'eta';
   sortAsc = true;
 
@@ -203,6 +214,7 @@ export class ClearanceList implements OnInit {
 
   get shipments(): ClearanceShipmentSummary[] {
     let filtered = applyFilters(this.allShipments, this.filters, (r, col) => this.getValue(r, col));
+    if (this.buFilter) filtered = filtered.filter((s) => s.businessUnit === this.buFilter);
     if (this.statusFilter === 'Pending') filtered = filtered.filter((s) => !s.isCompleted);
     if (this.statusFilter === 'Confirmed') filtered = filtered.filter((s) => s.isCompleted);
 
