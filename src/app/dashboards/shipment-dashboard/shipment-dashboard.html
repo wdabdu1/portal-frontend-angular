@@ -43,7 +43,7 @@
       <tbody>
         <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee;">
           <td *ngFor="let col of columns" style="padding: 6px;" [ngSwitch]="col.key">
-            <span *ngSwitchCase="'orderCreationDate'" style="color: #888;">{{ r.orderCreationDate | date: 'MMM d, y' }}</span>
+            <span *ngSwitchCase="'orderCreationDate'" style="color: #888;">{{ r.orderCreationDate | date: 'dd/MM/yyyy' }}</span>
             <span *ngSwitchCase="'currentStatus'">
               <span
                 [style.background]="r.currentStatus === 'Delivered' ? '#e6f4ea' : (r.currentStatus === 'Under Clearance' ? '#fff4e5' : (r.currentStatus === 'In Transit' ? '#eaf1fb' : '#f0f0f0'))"
@@ -58,9 +58,9 @@
             <span *ngSwitchCase="'total'">{{ r.total | number: '1.2-2' }}</span>
             <span *ngSwitchCase="'paidUsd'" style="color: #1e7e34;">{{ r.paidUsd | number: '1.2-2' }}</span>
             <span *ngSwitchCase="'balanceUnpaidUsd'" style="font-weight: 600;">{{ r.balanceUnpaidUsd | number: '1.2-2' }}</span>
-            <span *ngSwitchCase="'eta'" style="color: #888;">{{ r.eta ? (r.eta | date: 'MMM d, y') : '—' }}</span>
-            <span *ngSwitchCase="'etd'" style="color: #888;">{{ r.etd ? (r.etd | date: 'MMM d, y') : '—' }}</span>
-            <span *ngSwitchCase="'clearanceCompletionDate'" style="color: #888;">{{ r.clearanceCompletionDate ? (r.clearanceCompletionDate | date: 'MMM d, y') : '—' }}</span>
+            <span *ngSwitchCase="'eta'" style="color: #888;">{{ r.eta ? (r.eta | date: 'dd/MM/yyyy') : '—' }}</span>
+            <span *ngSwitchCase="'etd'" style="color: #888;">{{ r.etd ? (r.etd | date: 'dd/MM/yyyy') : '—' }}</span>
+            <span *ngSwitchCase="'clearanceCompletionDate'" style="color: #888;">{{ r.clearanceCompletionDate ? (r.clearanceCompletionDate | date: 'dd/MM/yyyy') : '—' }}</span>
             <span *ngSwitchDefault>{{ getValue(r, col.key) }}</span>
           </td>
         </tr>
