@@ -25,14 +25,17 @@ export interface CPricingItemRow {
   isConfirmed: boolean;
 }
 
-// HsCode is intentionally not part of this request — it's entered once on
-// the Update Shipment page and shown read-only here (see CPricingItemRow).
+// hsCode: omitted/undefined = leave the stored value untouched; '' = clear
+// it; otherwise set it. HS Code is captured at New Shipment time, and is
+// (temporarily) also editable from the C Pricing list to clear the backlog
+// of lines created without one.
 export interface SaveCPricingItemRequest {
   cPricingCategoryId: number | null;
   cPricingTypeId: number | null;
   description: string | null;
   currencyId: number | null;
   cp: number | null;
+  hsCode?: string;
 }
 
 export interface CPricingCategory {
