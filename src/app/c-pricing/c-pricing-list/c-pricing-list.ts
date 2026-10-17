@@ -8,9 +8,15 @@ import { TablePreferencesService } from '../../table-preferences/table-preferenc
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { CPricingCategory, CPricingItemRow, CPricingService, CPricingType, SaveCPricingItemRequest } from '../c-pricing.service';
 
+// Temporary: HS Code can be typed/corrected right here (it's normally
+// captured on New Shipment). Set to false to make the column read-only
+// again, and set AllowHsCodeEditFromCPricing = false in CPricingController.cs.
+export const CPRICING_HS_CODE_EDITABLE = true;
+
 interface RowEdit {
   cPricingCategoryId: number | null;
   cPricingTypeId: number | null;
+  hsCode: string;
   description: string;
   currencyId: number | null;
   cp: number | null;
@@ -61,6 +67,7 @@ export class CPricingList implements OnInit {
 
   loading = true;
   error = '';
+  hsCodeEditable = CPRICING_HS_CODE_EDITABLE;
 
   // Defaults to Pending so the C Pricing user lands on their actual work
   // queue — a completed item disappears here and reappears under Confirmed.
@@ -145,6 +152,7 @@ export class CPricingList implements OnInit {
           this.edits[item.shipmentLineItemId] = {
             cPricingCategoryId: item.cPricingCategoryId,
             cPricingTypeId: item.cPricingTypeId,
+            hsCode: item.hsCode ?? '',
             description: item.description ?? '',
             currencyId: item.currencyId,
             cp: item.cp
@@ -243,7 +251,9 @@ export class CPricingList implements OnInit {
       cPricingTypeId: edit.cPricingTypeId,
       description: edit.description || null,
       currencyId: edit.currencyId,
-      cp: edit.cp
+      cp: edit.cp,
+      // Only sent while HS Code is editable here; omitted => backend leaves it alone.
+      ...(this.hsCodeEditable ? { hsCode: (edit.hsCode ?? '').trim() } : {})
     };
 
     this.service.saveItem(row.shipmentLineItemId, req).subscribe({
