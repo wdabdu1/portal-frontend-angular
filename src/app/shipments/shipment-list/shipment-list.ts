@@ -6,6 +6,7 @@ import { ExcelHeaderFilter } from '../../shared/excel-header-filter';
 import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { exportToExcel } from '../../shared/excel-export.util';
+import { AuthService } from '../../auth/auth.service';
 import { ShipmentSummary, ShipmentsService } from '../shipments.service';
 
 type SortColumn = keyof ShipmentSummary;
@@ -67,7 +68,8 @@ export class ShipmentList implements OnInit {
     private shipmentsService: ShipmentsService,
     private router: Router,
     private route: ActivatedRoute,
-    private tablePrefs: TablePreferencesService
+    private tablePrefs: TablePreferencesService,
+    public auth: AuthService
   ) {}
 
   viewDetails(id: number): void {
