@@ -1,0 +1,102 @@
+<div style="max-width: 1400px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="font-size: 20px; font-weight: 500;">{{ pageTitle }}</h1>
+    <div style="display: flex; gap: 8px;">
+      <button (click)="onExportClick()" style="padding: 8px 16px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        Export to Excel
+      </button>
+      <a *ngIf="auth.canCreateOrders()" routerLink="/shipments/new" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px;">
+        + New Shipment
+      </a>
+    </div>
+  </div>
+  <p style="color: #888; font-size: 12px; margin-top: 8px;">Drag a column header to reorder it. Click the ▼ arrow to filter that column.</p>
+
+  <select [(ngModel)]="buFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 4px; margin-right: 8px;">
+    <option value="">All BUs</option>
+    <option *ngFor="let bu of buOptions" [value]="bu">{{ bu }}</option>
+  </select>
+  <input [(ngModel)]="searchTerm" placeholder="Search BL/AWB No. or PO Number" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 240px; margin-top: 4px;" />
+  <select [(ngModel)]="statusFilter" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 4px; margin-left: 8px;">
+    <option value="Open">Open</option>
+    <option value="Cleared">Cleared</option>
+    <option value="All">All</option>
+  </select>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <!-- Scroll wrapper (same pattern as the other list screens): the table can
+       grow as wide as the Status text needs, with a sliding bar to the right
+       when it exceeds the screen; the capped height keeps header rows sticky. -->
+  <div *ngIf="!loading" style="overflow-x: auto; max-height: 70vh; overflow-y: auto; margin-top: 1rem;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+        <th
+          *ngFor="let col of columns; let i = index"
+          draggable="true"
+          (dragstart)="onDragStart(i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(i)"
+          [style.background]="isColumnFiltered(col.key) ? '#e8f0f8' : '#fff'"
+          style="padding: 8px 6px; cursor: grab; user-select: none; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd;"
+        >
+          <span (click)="sortBy(col.key)" style="cursor: pointer;">{{ col.label }}</span>
+          <span (mousedown)="$event.stopPropagation()">
+            <app-excel-header-filter [options]="optionsFor(col.key)" [selected]="filters[col.key]" (selectedChange)="onFilterChange(col.key, $event)" />
+          </span>
+        </th>
+        <th style="padding: 8px 6px; position: sticky; top: 0; z-index: 2; background: #fff; box-shadow: 0 1px 0 #ddd;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of shipments" (click)="viewDetails(s.id)" style="border-bottom: 1px solid #eee; cursor: pointer;">
+        <td *ngFor="let col of columns" style="padding: 8px 6px;" [style.white-space]="col.key === 'slaStatus' ? 'nowrap' : null" [ngSwitch]="col.key">
+          <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace; color: #0a3d62;">{{ s.blAwbNo }}</span>
+         <span *ngSwitchCase="'eta'" style="color: #888; font-size: 12px;">{{ s.eta ? (s.eta | date: 'dd/MM/yyyy') : '—' }}</span>
+          <span *ngSwitchCase="'createdAt'" style="color: #888; font-size: 12px;">{{ s.createdAt | date: 'dd/MM/yyyy' }}</span>
+          <div *ngSwitchCase="'slaPercent'">
+            <span *ngIf="s.slaStatus === '—'" style="color: #ccc; font-size: 12px;">—</span>
+            <div *ngIf="s.slaStatus !== '—'" style="display:flex; align-items:center; gap:6px;">
+              <div style="width:50px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
+                <div [style.width.%]="s.slaPercent > 100 ? 100 : s.slaPercent" [style.background]="s.slaLight === 'Red' ? '#c0392b' : (s.slaLight === 'Amber' ? '#c98a00' : '#1e7e34')" style="height:100%;"></div>
+              </div>
+              <span style="font-size:12px; color:#666;">{{ s.slaPercent | number: '1.0-0' }}%</span>
+            </div>
+          </div>
+          <span *ngSwitchCase="'status'">
+            <span
+              [style.background]="s.status === 'Confirmed' ? '#e6f4ea' : '#fff4e5'"
+              [style.color]="s.status === 'Confirmed' ? '#1e7e34' : '#a66a00'"
+              style="padding: 2px 8px; border-radius: 4px; font-size: 12px;"
+            >
+              {{ s.status }}
+            </span>
+          </span>
+          <span *ngSwitchCase="'slaStatus'">
+            <span *ngIf="s.slaStatus === '—'" style="color: #ccc;">—</span>
+            <span *ngIf="s.slaStatus !== '—'" style="display: inline-flex; align-items: center; gap: 5px; font-size: 12px;">
+              <span
+                [style.background]="s.slaLight === 'Red' ? '#c0392b' : (s.slaLight === 'Amber' ? '#c98a00' : '#2a7d2a')"
+                style="display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink: 0;"
+              ></span>
+              <span style="color: #444;">{{ s.slaStatus }}</span>
+            </span>
+          </span>
+          <span *ngSwitchDefault>{{ s[col.key] }}</span>
+        </td>
+        <td style="padding: 8px 6px;" (click)="$event.stopPropagation()">
+          <a [routerLink]="['/shipments', s.id]" style="padding: 4px 10px; font-size: 12px; background: #eee; color: #333; border-radius: 4px; text-decoration: none;">
+            {{ actionLabel }}
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p *ngIf="!loading && shipments.length === 0" style="color: #888; font-size: 13px; margin-top: 1rem;">
+    No shipments yet.
+  </p>
+</div>
