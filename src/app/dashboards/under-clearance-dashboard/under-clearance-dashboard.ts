@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { exportToExcel } from '../../shared/excel-export.util';
@@ -86,7 +86,14 @@ export class UnderClearanceDashboard implements OnInit {
     return ordered;
   }
 
+  private static readonly DATE_COLUMNS = new Set(['eta', 'clearanceCompletionDate']);
+
+  private fmtDate(v: string | null | undefined): string {
+    return v ? formatDate(v, 'dd/MM/yyyy', 'en-US') : '';
+  }
+
   getValue(row: any, col: string): string {
+    if (UnderClearanceDashboard.DATE_COLUMNS.has(col)) return this.fmtDate(row[col]);
     return String(row[col] ?? '');
   }
 
@@ -104,7 +111,12 @@ export class UnderClearanceDashboard implements OnInit {
 
   optionsFor(col: string): string[] {
     if (!this.filters[col]) this.filters[col] = new Set();
-    return columnOptions(this.allRows, this.filters, col, (r, c) => this.getValue(r, c));
+    const options = columnOptions(this.allRows, this.filters, col, (r, c) => this.getValue(r, c));
+    if (!UnderClearanceDashboard.DATE_COLUMNS.has(col)) return options;
+    // columnOptions sorts alphabetically, which for dd/MM/yyyy would order
+    // by day first — re-sort dates chronologically (yyyy, MM, dd).
+    const chrono = (s: string) => (s ? s.split('/').reverse().join('') : '');
+    return [...options].sort((a, b) => chrono(a).localeCompare(chrono(b)));
   }
   onFilterChange(col: string, values: Set<string>): void { this.filters[col] = values; this.cdr.markForCheck(); }
   isColumnFiltered(col: string): boolean {
@@ -144,6 +156,12 @@ export class UnderClearanceDashboard implements OnInit {
   }
 
   onExportClick(): void {
-    exportToExcel('Under Clearance Dashboard', this.columns, this.rows);
+    // Dates exported as DD/MM/YYYY text, matching what's on screen.
+    const rows = this.rows.map((r) => {
+      const copy: any = { ...r };
+      for (const c of UnderClearanceDashboard.DATE_COLUMNS) copy[c] = this.fmtDate(copy[c]);
+      return copy;
+    });
+    exportToExcel('Under Clearance Dashboard', this.columns, rows);
   }
 }
