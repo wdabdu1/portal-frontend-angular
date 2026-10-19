@@ -43,7 +43,7 @@ const MENU_GROUPS: MenuGroup[] = [
     label: 'New Entry',
     items: [
       { label: 'New Supplier Order', route: '/orders/new', canAccess: (a) => a.canCreateOrders() },
-      { label: 'New Shipment', route: '/shipments/new', canAccess: (a) => a.canSeeShipments() }
+      { label: 'New Shipment', route: '/shipments/new', canAccess: (a) => a.canCreateOrders() }
     ]
   },
   {

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { cPricingLockGuard } from './auth/c-pricing-lock.guard';
 import { logisticsLockGuard } from './auth/logistics-lock.guard';
+import { createAccessGuard } from './auth/create-access.guard';
 import { logisticsBoxGuard } from './auth/logistics-box.guard';
 import { modelProductsAccessGuard } from './auth/model-products-access.guard';
 import { LogisticsVisibility } from './settings/logistics-visibility/logistics-visibility';
@@ -403,7 +404,7 @@ export const routes: Routes = [
   },
 
   { path: 'orders', component: OrderList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  { path: 'orders/new', component: NewSupplierOrder, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  { path: 'orders/new', component: NewSupplierOrder, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard, createAccessGuard] },
   // Model/Product management — moved out of Settings and into Update
   // Order (end of that menu group) per request, with access narrowed to
   // Manager/IP_Supervisor/SuperUser via modelProductsAccessGuard (instead
@@ -429,7 +430,7 @@ export const routes: Routes = [
     data: { detailSegment: 'update' } },
   { path: 'additional', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
     data: { pageTitle: 'Additional', detailSegment: 'additional' } },
-  { path: 'shipments/new', component: NewShipment, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  { path: 'shipments/new', component: NewShipment, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard, createAccessGuard] },
   { path: 'shipments/:id/update', component: UpdateShipment, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'shipments/:id/additional', component: ShipmentAdditional, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'shipments/:id', component: ShipmentDetails, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
