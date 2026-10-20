@@ -1,0 +1,70 @@
+<div style="max-width: 750px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a [routerLink]="['/shipments', shipmentId]" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Shipment</a>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 12px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
+
+  <div *ngIf="!loading && data">
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Edit Shipment {{ data.blAwbNo }}</h1>
+    <p style="color: #888; font-size: 13px;">{{ data.businessUnit }} — PO {{ data.poNumber }} — Status: {{ data.status }}</p>
+
+    <p style="background: #fff8e1; border: 1px solid #f0e0a0; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #7a5c00;">
+      Corrections are recorded in the Change History below (who, when, old &rarr; new). BL/AWB number, the PO link, quantities and values
+      can't be changed here, and the Ship-on-Board date is still edited from Update Shipment. Changing container counts doesn't recalculate
+      anything already saved elsewhere (e.g. a clearance cost estimate that was already created).
+    </p>
+
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">Shipment Details</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+        <label>Shipping Line
+          <select [(ngModel)]="form.shippingLineId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let l of shippingLines" [ngValue]="l.id">{{ l['name'] }}</option>
+          </select>
+        </label>
+        <label>Vessel Name
+          <input [(ngModel)]="form.vesselName" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>BL/AWB Date
+          <input type="date" [(ngModel)]="form.blAwbDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>BL Free Days
+          <input type="number" min="0" [(ngModel)]="form.blFreeDays" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>ETD
+          <input type="date" [(ngModel)]="form.etd" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>ETA
+          <input type="date" [(ngModel)]="form.eta" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>FCL 20' Count
+          <input type="number" min="0" [(ngModel)]="form.fcl20Count" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>FCL 40' Count
+          <input type="number" min="0" [(ngModel)]="form.fcl40Count" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label style="display: flex; align-items: center; gap: 6px;">
+          <input type="checkbox" [(ngModel)]="form.soc" /> SOC (shipper-owned containers)
+        </label>
+      </div>
+    </div>
+
+    <div *ngIf="data.lineItems.length > 0" style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">HS Codes</h3>
+      <div *ngFor="let li of data.lineItems" style="display: flex; align-items: center; gap: 12px; padding: 4px 0; font-size: 13px;">
+        <span style="flex: 1;">{{ li.modelProduct }}</span>
+        <input [(ngModel)]="hsCodes[li.lineItemId]" placeholder="HS Code" style="width: 160px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;" />
+      </div>
+    </div>
+
+    <div style="margin-top: 1rem; display: flex; align-items: center; gap: 12px;">
+      <button (click)="save()" [disabled]="saving" style="padding: 8px 18px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <span *ngIf="message" style="color: #1e7e34; font-size: 13px;">{{ message }}</span>
+      <span *ngIf="saveError" style="color: #c0392b; font-size: 13px;">{{ saveError }}</span>
+    </div>
+
+    <app-change-history [entityType]="'shipments'" [entityId]="shipmentId" [refreshKey]="historyKey" />
+  </div>
+</div>
