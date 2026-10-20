@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 import { OrderDetailsService, PurchaseOrderDetail } from './order-details.service';
 
 @Component({
@@ -26,7 +27,7 @@ export class OrderDetails implements OnInit {
   savingAdvance = false;
   advanceError = '';
 
-  constructor(private service: OrderDetailsService) {}
+  constructor(private service: OrderDetailsService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.orderId = Number(this.route.snapshot.paramMap.get('id'));

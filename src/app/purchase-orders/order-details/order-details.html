@@ -5,7 +5,12 @@
   <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
 
   <div *ngIf="!loading && order">
-    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Order {{ order.poNumber }}</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Order {{ order.poNumber }}</h1>
+      <a *ngIf="auth.canCorrectRecords()" [routerLink]="['/orders', order.id, 'edit']" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px; white-space: nowrap;">
+        Edit Details
+      </a>
+    </div>
     <p style="color: #888; font-size: 13px;">{{ order.businessUnit }}<span *ngIf="order.division"> — {{ order.division }}</span> — Status: {{ order.status }} — Created {{ order.createdAt | date: 'MMM d, y' }}</p>
 
     <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 16px;">
