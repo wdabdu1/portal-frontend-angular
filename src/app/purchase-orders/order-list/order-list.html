@@ -18,7 +18,9 @@
   <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 1rem;">Loading...</p>
   <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
 
-  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 1rem;">
+  <p *ngIf="!loading" style="color: #aaa; font-size: 11px; font-weight: 300; margin: 10px 0 0; text-align: right;">Showing {{ orders.length }} of {{ allOrders.length }} lines</p>
+
+  <table *ngIf="!loading" style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 2px;">
     <thead>
       <tr style="text-align: left; border-bottom: 1px solid #ddd;">
         <th
