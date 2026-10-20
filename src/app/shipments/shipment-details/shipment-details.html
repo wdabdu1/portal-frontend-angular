@@ -21,6 +21,9 @@
       <a *ngIf="auth.hasRole('CorpFinance') || auth.hasRole('Manager') || auth.hasRole('SuperUser')" [routerLink]="['/transfer-pricing', shipmentId]" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; white-space: nowrap; margin-right: 8px;">
         P Simulator
       </a>
+      <a *ngIf="auth.canCorrectRecords()" [routerLink]="['/shipments', shipmentId, 'edit']" style="padding: 8px 16px; background: #eee; color: #333; border-radius: 4px; text-decoration: none; font-size: 13px; white-space: nowrap; margin-right: 8px;">
+        Edit Details
+      </a>
       <a [routerLink]="['/shipments', shipmentId, 'update']" style="padding: 8px 16px; background: #0a3d62; color: white; border-radius: 4px; text-decoration: none; font-size: 13px; white-space: nowrap;">
         Update
       </a>
