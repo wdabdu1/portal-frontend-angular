@@ -1,0 +1,107 @@
+<div style="max-width: 750px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <a [routerLink]="['/orders', orderId]" style="font-size: 13px; color: #0a3d62; text-decoration: none;">&larr; Back to Order</a>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin-top: 12px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin-top: 12px;">{{ error }}</p>
+
+  <div *ngIf="!loading && data">
+    <h1 style="font-size: 20px; font-weight: 500; margin-top: 8px;">Edit Order {{ data.poNumber }}</h1>
+    <p style="color: #888; font-size: 13px;">{{ data.businessUnit }} — Status: {{ data.status }}</p>
+
+    <p style="background: #fff8e1; border: 1px solid #f0e0a0; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #7a5c00;">
+      Corrections are recorded in the Change History below (who, when, old &rarr; new). Supplier, BU, Division, Consignee, PO number, status,
+      line items (quantities, prices, currency) and the offshore chain can't be changed here.
+    </p>
+
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">Order Details</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+        <label>Origin Country
+          <select [(ngModel)]="form.originCountryId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let o of originCountries" [ngValue]="o.id">{{ o['name'] }}</option>
+          </select>
+        </label>
+        <label>Incoterm
+          <select [(ngModel)]="form.incotermId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let i of incoterms" [ngValue]="i.id">{{ i['name'] }}</option>
+          </select>
+        </label>
+        <label>Shipment Mode
+          <select [(ngModel)]="form.shipmentModeId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let m of shipmentModes" [ngValue]="m.id">{{ m['name'] }}</option>
+          </select>
+        </label>
+        <label>Payment Term
+          <select [(ngModel)]="form.supplierPaymentTermId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let p of paymentTerms" [ngValue]="p.id">{{ p['name'] }}</option>
+          </select>
+        </label>
+        <label>Approval Type
+          <select [(ngModel)]="form.approvalTypeId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let a of approvalTypes" [ngValue]="a.id">{{ a['name'] }}</option>
+          </select>
+        </label>
+        <label>Brand/Manufacturer
+          <select [(ngModel)]="form.brandManufacturerId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let b of brands" [ngValue]="b.id">{{ b['name'] }}</option>
+          </select>
+        </label>
+        <label>Port of Loading
+          <select [(ngModel)]="form.portOfLoadingId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option [ngValue]="null">-- none --</option>
+            <option *ngFor="let p of ports" [ngValue]="p.id">{{ p['name'] }}</option>
+          </select>
+        </label>
+        <label>Port of Discharge
+          <select [(ngModel)]="form.portOfDischargeId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
+            <option [ngValue]="null">-- none --</option>
+            <option *ngFor="let p of ports" [ngValue]="p.id">{{ p['name'] }}</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1rem; padding: 16px;">
+      <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">References &amp; Dates</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+        <label>Offshore PO No.
+          <input [(ngModel)]="form.offshorePoNo" maxlength="60" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Offshore PO Date
+          <input type="date" [(ngModel)]="form.offshorePoDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Supplier PI No.
+          <input [(ngModel)]="form.supplierPiNo" maxlength="60" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Supplier PI Date
+          <input type="date" [(ngModel)]="form.supplierPiDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Received Signed PI Date
+          <input type="date" [(ngModel)]="form.receivedSignedPiDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Sent Signed PI Date
+          <input type="date" [(ngModel)]="form.sentSignedPiDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>BU PO Date
+          <input type="date" [(ngModel)]="form.buPoDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Order Execution Date
+          <input type="date" [(ngModel)]="form.orderExecutionDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Latest Shipping Date
+          <input type="date" [(ngModel)]="form.latestShippingDate" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+      </div>
+    </div>
+
+    <div style="margin-top: 1rem; display: flex; align-items: center; gap: 12px;">
+      <button (click)="save()" [disabled]="saving" style="padding: 8px 18px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <span *ngIf="message" style="color: #1e7e34; font-size: 13px;">{{ message }}</span>
+      <span *ngIf="saveError" style="color: #c0392b; font-size: 13px;">{{ saveError }}</span>
+    </div>
+
+    <app-change-history [entityType]="'orders'" [entityId]="orderId" [refreshKey]="historyKey" />
+  </div>
+</div>
