@@ -103,6 +103,12 @@ export class AuthService {
     return this.hasAnyRole(['IP_User', 'IP_Supervisor', 'Treasury', 'CorpFinance', 'SuperUser']);
   }
 
+  // Correcting descriptive fields on an existing PO / Shipment — mirrors
+  // backend AppRoles.RecordCorrectors exactly.
+  canCorrectRecords(): boolean {
+    return this.hasAnyRole(['Manager', 'SuperUser']);
+  }
+
   canSeeSettings(): boolean {
     return this.hasAnyRole(['Manager', 'SuperUser']);
   }
