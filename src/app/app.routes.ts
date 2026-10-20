@@ -3,6 +3,9 @@ import { authGuard } from './auth/auth.guard';
 import { cPricingLockGuard } from './auth/c-pricing-lock.guard';
 import { logisticsLockGuard } from './auth/logistics-lock.guard';
 import { createAccessGuard } from './auth/create-access.guard';
+import { recordCorrectorGuard } from './auth/record-corrector.guard';
+import { EditOrder } from './corrections/edit-order/edit-order';
+import { EditShipment } from './corrections/edit-shipment/edit-shipment';
 import { logisticsBoxGuard } from './auth/logistics-box.guard';
 import { modelProductsAccessGuard } from './auth/model-products-access.guard';
 import { LogisticsVisibility } from './settings/logistics-visibility/logistics-visibility';
@@ -425,6 +428,7 @@ export const routes: Routes = [
       editRoles: ['Manager', 'IP_Supervisor', 'SuperUser']
     }
   },
+  { path: 'orders/:id/edit', component: EditOrder, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard, recordCorrectorGuard] },
   { path: 'orders/:id', component: OrderDetails, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'shipments', component: ShipmentList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
     data: { detailSegment: 'update' } },
@@ -433,6 +437,7 @@ export const routes: Routes = [
   { path: 'shipments/new', component: NewShipment, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard, createAccessGuard] },
   { path: 'shipments/:id/update', component: UpdateShipment, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'shipments/:id/additional', component: ShipmentAdditional, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
+  { path: 'shipments/:id/edit', component: EditShipment, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard, recordCorrectorGuard] },
   { path: 'shipments/:id', component: ShipmentDetails, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
 
   // C Pricing — these three are deliberately NOT given cPricingLockGuard
