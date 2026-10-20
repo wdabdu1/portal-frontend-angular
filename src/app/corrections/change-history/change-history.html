@@ -1,0 +1,29 @@
+<div style="border: 1px solid #ddd; border-radius: 6px; margin-top: 1.5rem; padding: 16px;">
+  <h3 style="font-size: 14px; margin: 0 0 10px; color: #333;">Change History</h3>
+  <p *ngIf="loading" style="color: #888; font-size: 13px; margin: 0;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin: 0;">{{ error }}</p>
+  <p *ngIf="!loading && !error && rows.length === 0" style="color: #888; font-size: 13px; margin: 0;">No corrections have been made to this record yet.</p>
+
+  <div *ngIf="!loading && rows.length > 0" style="overflow-x: auto; max-height: 360px; overflow-y: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #666;">
+          <th style="padding: 6px; white-space: nowrap;">When</th>
+          <th style="padding: 6px;">By</th>
+          <th style="padding: 6px;">Field</th>
+          <th style="padding: 6px;">Old value</th>
+          <th style="padding: 6px;">New value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rows" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 6px; white-space: nowrap; color: #888;">{{ when(r.changedAt) | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td style="padding: 6px;">{{ r.changedByName }}</td>
+          <td style="padding: 6px;">{{ r.fieldName }}</td>
+          <td style="padding: 6px; color: #a33;">{{ show(r.oldValue) }}</td>
+          <td style="padding: 6px; color: #1e7e34;">{{ show(r.newValue) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
