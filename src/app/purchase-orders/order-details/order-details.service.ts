@@ -37,9 +37,47 @@ export interface PurchaseOrderDetail {
   totalOrderValueUsd: number | null;
   lineItems: PoLineItemDetail[];
   offshorePartners: PoOffshorePartnerDetail[];
-  advancePaymentPercent: number | null;
-  advancePaymentPlannedDate: string | null;
-  advancePaymentExecutedDate: string | null;
+  // Legacy single-advance fields — superseded by PO payments (see PoPaymentsSummary).
+  advancePaymentPercent?: number | null;
+  advancePaymentPlannedDate?: string | null;
+  advancePaymentExecutedDate?: string | null;
+}
+
+export interface PoPaymentItem {
+  id: number;
+  description: string;
+  amount: number;
+  currencyId: number;
+  currencyCode: string;
+  amountUsd: number;
+  percent: number;
+  plannedDate: string | null;
+  executedDate: string | null;
+  note: string | null;
+}
+
+export interface PoPaymentsSummary {
+  defaultCurrencyId: number;
+  defaultCurrencyCode: string;
+  isMixedCurrency: boolean;
+  poTotalNative: number;
+  poTotalUsd: number;
+  totalPercent: number;
+  executedPercent: number;
+  remainingPercent: number;
+  totalAmountInPoCurrency: number;
+  executedAmountInPoCurrency: number;
+  remainingAmountInPoCurrency: number;
+  items: PoPaymentItem[];
+}
+
+export interface PoPaymentRequest {
+  description: string | null;
+  amount: number;
+  currencyId: number;
+  plannedDate: string | null;
+  executedDate: string | null;
+  note: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -50,7 +88,19 @@ export class OrderDetailsService {
     return this.http.get<PurchaseOrderDetail>(`${API_URL}/orders/${id}/details`);
   }
 
-  saveAdvancePayment(id: number, req: { advancePaymentPercent: number | null; advancePaymentPlannedDate: string | null; advancePaymentExecutedDate: string | null }) {
-    return this.http.put(`${API_URL}/purchase-orders/${id}/advance-payment`, req);
+  getPayments(id: number) {
+    return this.http.get<PoPaymentsSummary>(`${API_URL}/purchase-orders/${id}/payments`);
+  }
+
+  addPayment(id: number, req: PoPaymentRequest) {
+    return this.http.post<PoPaymentsSummary>(`${API_URL}/purchase-orders/${id}/payments`, req);
+  }
+
+  updatePayment(id: number, paymentId: number, req: PoPaymentRequest) {
+    return this.http.put<PoPaymentsSummary>(`${API_URL}/purchase-orders/${id}/payments/${paymentId}`, req);
+  }
+
+  deletePayment(id: number, paymentId: number) {
+    return this.http.delete<PoPaymentsSummary>(`${API_URL}/purchase-orders/${id}/payments/${paymentId}`);
   }
 }

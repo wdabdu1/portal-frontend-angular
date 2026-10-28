@@ -31,46 +31,105 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h4 style="font-size: 13px; margin: 0; color: #333;">Advance Payment</h4>
-          <button *ngIf="!editingAdvance" (click)="startEditAdvance()" style="padding: 4px 10px; font-size: 12px; background: transparent; color: #0a3d62; border: 1px solid #0a3d62; border-radius: 4px; cursor: pointer;">
-            {{ order.advancePaymentPercent !== null ? 'Edit' : 'Set up' }}
+          <h4 style="font-size: 13px; margin: 0; color: #333;">Payments to Supplier (whole order)</h4>
+          <button *ngIf="canEditPayments && !formOpen && payments" (click)="startAdd()" style="padding: 4px 10px; font-size: 12px; background: transparent; color: #0a3d62; border: 1px solid #0a3d62; border-radius: 4px; cursor: pointer;">
+            + Add payment
           </button>
         </div>
+        <p style="font-size: 11px; color: #888; margin: 6px 0 0;">
+          Enter each payment by value; the % of the order is calculated. Every payment is added to each shipment's own Payment Due Schedule, pro rata to that shipment's share of the order.
+        </p>
 
-        <div *ngIf="!editingAdvance" style="font-size: 13px; margin-top: 8px;">
-          <span *ngIf="order.advancePaymentPercent === null" style="color: #888;">No advance configured on this order.</span>
-          <ng-container *ngIf="order.advancePaymentPercent !== null">
-            <span style="color: #888;">Advance:</span> <strong>{{ order.advancePaymentPercent }}%</strong>
-            <span style="margin-left: 12px; color: #888;">Planned:</span> {{ order.advancePaymentPlannedDate ? (order.advancePaymentPlannedDate | date: 'MMM d, y') : '—' }}
-            <span style="margin-left: 12px; color: #888;">Actual:</span>
-            <strong [style.color]="order.advancePaymentExecutedDate ? '#1e7e34' : '#c0392b'">
-              {{ order.advancePaymentExecutedDate ? (order.advancePaymentExecutedDate | date: 'MMM d, y') : 'Not yet executed' }}
-            </strong>
-          </ng-container>
-        </div>
+        <ng-container *ngIf="payments">
+          <div style="font-size: 12px; margin-top: 8px; background:#f7f7f7; padding:8px; border-radius:4px; display:flex; flex-wrap:wrap; gap:6px 18px;">
+            <span><span style="color:#888;">Order value:</span> <strong>{{ poTotalDisplay | number: '1.2-2' }} {{ poCurrencyLabel }}</strong></span>
+            <span><span style="color:#888;">Committed:</span> <strong>{{ payments.totalAmountInPoCurrency | number: '1.2-2' }} {{ poCurrencyLabel }}</strong> ({{ payments.totalPercent | number: '1.0-4' }}%)</span>
+            <span><span style="color:#888;">Paid (executed):</span> <strong style="color:#1e7e34;">{{ payments.executedAmountInPoCurrency | number: '1.2-2' }} {{ poCurrencyLabel }}</strong> ({{ payments.executedPercent | number: '1.0-4' }}%)</span>
+            <span><span style="color:#888;">Not yet covered:</span> <strong>{{ payments.remainingAmountInPoCurrency | number: '1.2-2' }} {{ poCurrencyLabel }}</strong> ({{ payments.remainingPercent | number: '1.0-4' }}%)</span>
+          </div>
+          <p *ngIf="payments.isMixedCurrency" style="font-size: 11px; color: #888; margin: 4px 0 0;">This order has lines in more than one currency, so totals are shown in USD.</p>
 
-        <div *ngIf="editingAdvance" style="margin-top: 8px;">
-          <p style="font-size: 11px; color: #888; margin: 0 0 8px;">
-            Auto-inserted into every shipment's own Payment Due Schedule, prorated by that shipment's invoice value. Recording the actual execution date here updates every shipment that's still showing it as planned.
-          </p>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+          <p *ngIf="payments.items.length === 0" style="font-size: 13px; color: #888; margin: 10px 0 0;">No payments recorded on this order.</p>
+
+          <table *ngIf="payments.items.length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 1px solid #ddd; color:#555;">
+                <th style="padding: 5px;">Payment</th>
+                <th style="padding: 5px; text-align:right;">Amount</th>
+                <th style="padding: 5px; text-align:right;">% of order</th>
+                <th style="padding: 5px;">Planned</th>
+                <th style="padding: 5px;">Actual</th>
+                <th style="padding: 5px;" *ngIf="canEditPayments"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of payments.items" style="border-bottom: 1px solid #eee; vertical-align: top;">
+                <td style="padding: 5px;">
+                  {{ p.description }}
+                  <div *ngIf="p.note" style="font-size: 11px; color:#888;">{{ p.note }}</div>
+                </td>
+                <td style="padding: 5px; text-align:right; white-space:nowrap;">
+                  <strong>{{ p.amount | number: '1.2-2' }} {{ p.currencyCode }}</strong>
+                  <div *ngIf="p.currencyCode !== 'USD'" style="font-size: 11px; color:#888;">≈ {{ p.amountUsd | number: '1.2-2' }} USD</div>
+                </td>
+                <td style="padding: 5px; text-align:right;">{{ p.percent | number: '1.0-4' }}%</td>
+                <td style="padding: 5px; white-space:nowrap;">{{ p.plannedDate ? (p.plannedDate | date: 'dd/MM/yyyy') : '—' }}</td>
+                <td style="padding: 5px; white-space:nowrap;">
+                  <strong [style.color]="p.executedDate ? '#1e7e34' : '#c0392b'">{{ p.executedDate ? (p.executedDate | date: 'dd/MM/yyyy') : 'Not yet executed' }}</strong>
+                </td>
+                <td style="padding: 5px; white-space:nowrap; text-align:right;" *ngIf="canEditPayments">
+                  <button (click)="startEdit(p)" style="padding: 2px 8px; font-size: 12px; background: transparent; color: #0a3d62; border: 1px solid #0a3d62; border-radius: 4px; cursor: pointer;">Edit</button>
+                  <button (click)="remove(p)" style="margin-left:4px; padding: 2px 8px; font-size: 12px; background: transparent; color: #c0392b; border: 1px solid #c0392b; border-radius: 4px; cursor: pointer;">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
+
+        <p *ngIf="payError && !formOpen" style="color: #c0392b; font-size: 12px; margin-top: 8px;">{{ payError }}</p>
+
+        <div *ngIf="formOpen" style="margin-top: 12px; padding: 12px; border: 1px solid #cfd8e3; border-radius: 6px; background:#fbfcfe;">
+          <div style="font-size: 12px; font-weight: 600; color:#333; margin-bottom: 8px;">{{ editingPaymentId === null ? 'New payment' : 'Edit payment' }}</div>
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr 0.8fr; gap: 10px;">
             <div>
-              <label style="display:block; font-size:12px; color:#555;">Advance %</label>
-              <input type="number" step="0.01" [(ngModel)]="advanceForm.advancePaymentPercent" style="width:100%; padding:6px; box-sizing:border-box;" />
+              <label style="display:block; font-size:12px; color:#555;">Description</label>
+              <input type="text" name="payDescription" [(ngModel)]="form.description" maxlength="60" placeholder="e.g. Advance, Pre-dispatch balance" style="width:100%; padding:6px; box-sizing:border-box;" />
             </div>
             <div>
+              <label style="display:block; font-size:12px; color:#555;">Amount *</label>
+              <input type="text" appThousands name="payAmount" [(ngModel)]="form.amount" inputmode="decimal" style="width:100%; padding:6px; box-sizing:border-box; text-align:right;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; color:#555;">Currency *</label>
+              <select name="payCurrency" [(ngModel)]="form.currencyId" style="width:100%; padding:6px; box-sizing:border-box;">
+                <option [ngValue]="0" disabled>Select...</option>
+                <option *ngFor="let c of currencies" [ngValue]="c['id']">{{ c['code'] }}</option>
+              </select>
+            </div>
+          </div>
+          <p style="font-size: 12px; margin: 6px 0 0; color:#0a3d62;">
+            Amount entered in <strong>{{ formCurrencyCode || '—' }}</strong>
+            <ng-container *ngIf="previewPercent !== null"> = <strong>{{ previewPercent | number: '1.0-4' }}%</strong> of the order<span *ngIf="previewTotalPercent !== null"> (all payments: {{ previewTotalPercent | number: '1.0-4' }}%)</span></ng-container>
+            <ng-container *ngIf="previewPercent === null && form.amount && formCurrencyCode"> — the % is calculated on save at the current exchange rate</ng-container>
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <div>
               <label style="display:block; font-size:12px; color:#555;">Planned Date</label>
-              <input type="date" [(ngModel)]="advanceForm.advancePaymentPlannedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+              <input type="date" name="payPlanned" [(ngModel)]="form.plannedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
             </div>
             <div>
               <label style="display:block; font-size:12px; color:#555;">Actual Execution Date</label>
-              <input type="date" [(ngModel)]="advanceForm.advancePaymentExecutedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
+              <input type="date" name="payExecuted" [(ngModel)]="form.executedDate" style="width:100%; padding:6px; box-sizing:border-box;" />
             </div>
           </div>
-          <p *ngIf="advanceError" style="color: #c0392b; font-size: 12px; margin-top: 8px;">{{ advanceError }}</p>
+          <div style="margin-top: 10px;">
+            <label style="display:block; font-size:12px; color:#555;">Note (optional)</label>
+            <input type="text" name="payNote" [(ngModel)]="form.note" maxlength="255" style="width:100%; padding:6px; box-sizing:border-box;" />
+          </div>
+          <p *ngIf="payError" style="color: #c0392b; font-size: 12px; margin-top: 8px;">{{ payError }}</p>
           <div style="margin-top:12px; display:flex; gap:8px;">
-            <button (click)="cancelEditAdvance()" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Cancel</button>
-            <button (click)="saveAdvance()" [disabled]="savingAdvance" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingAdvance ? 'Saving...' : 'Save' }}</button>
+            <button (click)="cancelForm()" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Cancel</button>
+            <button (click)="save()" [disabled]="saving" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ saving ? 'Saving...' : 'Save' }}</button>
           </div>
         </div>
       </div>
