@@ -23,7 +23,7 @@
         </label>
         <label>Incoterm
           <select [(ngModel)]="form.incotermId" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px;">
-            <option *ngFor="let i of incoterms" [ngValue]="i.id">{{ i['name'] }}</option>
+            <option *ngFor="let i of incoterms" [ngValue]="i.id">{{ i['code'] ? i['code'] + ' (' + i['name'] + ')' : i['name'] }}</option>
           </select>
         </label>
         <label>Shipment Mode
