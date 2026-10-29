@@ -34,7 +34,15 @@ export class NewShipment implements OnInit {
   invalidFields = new Set<string>();
   success = '';
 
+  // Open purchase orders only: confirmed AND still carrying at least one
+  // line with quantity left to ship (openCategories is the comma-joined list
+  // of those open lines' categories, so blank means nothing left to ship).
   confirmedOrders: ConfirmedOrderOption[] = [];
+
+  // Typeahead for the primary PO: the user types a few letters of the PO
+  // number, supplier or category and the list below narrows to matching POs.
+  poSearch = '';
+  poListOpen = false;
   shippingLines: LookupEntity[] = [];
   lineItems: LineItemSelection[] = [];
 
@@ -63,7 +71,7 @@ export class NewShipment implements OnInit {
   ngOnInit(): void {
     this.shipments.getConfirmedOrders().subscribe({
       next: (orders) => {
-        this.confirmedOrders = orders;
+        this.confirmedOrders = orders.filter((o) => !!(o.openCategories ?? '').trim());
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -80,6 +88,44 @@ export class NewShipment implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private orderLabel(po: ConfirmedOrderOption): string {
+    return `${po.poNumber} — ${po.supplier} — ${po.openCategories}`;
+  }
+
+  // Every whitespace-separated word typed must appear somewhere in the PO
+  // number, supplier, category list or business unit (any order, any case).
+  get filteredOrders(): ConfirmedOrderOption[] {
+    const words = this.poSearch.toLowerCase().split(/\s+/).filter((w) => w.length > 0);
+    if (words.length === 0) return this.confirmedOrders;
+    return this.confirmedOrders.filter((po) => {
+      const haystack = `${po.poNumber} ${po.supplier} ${po.openCategories} ${po.businessUnit}`.toLowerCase();
+      return words.every((w) => haystack.includes(w));
+    });
+  }
+
+  onPoSearchInput(): void {
+    this.poListOpen = true;
+    // Typing after a PO was already picked starts a new search, which also
+    // clears the previous selection (and its line items) — the same reset
+    // that changing the dropdown used to do.
+    if (this.purchaseOrderId !== null) {
+      this.purchaseOrderId = null;
+      this.onOrderChange();
+    }
+  }
+
+  pickOrder(po: ConfirmedOrderOption): void {
+    this.purchaseOrderId = po.id;
+    this.poSearch = this.orderLabel(po);
+    this.poListOpen = false;
+    this.onOrderChange();
+  }
+
+  closePoListSoon(): void {
+    // Delay so a click on a list row (mousedown) is handled before the list disappears.
+    setTimeout(() => { this.poListOpen = false; this.cdr.markForCheck(); }, 150);
   }
 
   // Orders that could realistically be combined with what's already
@@ -229,7 +275,8 @@ export class NewShipment implements OnInit {
   private scrollToFirstError(): void {
     setTimeout(() => {
       const firstKey = Array.from(this.invalidFields)[0];
-      const el = document.querySelector(`[name="${firstKey}"]`);
+      const fieldName = firstKey === 'purchaseOrderId' ? 'poSearch' : firstKey;
+      const el = document.querySelector(`[name="${fieldName}"]`);
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
