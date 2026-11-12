@@ -9,6 +9,9 @@ export interface TruckLoadSummary {
   loadDate: string;
   dropCount: number;
   itemCount: number;
+  isExternal?: boolean;
+  transporterName?: string | null;
+  driverPhone?: string | null;
 }
 
 export interface TruckLoadItemSummary {
@@ -47,11 +50,18 @@ export interface TruckLoadItemRow {
   inHousePrice: number | null;
   parallelMarketPrice: number | null;
   isCompleted: boolean;
+  isExternal?: boolean;
+  transporterName?: string | null;
+  driverPhone?: string | null;
 }
 
 export interface TruckLoadDetail {
   id: number;
-  truckId: number;
+  truckId: number | null;
+  isExternal?: boolean;
+  externalTransporterId?: number | null;
+  transporterName?: string | null;
+  driverPhone?: string | null;
   plateNo: string;
   driverId: number | null;
   driverName: string | null;
@@ -91,8 +101,14 @@ export interface QuickAssignItem {
 }
 
 export interface QuickAssignRequest {
-  truckId: number;
+  truckId: number | null;
   driverId: number | null;
+  // External mode: truck/driver are typed per trip (no Settings record).
+  isExternal?: boolean;
+  externalTransporterId?: number | null;
+  externalTruckNo?: string | null;
+  externalDriverName?: string | null;
+  externalDriverPhone?: string | null;
   loadDate: string;
   warehouseId: number;
   expectedDeliveryDate: string | null;
