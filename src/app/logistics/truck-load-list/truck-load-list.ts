@@ -19,6 +19,7 @@ interface ColumnDef {
 const DEFAULT_COLUMNS: ColumnDef[] = [
   { key: 'plateNo', label: 'Truck' },
   { key: 'driverName', label: 'Driver' },
+  { key: 'transporterName', label: 'Transporter' },
   { key: 'loadDate', label: 'Load Date' },
   { key: 'warehouseName', label: 'Warehouse' },
   { key: 'city', label: 'City' },
@@ -119,7 +120,10 @@ export class TruckLoadList implements OnInit {
   load(): void {
     this.loading = true;
     this.service.getItems().subscribe({
-      next: (r) => { this.allItems = r; this.loading = false; this.cdr.markForCheck(); },
+      next: (r) => {
+        // Label the mode in the Transporter column ('In-house' / transporter name).
+        this.allItems = r.map((x) => ({ ...x, transporterName: x.isExternal ? (x.transporterName || 'External') : 'In-house' }));
+        this.loading = false; this.cdr.markForCheck(); },
       error: () => { this.error = 'Could not load truck load items.'; this.loading = false; this.cdr.markForCheck(); }
     });
   }

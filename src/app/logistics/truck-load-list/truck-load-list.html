@@ -78,6 +78,7 @@
           <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
             <span *ngSwitchCase="'plateNo'" style="font-family: monospace;">{{ item.plateNo }}</span>
             <span *ngSwitchCase="'driverName'">{{ item.driverName || '—' }}</span>
+            <span *ngSwitchCase="'transporterName'">{{ item.transporterName }}</span>
             <span *ngSwitchCase="'loadDate'" style="color: #888;">{{ item.loadDate | date: 'MMM d, y' }}</span>
             <span *ngSwitchCase="'city'">{{ item.city || '—' }}</span>
            <span *ngSwitchCase="'expectedDeliveryDate'" style="color: #0a3d62;">
