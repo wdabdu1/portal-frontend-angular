@@ -148,6 +148,25 @@ export class AuthService {
       && !this.hasRole('Manager') && !this.hasRole('SuperUser');
   }
 
+  // Clearance screen is open (read-only) to Coordinator, but still closed
+  // to LogisticsOfficer. Mirrors backend AppRoles.ClearanceScreenViewers.
+  canSeeClearanceScreen(): boolean {
+    return !this.isLogisticsBoxOnly() || this.hasRole('Coordinator');
+  }
+
+  // Coordinator without any Clearance write role (and not an admin) sees
+  // the Clearance screen read-only — except the Truck & Containers section.
+  isClearanceReadOnly(): boolean {
+    return this.hasRole('Coordinator')
+      && !this.hasAnyRole(['CLR_Usr', 'CLR_Supervisor', 'SuperUser']);
+  }
+
+  // Who may edit the Drivers / Trucks / Warehouses / External Transporters
+  // lists from the Logistics box. Mirrors backend LogisticsSettingsEditors.
+  canEditLogisticsLists(): boolean {
+    return this.hasAnyRole(['Coordinator', 'Manager', 'SuperUser']);
+  }
+
   // Who may open the Logistics box at all (route guard + menu gating).
   canSeeLogisticsBox(): boolean {
     return this.hasAnyRole(['LogisticsOfficer', 'Coordinator', 'Manager', 'SuperUser']);
