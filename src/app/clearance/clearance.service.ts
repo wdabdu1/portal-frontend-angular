@@ -296,6 +296,19 @@ export class ClearanceService {
     return this.http.put(`${API_URL}/clearance/${shipmentId}/route3`, req);
   }
 
+  // Narrow Truck & Containers saves — the only Clearance writes open to
+  // the Coordinator. Each sends just that section's fields.
+  saveTruckContainers(shipmentId: number, route: 1 | 2 | 3, f: Partial<ClearanceRoute1Details & ClearanceRoute2Details & ClearanceRoute3Details>) {
+    const body: Record<string, unknown> = {
+      truckPortEntryPermitDate: f.truckPortEntryPermitDate ?? null,
+      clearanceActualCompletedDate: f.clearanceActualCompletedDate ?? null,
+      truckContainersComments: f.truckContainersComments ?? null
+    };
+    if (route !== 3) body['containersReturnedDate'] = f.containersReturnedDate ?? null;
+    if (route === 2) body['containersReceivedAtFzDate'] = f.containersReceivedAtFzDate ?? null;
+    return this.http.put(`${API_URL}/clearance/${shipmentId}/route${route}/truck-containers`, body);
+  }
+
   getFzDepositOptions() {
     return this.http.get<FzDepositOption[]>(`${API_URL}/fz-inventory/options`);
   }
