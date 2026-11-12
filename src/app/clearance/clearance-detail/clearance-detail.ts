@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
@@ -23,8 +24,10 @@ interface GroupItemDef {
   imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective, SectionLockBadge, ShipmentInfoPanel],
   templateUrl: './clearance-detail.html'
 })
-export class ClearanceDetailComponent implements OnInit {
+export class ClearanceDetailComponent implements OnInit, AfterViewChecked {
   private cdr = inject(ChangeDetectorRef);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -432,6 +435,47 @@ export class ClearanceDetailComponent implements OnInit {
     this.service.recalculateForecast(this.shipmentId).subscribe({
       next: (r) => { this.actualChargesForm = r; this.recalculatingForecast = false; this.cdr.markForCheck(); },
       error: () => { this.recalculatingForecast = false; this.error = 'Could not recalculate forecast.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  // Coordinator sees every Clearance section read-only, except the Truck &
+  // Containers sections (marked .ro-exempt in the template). The backend
+  // enforces the same rule; this keeps the UI honest.
+  get readOnly(): boolean {
+    return this.auth.isClearanceReadOnly();
+  }
+
+  ngAfterViewChecked(): void {
+    if (!this.readOnly) return;
+    const root = this.host.nativeElement;
+    root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement>('input, select, textarea, button').forEach((el) => {
+      if (el.closest('.ro-exempt')) return;
+      // Section navigation ("Next") stays usable while reading.
+      if (el instanceof HTMLButtonElement && el.textContent?.trim() === 'Next') return;
+      if (!el.disabled) el.disabled = true;
+    });
+  }
+
+  // Truck & Containers Save: Clearance team saves the whole route as
+  // before; a read-only user (Coordinator) saves only this section via the
+  // narrow endpoint.
+  saveTruckContainers(andNext: boolean, nextKey: string | null): void {
+    if (!this.readOnly) { this.saveRouteDetail(andNext, nextKey); return; }
+    this.savingRouteDetail = true;
+    const route = this.selectedRoute as 1 | 2 | 3;
+    const form = route === 1 ? this.route1Form : route === 2 ? this.route2Form : this.route3Form;
+    this.service.saveTruckContainers(this.shipmentId, route, form as any).subscribe({
+      next: () => {
+        this.savingRouteDetail = false;
+        this.loadSchedule();
+        if (andNext) this.expanded = nextKey;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.savingRouteDetail = false;
+        this.error = err?.error?.message || 'Could not save Truck & Containers.';
+        this.cdr.markForCheck();
+      }
     });
   }
 
