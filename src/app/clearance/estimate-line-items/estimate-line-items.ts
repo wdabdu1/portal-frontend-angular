@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { ClearanceEstimateLineItem, ClearanceService } from '../clearance.service';
@@ -16,6 +17,10 @@ type SortColumn = keyof ClearanceEstimateLineItem;
 export class EstimateLineItems implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+
+  // Coordinator may view the estimate breakdown but not change it.
+  get readOnly(): boolean { return this.auth.isClearanceReadOnly(); }
 
   shipmentId!: number;
   items: ClearanceEstimateLineItem[] = [];
