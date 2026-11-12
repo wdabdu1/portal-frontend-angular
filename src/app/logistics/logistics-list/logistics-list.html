@@ -49,6 +49,7 @@
             <td *ngFor="let col of columns" style="padding: 8px 6px;" [ngSwitch]="col.key">
               <span *ngSwitchCase="'blAwbNo'" style="font-family: monospace;">{{ item.blAwbNo }}</span>
               <span *ngSwitchCase="'arrivalDate'" style="color: #888;">{{ item.arrivalDate ? (item.arrivalDate | date: 'MMM d, y') : '—' }}</span>
+              <span *ngSwitchCase="'clearanceReleaseDate'" [style.color]="item.releaseIsForecast ? '#b36b00' : '#333'" [style.font-style]="item.releaseIsForecast ? 'italic' : 'normal'">{{ item.clearanceReleaseDate ? (item.clearanceReleaseDate | date: 'MMM d, y') : '—' }}<span *ngIf="item.clearanceReleaseDate && item.releaseIsForecast" style="font-size:11px;"> (forecast)</span></span>
               <span *ngSwitchCase="'plannedCompletionDate'" style="color: #888;">{{ item.plannedCompletionDate ? (item.plannedCompletionDate | date: 'MMM d, y') : '—' }}</span>
               <span *ngSwitchCase="'actualCompletionDate'" style="color: #888;">{{ item.actualCompletionDate ? (item.actualCompletionDate | date: 'MMM d, y') : '—' }}</span>
               <span *ngSwitchCase="'fzDestination'">{{ item.fzDestination || '—' }}</span>

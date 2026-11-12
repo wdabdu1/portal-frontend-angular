@@ -26,6 +26,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   // just be a permanent blank.
   { key: 'blAwbNo', label: 'BL No.' },
   { key: 'arrivalDate', label: 'Arrival Date' },
+  { key: 'clearanceReleaseDate', label: 'Clearance Release (SPC Bill)' },
   { key: 'plannedCompletionDate', label: 'Planned Completion' },
   { key: 'actualCompletionDate', label: 'Actual Completion' },
   { key: 'qty', label: 'Qty' },
