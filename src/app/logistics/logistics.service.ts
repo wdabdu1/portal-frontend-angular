@@ -13,6 +13,11 @@ export interface LogisticsItemRow {
   arrivalDate: string | null;
   plannedCompletionDate: string | null;
   actualCompletionDate: string | null;
+  // Clearance ends / Logistics clock starts here: SPC Bill settlement
+  // (Route 1/2) or Release/Exit Pass date (FZ withdrawal). Forecast = the
+  // SLA-projected date, shown until the real one is entered.
+  clearanceReleaseDate?: string | null;
+  releaseIsForecast?: boolean;
   qty: number;
   unit: string;
   clearanceRoute: string;
