@@ -10,6 +10,7 @@ interface LogisticsVisibilitySettingsDto {
   arrivalLeadTimeDays: number;
   preClearanceCatQtyRevealDays: number;
   postDeliveryRehideDays: number;
+  showLogisticsListsInMainSettings: boolean;
   updatedAt: string;
 }
 
@@ -51,7 +52,8 @@ export class LogisticsVisibility implements OnInit {
     this.http.put<LogisticsVisibilitySettingsDto>(`${API_URL}/logistics/visibility-settings`, {
       arrivalLeadTimeDays: this.settings.arrivalLeadTimeDays,
       preClearanceCatQtyRevealDays: this.settings.preClearanceCatQtyRevealDays,
-      postDeliveryRehideDays: this.settings.postDeliveryRehideDays
+      postDeliveryRehideDays: this.settings.postDeliveryRehideDays,
+      showLogisticsListsInMainSettings: this.settings.showLogisticsListsInMainSettings
     }).subscribe({
       next: (r) => {
         this.settings = r;

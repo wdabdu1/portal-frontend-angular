@@ -49,6 +49,18 @@
       />
     </div>
 
+    <div style="border-top: 1px solid #eee; padding-top: 14px;">
+      <label style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #555;">
+        <input type="checkbox" [(ngModel)]="settings.showLogisticsListsInMainSettings" [disabled]="!canEdit" style="margin-top: 2px;" />
+        <span>
+          Show Logistics Cities, Drivers, Trucks, Warehouses and External Transporters in the main Settings menu.
+          <span style="display: block; color: #888; font-size: 12px;">
+            Switch off to keep them only under Logistics &rarr; Logistics - Settings, which always has them.
+          </span>
+        </span>
+      </label>
+    </div>
+
     <p *ngIf="!canEdit" style="color: #888; font-size: 12px; margin: 0;">
       Read-only — only Manager or SuperUser can change these values.
     </p>
