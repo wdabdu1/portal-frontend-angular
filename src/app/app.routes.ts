@@ -7,6 +7,8 @@ import { recordCorrectorGuard } from './auth/record-corrector.guard';
 import { EditOrder } from './corrections/edit-order/edit-order';
 import { EditShipment } from './corrections/edit-shipment/edit-shipment';
 import { logisticsBoxGuard } from './auth/logistics-box.guard';
+import { clearanceScreenGuard } from './auth/clearance-screen.guard';
+import { LogisticsSettings } from './logistics/logistics-settings/logistics-settings';
 import { modelProductsAccessGuard } from './auth/model-products-access.guard';
 import { LogisticsVisibility } from './settings/logistics-visibility/logistics-visibility';
 import { CPricingList } from './c-pricing/c-pricing-list/c-pricing-list';
@@ -109,14 +111,14 @@ export const routes: Routes = [
   // Breakdown *edit* page, linked from the detail screen) is intentionally
   // left locked — CPricing stays a Clearance viewer, not an editor, and the
   // estimate total is already visible read-only on the detail screen.
-  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, logisticsLockGuard] },
+  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, clearanceScreenGuard] },
   { path: 'bank-dues', component: BankDuesList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'direct-sales', component: DirectSalesList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   // 'price-history' route removed — superseded by 'c-pricing/history' below;
   // its backend endpoint moved from api/price-history to api/c-pricing/history.
   { path: 'pay-bank-dues', component: PayBankDues, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
-  { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard, logisticsLockGuard] },
+  { path: 'clearance/:id/estimate-items', component: EstimateLineItems, canActivate: [authGuard, cPricingLockGuard, clearanceScreenGuard] },
+  { path: 'clearance/:id', component: ClearanceDetailComponent, canActivate: [authGuard, clearanceScreenGuard] },
   { path: 'settings/clearance-sla', component: ClearanceSla, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'settings/offshore-markup-defaults', component: OffshoreMarkupDefaults, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   // Reveal-timing settings: moved into the general Settings module (was
@@ -142,13 +144,79 @@ export const routes: Routes = [
   { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'logistics/truck-availability', component: TruckAvailability, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'logistics/truck-allocations', component: TruckAllocations, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
+  { path: 'logistics/settings', component: LogisticsSettings, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
+  {
+    path: 'logistics/settings/drivers',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard],
+    data: {
+      title: 'Logistics — Drivers',
+      resource: 'drivers',
+      fields: [{ key: 'name', label: 'Name', type: 'text' }, { key: 'phone', label: 'Phone', type: 'text' }],
+      backRoute: '/logistics/settings',
+      backLabel: 'Back to Logistics - Settings',
+      editRoles: ['Coordinator', 'Manager', 'SuperUser']
+    }
+  },
+  {
+    path: 'logistics/settings/trucks',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard],
+    data: {
+      title: 'Logistics — Trucks',
+      resource: 'trucks',
+      fields: [{ key: 'plateNo', label: 'Plate No.', type: 'text' }, { key: 'driverId', label: 'Assigned Driver', type: 'select', optionsResource: 'drivers' }],
+      backRoute: '/logistics/settings',
+      backLabel: 'Back to Logistics - Settings',
+      editRoles: ['Coordinator', 'Manager', 'SuperUser']
+    }
+  },
+  {
+    path: 'logistics/settings/warehouses',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard],
+    data: {
+      title: 'Logistics — Warehouses',
+      resource: 'warehouses',
+      fields: [{ key: 'name', label: 'Name', type: 'text' }, { key: 'cityId', label: 'City', type: 'select', optionsResource: 'logistics-cities' }, { key: 'contactName', label: 'Default Contact Name', type: 'text' }, { key: 'contactPhone', label: 'Default Contact Phone', type: 'text' }],
+      backRoute: '/logistics/settings',
+      backLabel: 'Back to Logistics - Settings',
+      editRoles: ['Coordinator', 'Manager', 'SuperUser']
+    }
+  },
+  {
+    path: 'logistics/settings/external-transporters',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard],
+    data: {
+      title: 'Logistics — External Transporters',
+      resource: 'external-transporters',
+      fields: [{ key: 'name', label: 'Transporter Name', type: 'text' }, { key: 'phone', label: 'Phone', type: 'text' }],
+      backRoute: '/logistics/settings',
+      backLabel: 'Back to Logistics - Settings',
+      editRoles: ['Coordinator', 'Manager', 'SuperUser']
+    }
+  },
+  {
+    path: 'logistics/settings/logistics-cities',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard],
+    data: {
+      title: 'Logistics — Cities',
+      resource: 'logistics-cities',
+      fields: [{ key: 'name', label: 'Name', type: 'text' }],
+      backRoute: '/logistics/settings',
+      backLabel: 'Back to Logistics - Settings',
+      editRoles: ['Coordinator', 'Manager', 'SuperUser']
+    }
+  },
   { path: 'transfer-pricing', component: TransferPricingList, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'transfer-pricing/accumulated', component: TransferPricingAccumulated, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'transfer-pricing/:shipmentId', component: TransferPricingDetailComponent, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   // Duplicate of the 'clearance' route defined above (dead entry — Angular
   // resolves the first match), left as-is but without cPricingLockGuard for
   // consistency rather than reintroducing the lockout via a shadowed route.
-  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, logisticsLockGuard] },
+  { path: 'clearance', component: ClearanceList, canActivate: [authGuard, clearanceScreenGuard] },
   { path: 'dashboards/clearance-readiness', component: ClearanceReadiness, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'mobile/pipeline-health', component: PipelineHealthMobile, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
   { path: 'dashboards/cashflow', component: CashflowDashboard, canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard] },
@@ -403,6 +471,16 @@ export const routes: Routes = [
         { key: 'contactName', label: 'Default Contact Name', type: 'text' },
         { key: 'contactPhone', label: 'Default Contact Phone', type: 'text' }
       ]
+    }
+  },
+  {
+    path: 'settings/external-transporters',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
+    data: {
+      title: 'Logistics — External Transporters',
+      resource: 'external-transporters',
+      fields: [{ key: 'name', label: 'Transporter Name', type: 'text' }, { key: 'phone', label: 'Phone', type: 'text' }]
     }
   },
 

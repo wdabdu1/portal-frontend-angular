@@ -56,7 +56,7 @@ const MENU_GROUPS: MenuGroup[] = [
       // (Withdrawal detail and the FZ Deposit/Route 2-3 screens live
       // there) — everything they need instead lives in the Logistics
       // box below.
-      { label: 'Clearance', route: '/clearance', canAccess: (a) => !a.hasRole('LogisticsOfficer') && !a.hasRole('Coordinator') },
+      { label: 'Clearance', route: '/clearance', canAccess: (a) => a.canSeeClearanceScreen() },
       // Moved out of Settings per request — now the last item here,
       // restricted to Manager/IP_Supervisor/SuperUser.
       { label: 'Model/Product', route: '/orders/model-products', canAccess: (a) => a.canManageModelProducts() }
@@ -69,8 +69,9 @@ const MENU_GROUPS: MenuGroup[] = [
     label: 'Logistics',
     items: [
       { label: 'Shipments for Dispatch', route: '/logistics', canAccess: (a) => a.canSeeLogisticsBox() },
+      { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: (a) => a.canSeeLogisticsBox() },
       { label: 'Truck Availability', route: '/logistics/truck-availability', canAccess: (a) => a.canSeeLogisticsBox() },
-      { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: (a) => a.canSeeLogisticsBox() }
+      { label: 'Logistics - Settings', route: '/logistics/settings', canAccess: (a) => a.canSeeLogisticsBox() }
       // "Cargo Under Delivery" deliberately removed from this group for
       // now — it pointed at the full item-level Goods in Transit
       // dashboard, which Logistics/Coordinator can no longer reach
