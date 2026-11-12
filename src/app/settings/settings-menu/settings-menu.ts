@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { API_URL } from '../../api-config';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 
 interface MenuGroup {
   title: string;
-  links: { label: string; path: string }[];
+  links: { label: string; path: string; logisticsList?: boolean }[];
 }
 
 @Component({
@@ -13,8 +15,27 @@ interface MenuGroup {
   imports: [CommonModule, RouterLink],
   templateUrl: './settings-menu.html'
 })
-export class SettingsMenu {
-  constructor(public auth: AuthService, private router: Router) {}
+export class SettingsMenu implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+  // One admin switch (Logistics - Reveal Settings page) decides whether the
+  // Drivers / Trucks / Warehouses / External Transporters / Cities links
+  // also appear here. Default shown; the Logistics - Settings page in the
+  // Logistics box always has them.
+  showLogisticsLists = true;
+
+  constructor(public auth: AuthService, private router: Router, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.http.get<{ showLogisticsListsInMainSettings?: boolean }>(`${API_URL}/logistics/visibility-settings`).subscribe({
+      next: (r) => { this.showLogisticsLists = r.showLogisticsListsInMainSettings !== false; this.cdr.markForCheck(); },
+      error: () => { /* keep default (shown) */ }
+    });
+  }
+
+  visibleLinks(group: MenuGroup) {
+    return group.links.filter((l) => !l.logisticsList || this.showLogisticsLists);
+  }
+
 
   goToUsers(): void {
     if (!this.auth.hasRole('SuperUser')) return;
@@ -60,10 +81,11 @@ export class SettingsMenu {
         { label: 'Process SLA', path: '/settings/clearance-sla' },
         { label: 'Clearance Charge Types', path: '/settings/clearance-charge-types' },
         { label: 'MOT Certificate Expiry', path: '/settings/mot-certificate' },
-        { label: 'Logistics Cities', path: '/settings/logistics-cities' },
-        { label: 'Drivers', path: '/settings/drivers' },
-        { label: 'Trucks', path: '/settings/trucks' },
-        { label: 'Warehouses', path: '/settings/warehouses' },
+        { label: 'Logistics Cities', path: '/settings/logistics-cities', logisticsList: true },
+        { label: 'Drivers', path: '/settings/drivers', logisticsList: true },
+        { label: 'Trucks', path: '/settings/trucks', logisticsList: true },
+        { label: 'Warehouses', path: '/settings/warehouses', logisticsList: true },
+        { label: 'External Transporters', path: '/settings/external-transporters', logisticsList: true },
         // Moved out of the Logistics box on purpose: Coordinator could
         // previously reach and edit this from inside /logistics itself,
         // letting them widen their own reveal window. It now lives here
