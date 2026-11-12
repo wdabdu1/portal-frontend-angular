@@ -36,8 +36,8 @@
           <th style="padding: 6px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Product/Model</th>
           <th style="padding: 6px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Remaining</th>
           <th *ngIf="expandedCity === group.city" style="padding: 6px 16px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Qty to Load</th>
-          <th *ngIf="expandedCity === group.city" style="padding: 6px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">In-House Price</th>
-          <th *ngIf="expandedCity === group.city" style="padding: 6px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">Parallel Market Price</th>
+          <th *ngIf="expandedCity === group.city" style="padding: 6px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff;">{{ assignMode === 'internal' ? 'In-House Price' : 'External Price' }}</th>
+          <th *ngIf="expandedCity === group.city" style="padding: 6px 6px; position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 #ddd; background: #fff; font-weight: 400; font-style: italic; color: #888; font-size: 11px;">{{ assignMode === 'internal' ? 'External price (ref.)' : 'In-house price (ref.)' }}</th>
         </tr>
       </thead>
       <tbody>
@@ -54,32 +54,74 @@
               style="width: 90px; padding: 4px;"
             />
           </td>
-          <td *ngIf="expandedCity === group.city" style="padding: 6px 6px;">
-            <input type="number" [(ngModel)]="inHousePriceByAllocationId[item.warehouseAllocationId]" style="width: 100px; padding: 4px;" />
+          <!-- Entered price (bold/larger) first, reference price (small/grey/italic) second. -->
+          <td *ngIf="expandedCity === group.city && assignMode === 'internal'" style="padding: 6px 6px;">
+            <input type="text" appThousands [(ngModel)]="inHousePriceByAllocationId[item.warehouseAllocationId]" style="width: 110px; padding: 4px; font-weight: 700; font-size: 14px;" />
           </td>
-          <td *ngIf="expandedCity === group.city" style="padding: 6px 6px;">
-            <input type="number" [(ngModel)]="parallelMarketPriceByAllocationId[item.warehouseAllocationId]" style="width: 100px; padding: 4px;" />
+          <td *ngIf="expandedCity === group.city && assignMode === 'internal'" style="padding: 6px 6px;">
+            <input type="text" appThousands [(ngModel)]="parallelMarketPriceByAllocationId[item.warehouseAllocationId]" style="width: 90px; padding: 2px 4px; font-size: 11px; font-style: italic; color: #888; border: 1px solid #ddd;" />
+          </td>
+          <td *ngIf="expandedCity === group.city && assignMode === 'external'" style="padding: 6px 6px;">
+            <input type="text" appThousands [(ngModel)]="parallelMarketPriceByAllocationId[item.warehouseAllocationId]" style="width: 110px; padding: 4px; font-weight: 700; font-size: 14px;" />
+          </td>
+          <td *ngIf="expandedCity === group.city && assignMode === 'external'" style="padding: 6px 6px;">
+            <input type="text" appThousands [(ngModel)]="inHousePriceByAllocationId[item.warehouseAllocationId]" style="width: 90px; padding: 2px 4px; font-size: 11px; font-style: italic; color: #888; border: 1px solid #ddd;" />
           </td>
         </tr>
       </tbody>
     </table></div>
 
     <div *ngIf="expandedCity === group.city" style="padding: 16px; background: #f9f9f9; border-top: 1px solid #eee;">
+      <div style="display: flex; gap: 6px; margin-bottom: 12px; align-items: center;">
+        <span style="font-size: 12px; color: #555; margin-right: 4px;">Truck type:</span>
+        <button type="button" (click)="setMode('internal')"
+          [style.background]="assignMode === 'internal' ? '#0a3d62' : '#fff'" [style.color]="assignMode === 'internal' ? '#fff' : '#333'"
+          style="padding: 5px 14px; border: 1px solid #0a3d62; border-radius: 4px 0 0 4px; cursor: pointer; font-size: 13px;">Internal</button>
+        <button type="button" (click)="setMode('external')"
+          [style.background]="assignMode === 'external' ? '#0a3d62' : '#fff'" [style.color]="assignMode === 'external' ? '#fff' : '#333'"
+          style="padding: 5px 14px; border: 1px solid #0a3d62; border-radius: 0 4px 4px 0; margin-left: -7px; cursor: pointer; font-size: 13px;">External</button>
+        <span style="font-size: 11px; color: #888; margin-left: 8px;">
+          {{ assignMode === 'internal' ? 'Enter the in-house price; the external price is a reference.' : 'Enter the external price; the in-house price is a reference.' }}
+        </span>
+      </div>
       <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Truck</label>
-          <select [(ngModel)]="assignTruckId" (ngModelChange)="onTruckChange()" style="padding:6px;">
-            <option [ngValue]="null">-- select --</option>
-            <option *ngFor="let t of trucks" [ngValue]="t.id">{{ t['plateNo'] }}</option>
-          </select>
-        </div>
-        <div>
-          <label style="display:block; font-size:12px; color:#555;">Driver</label>
-          <select [(ngModel)]="assignDriverId" style="padding:6px;">
-            <option [ngValue]="null">-- none --</option>
-            <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d['name'] }}</option>
-          </select>
-        </div>
+        <ng-container *ngIf="assignMode === 'internal'">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Truck</label>
+            <select [(ngModel)]="assignTruckId" (ngModelChange)="onTruckChange()" style="padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let t of trucks" [ngValue]="t.id">{{ t['plateNo'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Driver</label>
+            <select [(ngModel)]="assignDriverId" style="padding:6px;">
+              <option [ngValue]="null">-- none --</option>
+              <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d['name'] }}</option>
+            </select>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="assignMode === 'external'">
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Transporter</label>
+            <select [(ngModel)]="assignTransporterId" style="padding:6px;">
+              <option [ngValue]="null">-- select --</option>
+              <option *ngFor="let t of transporters" [ngValue]="t.id">{{ t['name'] }}</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Truck No.</label>
+            <input type="text" [(ngModel)]="externalTruckNo" style="padding:6px; width: 120px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Driver Name</label>
+            <input type="text" [(ngModel)]="externalDriverName" style="padding:6px; width: 150px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#555;">Driver Phone</label>
+            <input type="text" [(ngModel)]="externalDriverPhone" style="padding:6px; width: 130px;" />
+          </div>
+        </ng-container>
         <div>
           <label style="display:block; font-size:12px; color:#555;">Load Date</label>
           <input type="date" [(ngModel)]="assignLoadDate" style="padding:6px;" />
@@ -90,7 +132,7 @@
         </div>
         <button
           (click)="confirmAssignment(group)"
-          [disabled]="assigning || !assignTruckId || !assignLoadDate"
+          [disabled]="!canConfirm"
           style="padding:7px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;"
         >
           {{ assigning ? 'Assigning...' : 'Confirm Assignment' }}

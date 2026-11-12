@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { exportToExcel } from '../../shared/excel-export.util';
+import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ReadyForTruckAssignment, TruckLoadService } from '../truck-load.service';
 
@@ -13,7 +14,7 @@ interface CityGroup {
 
 @Component({
   selector: 'app-truck-allocations',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective],
   templateUrl: './truck-allocations.html'
 })
 export class TruckAllocations implements OnInit {
@@ -25,11 +26,21 @@ export class TruckAllocations implements OnInit {
 
   trucks: LookupEntity[] = [];
   drivers: LookupEntity[] = [];
+  transporters: LookupEntity[] = [];
 
   expandedCity: string | null = null;
   qtyByAllocationId: Record<number, number | null> = {};
   inHousePriceByAllocationId: Record<number, number | null> = {};
   parallelMarketPriceByAllocationId: Record<number, number | null> = {};
+
+  // Internal = our own truck/driver (in-house price is the entered price);
+  // External = a hired transporter, truck/driver typed each time (external
+  // price is the entered price). The other price stays as a reference.
+  assignMode: 'internal' | 'external' = 'internal';
+  assignTransporterId: number | null = null;
+  externalTruckNo = '';
+  externalDriverName = '';
+  externalDriverPhone = '';
 
   assignTruckId: number | null = null;
   assignDriverId: number | null = null;
@@ -46,6 +57,7 @@ export class TruckAllocations implements OnInit {
   ngOnInit(): void {
     this.lookups.getAll<LookupEntity>('trucks').subscribe({ next: (r) => { this.trucks = r.filter((t) => t['isActive']); this.cdr.markForCheck(); } });
     this.lookups.getAll<LookupEntity>('drivers').subscribe({ next: (r) => { this.drivers = r; this.cdr.markForCheck(); } });
+    this.lookups.getAll<LookupEntity>('external-transporters').subscribe({ next: (r) => { this.transporters = r.filter((t) => t['isActive'] !== false); this.cdr.markForCheck(); } });
     this.load();
   }
 
@@ -98,11 +110,27 @@ export class TruckAllocations implements OnInit {
     this.parallelMarketPriceByAllocationId = {};
     const group = this.groups.find((g) => g.city === city);
     if (group) for (const item of group.items) this.qtyByAllocationId[item.warehouseAllocationId] = item.remainingQty;
+    this.assignMode = 'internal';
+    this.assignTransporterId = null;
+    this.externalTruckNo = '';
+    this.externalDriverName = '';
+    this.externalDriverPhone = '';
     this.assignTruckId = null;
     this.assignDriverId = null;
     this.assignLoadDate = '';
     this.assignExpectedDeliveryDate = '';
     this.assignError = '';
+  }
+
+  setMode(mode: 'internal' | 'external'): void {
+    this.assignMode = mode;
+    this.assignError = '';
+  }
+
+  get canConfirm(): boolean {
+    if (this.assigning || !this.assignLoadDate) return false;
+    if (this.assignMode === 'internal') return !!this.assignTruckId;
+    return !!this.assignTransporterId && !!this.externalTruckNo.trim() && !!this.externalDriverName.trim();
   }
 
   onTruckChange(): void {
@@ -111,7 +139,7 @@ export class TruckAllocations implements OnInit {
   }
 
   confirmAssignment(group: CityGroup): void {
-    if (!this.assignTruckId || !this.assignLoadDate) return;
+    if (!this.canConfirm) return;
     const items = group.items
       .filter((i) => (this.qtyByAllocationId[i.warehouseAllocationId] ?? 0) > 0)
       .map((i) => ({
@@ -138,7 +166,14 @@ export class TruckAllocations implements OnInit {
 
     for (const warehouseId of warehouseIds) {
       this.service.quickAssign({
-        truckId: this.assignTruckId, driverId: this.assignDriverId, loadDate: this.assignLoadDate,
+        isExternal: this.assignMode === 'external',
+        truckId: this.assignMode === 'internal' ? this.assignTruckId : null,
+        driverId: this.assignMode === 'internal' ? this.assignDriverId : null,
+        externalTransporterId: this.assignMode === 'external' ? this.assignTransporterId : null,
+        externalTruckNo: this.assignMode === 'external' ? this.externalTruckNo.trim() : null,
+        externalDriverName: this.assignMode === 'external' ? this.externalDriverName.trim() : null,
+        externalDriverPhone: this.assignMode === 'external' ? (this.externalDriverPhone.trim() || null) : null,
+        loadDate: this.assignLoadDate,
         warehouseId, expectedDeliveryDate: this.assignExpectedDeliveryDate || null,
         items: byWarehouse.get(warehouseId)!
       }).subscribe({
