@@ -80,23 +80,36 @@
           <ul style="margin: 6px 0 0 18px; padding: 0;"><li *ngFor="let g of tl.dataGaps" style="margin-bottom: 3px;">{{ g }}</li></ul>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 13px; margin-bottom: 14px;">
-          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
-            <span style="color: #888; font-size: 11px;">{{ tl.arrivalIsActual ? 'Actual Arrival' : 'Arrival (ETA - actual not entered)' }}</span><br>
-            <strong>{{ tl.arrivalDate ? (tl.arrivalDate | date: 'EEE d MMM y') : '—' }}</strong>
+        <!-- Headline: arrival -> container return -> days spent vs free days -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 13px; margin-bottom: 8px;">
+          <div style="background: #f7f9fb; border-radius: 6px; padding: 10px 12px;">
+            <span style="color: #888; font-size: 11px;">{{ tl.arrivalIsActual ? 'Actual Arrival Date' : 'Arrival (ETA - actual not entered)' }}</span><br>
+            <strong style="font-size: 15px;">{{ tl.arrivalDate ? (tl.arrivalDate | date: 'EEE d MMM y') : '—' }}</strong>
           </div>
-          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
-            <span style="color: #888; font-size: 11px;">Clearance Completed</span><br>
-            <strong>{{ tl.clearanceCompletedDate ? (tl.clearanceCompletedDate | date: 'EEE d MMM y') : '—' }}</strong>
+          <div style="background: #f7f9fb; border-radius: 6px; padding: 10px 12px;">
+            <span style="color: #888; font-size: 11px;">Container Return Date</span><br>
+            <strong style="font-size: 15px;">{{ tl.containersReturnedDate ? (tl.containersReturnedDate | date: 'EEE d MMM y') : 'Not returned yet' }}</strong>
+            <span *ngIf="!tl.containersReturnedDate && tl.demurrage.endDate" style="display:block; color:#a66a00; font-size: 11px;">projected to {{ tl.demurrage.endDate | date: 'd MMM y' }}</span>
           </div>
-          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
-            <span style="color: #888; font-size: 11px;">Truck Port Entry (ends storage)</span><br>
-            <strong>{{ tl.truckPortEntryDate ? (tl.truckPortEntryDate | date: 'EEE d MMM y') : '—' }}</strong>
+          <div style="background: #eef4fb; border-radius: 6px; padding: 10px 12px;">
+            <span style="color: #888; font-size: 11px;">No. of Days Spent <span *ngIf="!tl.containersReturnedDate">(projected)</span></span><br>
+            <strong style="font-size: 20px;">{{ tl.demurrage.elapsedDays }}</strong> <span style="color: #666;">calendar day(s)</span>
+            <div *ngFor="let l of tl.demurrage.lines" style="font-size: 12px; margin-top: 3px;">
+              {{ l.label }}: free <strong>{{ l.freeDays }}</strong> →
+              chargeable <strong [style.color]="l.chargeableDays > 0 ? '#c0392b' : '#1e7e34'">{{ l.chargeableDays }}</strong>
+              <span style="color: #888;"> ({{ tl.demurrage.elapsedDays }} − {{ l.freeDays }}{{ l.chargeableDays === 0 ? ', none' : '' }})</span>
+            </div>
           </div>
-          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
-            <span style="color: #888; font-size: 11px;">Containers Returned (ends demurrage)</span><br>
-            <strong>{{ tl.containersReturnedDate ? (tl.containersReturnedDate | date: 'EEE d MMM y') : '—' }}</strong>
-          </div>
+        </div>
+        <div style="font-size: 12px; color: #666; margin-bottom: 14px;">
+          Also: Clearance completed <strong>{{ tl.clearanceCompletedDate ? (tl.clearanceCompletedDate | date: 'd MMM y') : '—' }}</strong> ·
+          Truck port entry (ends storage) <strong>{{ tl.truckPortEntryDate ? (tl.truckPortEntryDate | date: 'd MMM y') : '—' }}</strong>
+          → storage days spent <strong>{{ tl.storage.elapsedDays }}</strong>, free <strong>{{ tl.storage.lines[0]?.freeDays }}</strong>,
+          chargeable <strong [style.color]="(tl.storage.lines[0]?.chargeableDays ?? 0) > 0 ? '#c0392b' : '#1e7e34'">{{ tl.storage.lines[0]?.chargeableDays ?? 0 }}</strong>
+        </div>
+
+        <div *ngFor="let w of chargeChecks" style="background: #fdf1f0; border: 1px solid #f0c9c4; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #8a2a1f;">
+          <strong>Check:</strong> {{ w }}
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">

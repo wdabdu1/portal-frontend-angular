@@ -128,6 +128,29 @@ export class DemurrageAnalysis implements OnInit {
   get gapSubtotal(): number {
     return this.stepDaysSubtotal - this.slaDaysSubtotal;
   }
+  // Quick sanity checks for the headline: the charge the portal calculates must follow from days spent vs
+  // free days, and money actually paid with no chargeable days (or the reverse) deserves a second look.
+  get chargeChecks(): string[] {
+    const d = this.data;
+    const tl = d?.timeline;
+    if (!d || !tl) return [];
+    const out: string[] = [];
+    const maxChg = (lines: { chargeableDays: number }[]) => lines.reduce((m, l) => Math.max(m, l.chargeableDays), 0);
+    const demChg = maxChg(tl.demurrage.lines);
+    const stoChg = maxChg(tl.storage.lines);
+    const fmt = (n: number) => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+    if ((d.actualDemurragePaidSdg ?? 0) > 0 && demChg === 0)
+      out.push(`${fmt(d.actualDemurragePaidSdg!)} SDG demurrage was paid, but ${tl.demurrage.elapsedDays} day(s) spent is within the free days - the portal calculates 0 chargeable days. Check the arrival / return dates or the shipping line's invoice.`);
+    if ((d.actualStoragePaidSdg ?? 0) > 0 && stoChg === 0)
+      out.push(`${fmt(d.actualStoragePaidSdg!)} SDG storage was paid, but ${tl.storage.elapsedDays} day(s) spent is within the free storage days - the portal calculates 0 chargeable days. Check the arrival / truck port entry dates or the port invoice.`);
+    if (d.demurrageCostSdg > 0 && (d.actualDemurragePaidSdg ?? 0) === 0 && tl.demurrage.endIsActual)
+      out.push(`The portal calculates ${fmt(d.demurrageCostSdg)} SDG demurrage (${demChg} chargeable day(s)) but no demurrage payment is recorded.`);
+    if (d.storageCostSdg > 0 && (d.actualStoragePaidSdg ?? 0) === 0 && tl.storage.endIsActual)
+      out.push(`The portal calculates ${fmt(d.storageCostSdg)} SDG storage (${stoChg} chargeable day(s)) but no storage payment is recorded.`);
+    return out;
+  }
+
   get grandTotalDays(): number {
     if (!this.data) return 0;
     return this.stepDaysSubtotal + this.data.weekendDays + this.data.holidayDays;
