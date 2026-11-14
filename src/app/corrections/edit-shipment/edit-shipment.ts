@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ChangeHistory } from '../change-history/change-history';
+import { AuthService } from '../../auth/auth.service';
 import { CorrectionsService, LookupRef, ShipmentCorrection, ShipmentCorrectionRequest } from '../corrections.service';
 
 // Manager/SuperUser-only screen for correcting the DESCRIPTIVE fields of an
@@ -18,6 +19,7 @@ import { CorrectionsService, LookupRef, ShipmentCorrection, ShipmentCorrectionRe
 export class EditShipment implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
 
   shipmentId = 0;
   data: ShipmentCorrection | null = null;
@@ -27,6 +29,14 @@ export class EditShipment implements OnInit {
   message = '';
   saveError = '';
   historyKey = 0;
+
+  // Phase 2 - BL/AWB number (SuperUser only)
+  isSuperUser = false;
+  blNo = '';
+  blReason = '';
+  blSaving = false;
+  blMessage = '';
+  blError = '';
 
   shippingLines: LookupEntity[] = [];
 
@@ -54,10 +64,36 @@ export class EditShipment implements OnInit {
       next: (r) => {
         this.shippingLines = this.withCurrent(r.shippingLines, r.shipment.shippingLine);
         this.applyData(r.shipment);
+        this.isSuperUser = this.auth.hasRole('SuperUser');
         this.loading = false;
         this.cdr.markForCheck();
       },
       error: () => { this.error = 'Could not load this shipment.'; this.loading = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  saveBlNumber(): void {
+    this.blMessage = '';
+    this.blError = '';
+    const no = this.blNo.trim();
+    if (!no) { this.blError = 'BL/AWB number is required.'; return; }
+    if (no === this.data?.blAwbNo) { this.blMessage = 'No changes to save.'; return; }
+    if (this.blReason.trim().length < 5) { this.blError = 'Please give a short reason for the correction (at least 5 characters).'; return; }
+    this.blSaving = true;
+    this.corrections.saveBlNumber(this.shipmentId, no, this.blReason.trim()).subscribe({
+      next: () => {
+        this.blSaving = false;
+        this.blMessage = 'BL/AWB number updated.';
+        this.blReason = '';
+        this.historyKey++;
+        this.corrections.getShipment(this.shipmentId).subscribe({ next: (sh) => { this.applyData(sh); this.cdr.markForCheck(); } });
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.blSaving = false;
+        this.blError = err?.error?.message ?? 'Could not save the change.';
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -68,6 +104,7 @@ export class EditShipment implements OnInit {
 
   private applyData(s: ShipmentCorrection): void {
     this.data = s;
+    this.blNo = s.blAwbNo;
     this.form = {
       blAwbDate: s.blAwbDate ?? '',
       etd: s.etd ?? '',

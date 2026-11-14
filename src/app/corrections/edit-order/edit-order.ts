@@ -5,7 +5,10 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ChangeHistory } from '../change-history/change-history';
-import { CorrectionsService, LookupRef, PoCorrection, PoCorrectionRequest } from '../corrections.service';
+import { AuthService } from '../../auth/auth.service';
+import { CorrectionsService, LookupRef, PoCorrection, PoCorrectionRequest, PoIdentity } from '../corrections.service';
+
+interface DivisionOption extends LookupEntity { businessUnitId: number; }
 
 // Manager/SuperUser-only screen for correcting the DESCRIPTIVE fields of an
 // existing Purchase Order. Money, supplier, BU, PO number, status and the
@@ -18,6 +21,7 @@ import { CorrectionsService, LookupRef, PoCorrection, PoCorrectionRequest } from
 export class EditOrder implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
 
   orderId = 0;
   data: PoCorrection | null = null;
@@ -27,6 +31,18 @@ export class EditOrder implements OnInit {
   message = '';
   saveError = '';
   historyKey = 0;
+
+  // ---- Phase 2: identity / ownership (SuperUser only) ----
+  isSuperUser = false;
+  identity: PoIdentity | null = null;
+  idMessage = '';
+  idError = '';
+  idSaving = false;
+  businessUnits: LookupEntity[] = [];
+  allDivisions: DivisionOption[] = [];
+  suppliers: LookupEntity[] = [];
+  consignees: LookupEntity[] = [];
+  idForm = { poNumber: '', businessUnitId: null as number | null, divisionId: null as number | null, supplierId: null as number | null, consigneeId: null as number | null, reason: '' };
 
   originCountries: LookupEntity[] = [];
   incoterms: LookupEntity[] = [];
@@ -83,8 +99,89 @@ export class EditOrder implements OnInit {
         this.applyData(r.po);
         this.loading = false;
         this.cdr.markForCheck();
+        this.isSuperUser = this.auth.hasRole('SuperUser');
+        if (this.isSuperUser) this.loadIdentity();
       },
       error: () => { this.error = 'Could not load this order.'; this.loading = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  private loadIdentity(): void {
+    forkJoin({
+      identity: this.corrections.getOrderIdentity(this.orderId),
+      businessUnits: this.lookups.getAll<LookupEntity>('business-units'),
+      divisions: this.lookups.getAll<DivisionOption>('divisions'),
+      suppliers: this.lookups.getAll<LookupEntity>('business-partners/suppliers'),
+      consignees: this.lookups.getAll<LookupEntity>('business-partners/consignees')
+    }).subscribe({
+      next: (r) => {
+        this.identity = r.identity;
+        this.businessUnits = this.withCurrent(r.businessUnits, r.identity.businessUnit);
+        this.suppliers = this.withCurrent(r.suppliers, r.identity.supplier);
+        this.consignees = this.withCurrent(r.consignees, r.identity.consignee);
+        this.allDivisions = r.divisions;
+        this.idForm = {
+          poNumber: r.identity.poNumber,
+          businessUnitId: r.identity.businessUnit.id,
+          divisionId: r.identity.division.id,
+          supplierId: r.identity.supplier.id,
+          consigneeId: r.identity.consignee.id,
+          reason: ''
+        };
+        this.cdr.markForCheck();
+      },
+      error: () => { this.idError = 'Could not load the identity section.'; this.cdr.markForCheck(); }
+    });
+  }
+
+  get divisionsForBu(): DivisionOption[] {
+    const list = this.allDivisions.filter((d) => d.businessUnitId === this.idForm.businessUnitId);
+    const cur = this.identity?.division;
+    if (cur && this.idForm.businessUnitId === this.identity?.businessUnit.id && !list.some((d) => d.id === cur.id))
+      list.push({ id: cur.id, name: cur.name, businessUnitId: this.idForm.businessUnitId! } as DivisionOption);
+    return list;
+  }
+
+  onBuChange(): void {
+    if (!this.divisionsForBu.some((d) => d.id === this.idForm.divisionId)) this.idForm.divisionId = null;
+  }
+
+  get idChanged(): boolean {
+    const i = this.identity;
+    const f = this.idForm;
+    if (!i) return false;
+    return f.poNumber.trim() !== i.poNumber || f.businessUnitId !== i.businessUnit.id || f.divisionId !== i.division.id
+      || f.supplierId !== i.supplier.id || f.consigneeId !== i.consignee.id;
+  }
+
+  saveIdentity(): void {
+    const f = this.idForm;
+    this.idMessage = '';
+    this.idError = '';
+    if (!f.poNumber.trim() || !f.businessUnitId || !f.divisionId || !f.supplierId || !f.consigneeId) {
+      this.idError = 'PO number, Business Unit, Division, Supplier and Consignee are all required.';
+      return;
+    }
+    if (!this.idChanged) { this.idMessage = 'No changes to save.'; return; }
+    if (f.reason.trim().length < 5) { this.idError = 'Please give a short reason for the correction (at least 5 characters).'; return; }
+    this.idSaving = true;
+    this.corrections.saveOrderIdentity(this.orderId, {
+      poNumber: f.poNumber.trim(), businessUnitId: f.businessUnitId, divisionId: f.divisionId,
+      supplierId: f.supplierId, consigneeId: f.consigneeId, reason: f.reason.trim()
+    }).subscribe({
+      next: (res) => {
+        this.idSaving = false;
+        this.idMessage = `Saved — ${res.changed} field${res.changed === 1 ? '' : 's'} updated.`;
+        this.historyKey++;
+        this.corrections.getOrder(this.orderId).subscribe({ next: (po) => { this.applyData(po); this.cdr.markForCheck(); } });
+        this.loadIdentity();
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.idSaving = false;
+        this.idError = err?.error?.message ?? 'Could not save the changes.';
+        this.cdr.markForCheck();
+      }
     });
   }
 

@@ -81,6 +81,28 @@ export interface ShipmentCorrectionRequest {
   lineItems: { lineItemId: number; hsCode: string | null }[];
 }
 
+export interface PoIdentity {
+  id: number;
+  poNumber: string;
+  businessUnit: LookupRef;
+  division: LookupRef;
+  supplier: LookupRef;
+  consignee: LookupRef;
+  shipmentCount: number;
+  shipmentBlNumbers: string[];
+  poPaymentCount: number;
+  lineItemCount: number;
+}
+
+export interface PoIdentityRequest {
+  poNumber: string;
+  businessUnitId: number;
+  divisionId: number;
+  supplierId: number;
+  consigneeId: number;
+  reason: string;
+}
+
 export interface ChangeLogRow {
   id: number;
   fieldName: string;
@@ -99,6 +121,15 @@ export class CorrectionsService {
 
   getShipment(id: number) { return this.http.get<ShipmentCorrection>(`${API_URL}/corrections/shipments/${id}`); }
   saveShipment(id: number, req: ShipmentCorrectionRequest) { return this.http.put<{ changed: number }>(`${API_URL}/corrections/shipments/${id}`, req); }
+
+  // Phase 2 - SuperUser only
+  getOrderIdentity(id: number) { return this.http.get<PoIdentity>(`${API_URL}/corrections/orders/${id}/identity`); }
+  saveOrderIdentity(id: number, req: PoIdentityRequest) {
+    return this.http.put<{ changed: number }>(`${API_URL}/corrections/orders/${id}/identity`, req);
+  }
+  saveBlNumber(id: number, blAwbNo: string, reason: string) {
+    return this.http.put<{ changed: number }>(`${API_URL}/corrections/shipments/${id}/bl-number`, { blAwbNo, reason });
+  }
 
   getHistory(entityType: 'orders' | 'shipments', id: number) {
     return this.http.get<ChangeLogRow[]>(`${API_URL}/corrections/history/${entityType}/${id}`);

@@ -9,8 +9,8 @@
     <p style="color: #888; font-size: 13px;">{{ data.businessUnit }} — PO {{ data.poNumber }} — Status: {{ data.status }}</p>
 
     <p style="background: #fff8e1; border: 1px solid #f0e0a0; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #7a5c00;">
-      Corrections are recorded in the Change History below (who, when, old &rarr; new). BL/AWB number, the PO link, quantities and values
-      can't be changed here, and the Ship-on-Board date is still edited from Update Shipment. Changing container counts doesn't recalculate
+      Corrections are recorded in the Change History below (who, when, old &rarr; new). The PO link, quantities and values
+      can't be changed here (SuperUser can correct the BL/AWB number at the bottom), and the Ship-on-Board date is still edited from Update Shipment. Changing container counts doesn't recalculate
       anything already saved elsewhere (e.g. a clearance cost estimate that was already created).
     </p>
 
@@ -63,6 +63,28 @@
       </button>
       <span *ngIf="message" style="color: #1e7e34; font-size: 13px;">{{ message }}</span>
       <span *ngIf="saveError" style="color: #c0392b; font-size: 13px;">{{ saveError }}</span>
+    </div>
+
+    <div *ngIf="isSuperUser" style="border: 1px solid #e0b0a8; border-radius: 6px; margin-top: 1rem; padding: 16px; background: #fffafa;">
+      <h3 style="font-size: 14px; margin: 0 0 4px; color: #8a2a1f;">BL/AWB Number (SuperUser only)</h3>
+      <p style="font-size: 12px; color: #666; margin: 0 0 10px;">
+        Everything stays linked to this shipment - only the number shown everywhere changes. It must be unique.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+        <label>BL/AWB Number
+          <input [(ngModel)]="blNo" maxlength="50" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+        <label>Reason for correction (required, kept in Change History)
+          <input [(ngModel)]="blReason" maxlength="480" placeholder="e.g. Typo in BL number at registration" style="display: block; width: 100%; padding: 6px; margin-top: 2px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </label>
+      </div>
+      <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px;">
+        <button (click)="saveBlNumber()" [disabled]="blSaving || blNo.trim() === data.blAwbNo" style="padding: 8px 18px; background: #8a2a1f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+          {{ blSaving ? 'Saving...' : 'Save BL/AWB Number' }}
+        </button>
+        <span *ngIf="blMessage" style="color: #1e7e34; font-size: 13px;">{{ blMessage }}</span>
+        <span *ngIf="blError" style="color: #c0392b; font-size: 13px;">{{ blError }}</span>
+      </div>
     </div>
 
     <app-change-history [entityType]="'shipments'" [entityId]="shipmentId" [refreshKey]="historyKey" />
