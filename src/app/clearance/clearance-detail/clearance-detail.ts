@@ -68,6 +68,7 @@ export class ClearanceDetailComponent implements OnInit, AfterViewChecked {
   actualChargesForm: ActualCharges = this.emptyActualCharges();
   savingActualCharges = false;
   recalculatingForecast = false;
+  forecastNotice = '';
 
   freeZoneDestinations: LookupEntity[] = [];
   fzDepositOptions: FzDepositOption[] = [];
@@ -419,14 +420,31 @@ export class ClearanceDetailComponent implements OnInit, AfterViewChecked {
 
   loadActualCharges(): void {
     this.service.getActualCharges(this.shipmentId).subscribe({
-      next: (r) => { this.actualChargesForm = r ?? this.emptyActualCharges(); this.cdr.markForCheck(); }
+      next: (r) => {
+        this.actualChargesForm = r ?? this.emptyActualCharges();
+        if (r?.forecastAutoCaptured) this.forecastNotice = this.forecastCapturedText(r, 'The forecast was missing, so it has been captured automatically');
+        this.cdr.markForCheck();
+      }
     });
+  }
+
+  private forecastCapturedText(r: ActualCharges, prefix: string): string {
+    const total = (r.forecastDemurrageSdg ?? 0) + (r.forecastStorageSdg ?? 0);
+    return `${prefix}: ${total.toLocaleString('en-US', { maximumFractionDigits: 0 })} SDG (demurrage ${(r.forecastDemurrageSdg ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })} + storage ${(r.forecastStorageSdg ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}).`;
   }
 
   saveActualChargesClick(): void {
     this.savingActualCharges = true;
     this.service.saveActualCharges(this.shipmentId, this.actualChargesForm).subscribe({
-      next: () => { this.savingActualCharges = false; this.cdr.markForCheck(); },
+      next: (r) => {
+        this.savingActualCharges = false;
+        // The server returns the saved record; if the forecast was missing it has just been captured, so show it.
+        if (r) this.actualChargesForm = r;
+        this.forecastNotice = r?.forecastAutoCaptured
+          ? this.forecastCapturedText(r, 'Saved. The forecast was missing, so it was captured automatically')
+          : 'Saved.';
+        this.cdr.markForCheck();
+      },
       error: () => { this.savingActualCharges = false; this.error = 'Could not save Actual Charges.'; this.cdr.markForCheck(); }
     });
   }
@@ -434,8 +452,13 @@ export class ClearanceDetailComponent implements OnInit, AfterViewChecked {
   recalculateForecastClick(): void {
     this.recalculatingForecast = true;
     this.service.recalculateForecast(this.shipmentId).subscribe({
-      next: (r) => { this.actualChargesForm = r; this.recalculatingForecast = false; this.cdr.markForCheck(); },
-      error: () => { this.recalculatingForecast = false; this.error = 'Could not recalculate forecast.'; this.cdr.markForCheck(); }
+      next: (r) => {
+        this.actualChargesForm = r;
+        this.recalculatingForecast = false;
+        this.forecastNotice = this.forecastCapturedText(r, 'Forecast recalculated');
+        this.cdr.markForCheck();
+      },
+      error: () => { this.recalculatingForecast = false; this.forecastNotice = ''; this.error = 'Could not recalculate forecast.'; this.cdr.markForCheck(); }
     });
   }
 

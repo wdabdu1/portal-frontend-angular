@@ -71,6 +71,81 @@
         <div><span style="color: #888;">Free Days:</span> <strong>{{ data.summaryFreeDays ?? '—' }}</strong></div>
       </div>
 
+      <!-- Timeline & charge clocks (single shipment) -->
+      <div *ngIf="data.isSingleShipment && data.timeline as tl" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Timeline &amp; charges at a glance</p>
+
+        <div *ngIf="tl.dataGaps.length > 0" style="background: #fff4e5; border: 1px solid #f0d9b5; border-radius: 6px; padding: 10px 12px; margin-bottom: 12px; font-size: 12px; color: #7a4b00;">
+          <strong>Missing or inconsistent dates on this shipment</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0;"><li *ngFor="let g of tl.dataGaps" style="margin-bottom: 3px;">{{ g }}</li></ul>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 13px; margin-bottom: 14px;">
+          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
+            <span style="color: #888; font-size: 11px;">{{ tl.arrivalIsActual ? 'Actual Arrival' : 'Arrival (ETA - actual not entered)' }}</span><br>
+            <strong>{{ tl.arrivalDate ? (tl.arrivalDate | date: 'EEE d MMM y') : '—' }}</strong>
+          </div>
+          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
+            <span style="color: #888; font-size: 11px;">Clearance Completed</span><br>
+            <strong>{{ tl.clearanceCompletedDate ? (tl.clearanceCompletedDate | date: 'EEE d MMM y') : '—' }}</strong>
+          </div>
+          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
+            <span style="color: #888; font-size: 11px;">Truck Port Entry (ends storage)</span><br>
+            <strong>{{ tl.truckPortEntryDate ? (tl.truckPortEntryDate | date: 'EEE d MMM y') : '—' }}</strong>
+          </div>
+          <div style="background: #f7f9fb; border-radius: 6px; padding: 8px 10px;">
+            <span style="color: #888; font-size: 11px;">Containers Returned (ends demurrage)</span><br>
+            <strong>{{ tl.containersReturnedDate ? (tl.containersReturnedDate | date: 'EEE d MMM y') : '—' }}</strong>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+          <div *ngFor="let clock of [tl.demurrage, tl.storage]" style="border: 1px solid #e3e8ee; border-radius: 6px; padding: 10px 12px; font-size: 13px;">
+            <strong>{{ clock.name }}</strong>
+            <div style="color: #666; margin-top: 4px;">
+              {{ clock.startDate | date: 'd MMM' }} → {{ clock.endDate | date: 'd MMM y' }}
+              <span *ngIf="!clock.endIsActual" style="color: #a66a00;">({{ clock.endLabel }} not recorded - projected)</span>
+              : <strong>{{ clock.elapsedDays }} calendar day(s)</strong>
+            </div>
+            <div *ngFor="let l of clock.lines" style="margin-top: 6px;">
+              <span style="color: #555;">{{ l.label }} ({{ l.containerCount }}):</span>
+              free <strong>{{ l.freeDays }}</strong> ·
+              chargeable <strong [style.color]="l.chargeableDays > 0 ? '#c0392b' : '#1e7e34'">{{ l.chargeableDays }}</strong>
+            </div>
+            <div *ngIf="clock.freeEndsOn" style="margin-top: 6px; font-size: 12px; color: #666;">Free days run out on <strong>{{ clock.freeEndsOn | date: 'EEE d MMM y' }}</strong></div>
+            <div style="margin-top: 6px;">Charge: <strong>{{ clock.costSdg | number: '1.0-0' }} SDG</strong></div>
+          </div>
+        </div>
+
+        <div *ngFor="let a of tl.attribution" style="margin-top: 14px;">
+          <p style="font-size: 12px; color: #555; margin: 0 0 6px;">
+            <strong>Where the days went - {{ a.clock }}</strong>
+            (free days: {{ a.freeDays }}, chargeable days: <strong [style.color]="a.totalChargeableDays > 0 ? '#c0392b' : '#1e7e34'">{{ a.totalChargeableDays }}</strong>)
+          </p>
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #555;">
+                <th style="padding: 4px;">Step (ends on)</th><th style="padding: 4px;">From</th><th style="padding: 4px;">To</th>
+                <th style="padding: 4px;">Calendar days</th><th style="padding: 4px;">Day # at end</th>
+                <th style="padding: 4px;">Used free days</th><th style="padding: 4px;">Chargeable days</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of a.rows" style="border-bottom: 1px solid #eee;" [style.background]="r.chargeableDays > 0 ? '#fdf1f0' : 'transparent'">
+                <td style="padding: 4px;">{{ r.step }}<span *ngIf="r.note" style="display:block; color:#a66a00; font-size: 11px;">{{ r.note }}</span></td>
+                <td style="padding: 4px;">{{ r.from | date: 'd MMM' }}</td>
+                <td style="padding: 4px;">{{ r.to | date: 'd MMM' }}</td>
+                <td style="padding: 4px;">{{ r.calendarDays }}</td>
+                <td style="padding: 4px;">{{ r.cumulativeDays }}</td>
+                <td style="padding: 4px;">{{ r.freeDaysUsed }}</td>
+                <td style="padding: 4px; font-weight: 600;" [style.color]="r.chargeableDays > 0 ? '#c0392b' : '#333'">{{ r.chargeableDays }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size: 11px; color: #999; margin: 10px 0 0;">Calendar days include weekends and holidays. Free days are used up by the earliest days; every step after the cut-off is what causes the chargeable days. The step table further down measures each step in working days.</p>
+      </div>
+
       <!-- Pre-Arrival Document Chain (informational only) -->
       <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
         <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Pre-Arrival Document Chain</p>
@@ -319,7 +394,7 @@
 
         <div style="margin-top: 16px; padding-top: 12px; border-top: 2px solid #ccc; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 14px;">
           <div>
-            Forecast <span style="color: #888; font-size: 11px;">(frozen at Truck &amp; Containers completion)</span><br>
+            Forecast <span style="color: #888; font-size: 11px;">(charges if every step had hit its SLA from arrival)</span><br>
             <strong>{{ data.forecastTotalSdg !== null ? (data.forecastTotalSdg | number: '1.0-0') + ' SDG' : '—' }}</strong>
           </div>
           <div>

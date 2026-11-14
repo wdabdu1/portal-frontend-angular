@@ -27,6 +27,22 @@ export interface CategoryGapRollup {
   totalGapDays: number;
 }
 
+export interface ClockSizeLine { label: string; containerCount: number; freeDays: number; chargeableDays: number; }
+export interface ChargeClock {
+  name: string; startDate: string | null; endDate: string | null; endIsActual: boolean; endLabel: string;
+  elapsedDays: number; freeEndsOn: string | null; lines: ClockSizeLine[]; costSdg: number;
+}
+export interface AttributionRow {
+  step: string; from: string; to: string; calendarDays: number; cumulativeDays: number;
+  freeDaysUsed: number; chargeableDays: number; note: string | null;
+}
+export interface ClockAttribution { clock: string; freeDays: number; totalChargeableDays: number; rows: AttributionRow[]; }
+export interface DemurrageTimeline {
+  arrivalDate: string | null; arrivalIsActual: boolean; clearanceCompletedDate: string | null;
+  truckPortEntryDate: string | null; containersReturnedDate: string | null;
+  demurrage: ChargeClock; storage: ChargeClock; attribution: ClockAttribution[]; dataGaps: string[];
+}
+
 export interface DemurrageAnalysisResult {
   isSingleShipment: boolean;
   shipmentCount: number;
@@ -68,6 +84,7 @@ export interface DemurrageAnalysisResult {
   warnings: string[];
   // Single shipment, Route 1 only: the Logistics-owned wait after clearance (SPC Bill settlement ->
   // whole shipment on trucks) and its logged delay reasons. NOT part of the stepGaps reconciliation.
+  timeline?: DemurrageTimeline | null;
   logisticsSteps?: ClearanceStepGap[] | null;
   logisticsDelays?: {
     id: number; reason: string; fromDate: string; toDate: string | null; days: number; ongoing: boolean; note: string | null; createdBy: string;

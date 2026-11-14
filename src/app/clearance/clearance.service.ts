@@ -29,6 +29,7 @@ export interface ActualCharges {
   plannedCompletionDate: string | null;
   depositPaidSdg: number | null;
   comments: string | null;
+  forecastAutoCaptured?: boolean;
 }
 
 export interface WithdrawalLineInput {
@@ -283,7 +284,7 @@ export class ClearanceService {
     return this.http.get<ActualCharges | null>(`${API_URL}/clearance/${shipmentId}/actual-charges`);
   }
   saveActualCharges(shipmentId: number, req: Partial<ActualCharges>) {
-    return this.http.put(`${API_URL}/clearance/${shipmentId}/actual-charges`, req);
+    return this.http.put<ActualCharges>(`${API_URL}/clearance/${shipmentId}/actual-charges`, req);
   }
   recalculateForecast(shipmentId: number) {
     return this.http.post<ActualCharges>(`${API_URL}/clearance/${shipmentId}/actual-charges/recalculate-forecast`, {});
