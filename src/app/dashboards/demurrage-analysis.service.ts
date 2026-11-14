@@ -68,7 +68,7 @@ export interface DemurrageAnalysisResult {
   warnings: string[];
   // Single shipment, Route 1 only: the Logistics-owned wait after clearance (SPC Bill settlement ->
   // whole shipment on trucks) and its logged delay reasons. NOT part of the stepGaps reconciliation.
-  logisticsStep?: ClearanceStepGap | null;
+  logisticsSteps?: ClearanceStepGap[] | null;
   logisticsDelays?: {
     id: number; reason: string; fromDate: string; toDate: string | null; days: number; ongoing: boolean; note: string | null; createdBy: string;
   }[] | null;

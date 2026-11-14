@@ -50,7 +50,7 @@ export class DelaySummaryPage implements OnInit {
   exportDispatch(): void {
     if (!this.data) return;
     exportToExcel('Logistics Dispatch', [
-      { key: 'blAwbNo', label: 'BL No.' }, { key: 'businessUnit', label: 'BU' }, { key: 'consignee', label: 'Consignee' },
+      { key: 'blAwbNo', label: 'BL No.' }, { key: 'withdrawalRef', label: 'FZ Withdrawal Ref' }, { key: 'businessUnit', label: 'BU' }, { key: 'consignee', label: 'Consignee' },
       { key: 'releaseDate', label: 'Clearance Release' }, { key: 'firstLoadDate', label: 'First Truck Loaded' },
       { key: 'fullyDispatchedDate', label: 'Fully Dispatched' }, { key: 'days', label: 'Business Days' },
       { key: 'targetDays', label: 'Target' }, { key: 'gap', label: 'Gap (+/-)' },

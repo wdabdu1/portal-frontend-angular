@@ -183,7 +183,7 @@ export class SimpleLookup implements OnInit {
       error: (err) => {
         this.deletingId = null;
         this.error = err?.status === 409
-          ? `"${label}" is in use and can't be deleted.`
+          ? `"${label}" is in use and can't be deleted. If it has an Active tick box, untick it to retire the entry instead.`
           : `Could not delete this entry.`;
         this.cdr.markForCheck();
       }

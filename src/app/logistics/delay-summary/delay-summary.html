@@ -48,11 +48,11 @@
     <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <p style="font-size: 12px; color: #888; margin: 0; text-transform: uppercase;">
-          Dispatch: Clearance release (SPC Bill) → whole shipment on trucks — target {{ data.dispatchTargetDays }} business day(s)
+          Dispatch: Clearance release (SPC Bill / FZ Release &amp; Exit Pass) → whole shipment or withdrawal on trucks — target {{ data.dispatchTargetDays }} business day(s)
         </p>
         <button (click)="exportDispatch()" style="padding: 5px 12px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Export to Excel</button>
       </div>
-      <p *ngIf="data.dispatch.length === 0" style="color: #888; font-size: 13px; margin: 10px 0 0;">No released shipments in this period.</p>
+      <p *ngIf="data.dispatch.length === 0" style="color: #888; font-size: 13px; margin: 10px 0 0;">No released shipments or withdrawals in this period.</p>
       <div *ngIf="data.dispatch.length > 0" style="overflow-x: auto; max-height: 60vh; overflow-y: auto; margin-top: 8px;">
         <table style="width: 100%; min-width: 1100px; border-collapse: collapse; font-size: 13px;">
           <thead>
@@ -72,7 +72,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let d of data.dispatch" style="border-bottom: 1px solid #eee;">
-              <td style="padding: 6px; font-family: monospace;">{{ d.blAwbNo }}</td>
+              <td style="padding: 6px; font-family: monospace;">{{ d.blAwbNo }}<span *ngIf="d.withdrawalId" style="font-family: inherit; color: #666;"> · FZ withdrawal {{ d.withdrawalRef || ('#' + d.withdrawalId) }}</span></td>
               <td style="padding: 6px;">{{ d.businessUnit }}</td>
               <td style="padding: 6px;">{{ d.consignee }}</td>
               <td style="padding: 6px;">{{ d.releaseDate | date: 'dd/MM/yyyy' }}</td>

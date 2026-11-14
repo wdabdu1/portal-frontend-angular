@@ -38,6 +38,7 @@ export interface DispatchRow {
   releaseDate: string; firstLoadDate: string | null; fullyDispatchedDate: string | null;
   days: number; dispatched: boolean; targetDays: number; gap: number; loggedDays: number; unexplainedDays: number;
   totalQty: number; loadedQty: number;
+  withdrawalId?: number | null; withdrawalRef?: string | null;
 }
 export interface CityDeliveryPerformance { city: string; targetDays: number | null; drops: number; avgDays: number; onTime: number; late: number; }
 export interface DelaySummary {
