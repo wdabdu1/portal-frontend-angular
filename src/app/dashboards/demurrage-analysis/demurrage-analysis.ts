@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
-import { DemurrageAnalysisResult, DemurrageAnalysisService, ShipmentWithHitOption } from '../demurrage-analysis.service';
+import { AuthService } from '../../auth/auth.service';
+import { DemurrageAnalysisResult, DemurrageAnalysisService, ForecastRecalcResult, ShipmentWithHitOption } from '../demurrage-analysis.service';
 
 type PeriodType = 'Monthly' | 'Quarterly' | 'Annual';
 
@@ -13,6 +14,34 @@ type PeriodType = 'Monthly' | 'Quarterly' | 'Annual';
 })
 export class DemurrageAnalysis implements OnInit {
   private cdr = inject(ChangeDetectorRef);
+  private auth = inject(AuthService);
+
+  // Manager / SuperUser: one-click "recalculate all forecasts"
+  get canRecalcForecasts(): boolean { return this.auth.hasRole('Manager') || this.auth.hasRole('SuperUser'); }
+  recalcBusy = false;
+  recalcConfirm = false;
+  recalcResult: ForecastRecalcResult | null = null;
+  recalcError = '';
+
+  recalcAll(): void {
+    this.recalcBusy = true;
+    this.recalcError = '';
+    this.recalcResult = null;
+    this.service.recalculateAllForecasts().subscribe({
+      next: (r) => {
+        this.recalcBusy = false;
+        this.recalcConfirm = false;
+        this.recalcResult = r;
+        this.onFilterChange();
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.recalcBusy = false;
+        this.recalcError = err?.error?.message ?? 'Could not recalculate the forecasts.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
 
   loading = true;
   data: DemurrageAnalysisResult | null = null;

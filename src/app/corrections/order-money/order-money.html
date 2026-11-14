@@ -1,0 +1,101 @@
+<!-- Phase 3 - SuperUser only: order lines (money) and offshore chain -->
+<div style="border: 1px solid #e0b0a8; border-radius: 6px; margin-top: 1rem; padding: 16px; background: #fffafa;">
+  <h3 style="font-size: 14px; margin: 0 0 4px; color: #8a2a1f;">Order Lines - Quantity, Price, Currency, UoM (SuperUser only)</h3>
+  <p style="font-size: 12px; color: #666; margin: 0 0 10px;">
+    Totals, shipment line values and planned payment lines are recalculated automatically (USD total at today's rate).
+    Quantity can't go below what is already shipped, and the PO's recorded payments can't exceed 100% of the corrected value.
+  </p>
+
+  <p *ngIf="lines?.moneyLocked" style="background: #fdf1f0; border: 1px solid #f0c9c4; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #8a2a1f;">
+    {{ lines?.lockReason }}
+  </p>
+
+  <div *ngIf="lines" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #666;">
+          <th style="padding: 6px;">Model</th>
+          <th style="padding: 6px;">Qty</th>
+          <th style="padding: 6px;">UoM</th>
+          <th style="padding: 6px;">Unit Price</th>
+          <th style="padding: 6px;">Currency</th>
+          <th style="padding: 6px; text-align: right;">Total</th>
+          <th style="padding: 6px; text-align: right;">Shipped</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of edits" style="border-bottom: 1px solid #eee; vertical-align: middle;">
+          <td style="padding: 6px;">{{ e.row.model }}<div style="color: #999; font-size: 11px;">{{ e.row.category }}</div></td>
+          <td style="padding: 6px;"><input type="text" appThousands [(ngModel)]="e.qty" [disabled]="lines.moneyLocked" style="width: 90px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" /></td>
+          <td style="padding: 6px;">
+            <select [(ngModel)]="e.uomId" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+              <option *ngFor="let u of uoms" [ngValue]="u.id">{{ u['code'] }}</option>
+              <option *ngIf="!uoms.length" [ngValue]="e.row.uom.id">{{ e.row.uom.name }}</option>
+            </select>
+          </td>
+          <td style="padding: 6px;"><input type="text" appThousands [(ngModel)]="e.unitPrice" [disabled]="lines.moneyLocked" style="width: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" /></td>
+          <td style="padding: 6px;">
+            <select [(ngModel)]="e.currencyId" [disabled]="lines.moneyLocked" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+              <option *ngFor="let c of currencies" [ngValue]="c.id">{{ c['code'] }}</option>
+              <option *ngIf="!currencies.length" [ngValue]="e.row.currency.id">{{ e.row.currency.name }}</option>
+            </select>
+          </td>
+          <td style="padding: 6px; text-align: right; white-space: nowrap;">
+            {{ newTotal(e) | number: '1.2-2' }}
+            <div *ngIf="moneyChanged(e)" style="color: #a66a00; font-size: 11px;">was {{ e.row.total | number: '1.2-2' }}</div>
+          </td>
+          <td style="padding: 6px; text-align: right; color: #666;">{{ e.row.shippedQty | number: '1.0-4' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <input [(ngModel)]="lineReason" maxlength="480" placeholder="Reason for correction (required, kept in Change History)" style="flex: 1; min-width: 260px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" />
+    <button (click)="saveLines()" [disabled]="lineSaving || !linesChanged" style="padding: 8px 18px; background: #8a2a1f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      {{ lineSaving ? 'Saving...' : 'Save Line Corrections' }}
+    </button>
+  </div>
+  <p *ngIf="lineMsg" style="color: #1e7e34; font-size: 13px; margin: 8px 0 0;">{{ lineMsg }}</p>
+  <p *ngIf="lineErr" style="color: #c0392b; font-size: 13px; margin: 8px 0 0;">{{ lineErr }}</p>
+</div>
+
+<div style="border: 1px solid #e0b0a8; border-radius: 6px; margin-top: 1rem; padding: 16px; background: #fffafa;">
+  <h3 style="font-size: 14px; margin: 0 0 4px; color: #8a2a1f;">Offshore Chain (SuperUser only)</h3>
+  <p style="font-size: 12px; color: #666; margin: 0 0 10px;">
+    The chain is replaced as a whole. If it changes, this order's <strong>Transfer Pricing entries are deleted</strong> (and TP is unlocked) so TP can be redone,
+    and the ERP info of any changed stage is deleted. Currently: <strong>{{ chain?.tpEntryCount ?? 0 }}</strong> TP row(s),
+    <strong>{{ chain?.erpInfoCount ?? 0 }}</strong> ERP info row(s) on <strong>{{ chain?.shipmentCount ?? 0 }}</strong> shipment(s).
+    <span *ngIf="chain?.sharedWithOtherPos">Shares a shipment with other POs - they must keep the same chain.</span>
+  </p>
+
+  <div *ngFor="let id of chainIds; let i = index; trackBy: trackIndex" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px;">
+    <span style="width: 56px; color: #666;">Stage {{ i + 1 }}</span>
+    <select [(ngModel)]="chainIds[i]" (ngModelChange)="chainConfirm = null" style="flex: 1; max-width: 420px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <option [ngValue]="null">-- select company --</option>
+      <option *ngFor="let p of optionsFor(i)" [ngValue]="p.id">{{ p.name }}</option>
+    </select>
+    <button (click)="move(i, -1)" [disabled]="i === 0" title="Move up" style="padding: 4px 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">&uarr;</button>
+    <button (click)="move(i, 1)" [disabled]="i === chainIds.length - 1" title="Move down" style="padding: 4px 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">&darr;</button>
+    <button (click)="removeStage(i)" title="Remove stage" style="padding: 4px 8px; border: 1px solid #e0b0a8; color: #8a2a1f; background: #fff; border-radius: 4px; cursor: pointer;">&times;</button>
+  </div>
+  <button (click)="addStage()" style="padding: 5px 12px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px;">+ Add stage</button>
+
+  <div *ngIf="chainConfirm" style="background: #fff8e1; border: 1px solid #f0e0a0; border-radius: 6px; padding: 10px 12px; margin-top: 12px; font-size: 13px; color: #7a5c00;">
+    This will delete <strong>{{ chainConfirm.tpRows }}</strong> Transfer Pricing row(s) and <strong>{{ chainConfirm.erpRows }}</strong> ERP info row(s).
+    Transfer Pricing will have to be redone for this order's shipments. This can't be undone.
+    <div style="margin-top: 8px;">
+      <button (click)="saveChain(true)" [disabled]="chainSaving" style="padding: 7px 16px; background: #8a2a1f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Yes, delete them and apply the new chain</button>
+      <button (click)="chainConfirm = null" style="padding: 7px 16px; margin-left: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;">Cancel</button>
+    </div>
+  </div>
+
+  <div *ngIf="!chainConfirm" style="margin-top: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <input [(ngModel)]="chainReason" maxlength="480" placeholder="Reason for correction (required, kept in Change History)" style="flex: 1; min-width: 260px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" />
+    <button (click)="saveChain(false)" [disabled]="chainSaving || !chainChanged" style="padding: 8px 18px; background: #8a2a1f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+      {{ chainSaving ? 'Saving...' : 'Save Offshore Chain' }}
+    </button>
+  </div>
+  <p *ngIf="chainMsg" style="color: #1e7e34; font-size: 13px; margin: 8px 0 0;">{{ chainMsg }}</p>
+  <p *ngIf="chainErr" style="color: #c0392b; font-size: 13px; margin: 8px 0 0;">{{ chainErr }}</p>
+</div>

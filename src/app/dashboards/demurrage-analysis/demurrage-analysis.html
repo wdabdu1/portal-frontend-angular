@@ -2,6 +2,36 @@
   <h1 style="font-size: 20px; font-weight: 500;">Demurrage Analysis</h1>
   <p style="color: #888; font-size: 13px;">Based on shipments with a real Demurrage or Storage payment recorded, filtered by ETA.</p>
 
+  <!-- Admin: recalculate every captured forecast (Manager / SuperUser) -->
+  <div *ngIf="canRecalcForecasts" style="margin-top: 8px; font-size: 12px; color: #555;">
+    <button *ngIf="!recalcConfirm" (click)="recalcConfirm = true; recalcResult = null" style="padding: 5px 12px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px;">
+      Recalculate all forecasts
+    </button>
+    <span *ngIf="recalcConfirm">
+      Re-compute the forecast of every shipment that already has one (Actual Paid figures are not touched; locked shipments are skipped)?
+      <button (click)="recalcAll()" [disabled]="recalcBusy" style="padding: 5px 12px; margin-left: 6px; background: #0a3d62; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        {{ recalcBusy ? 'Working...' : 'Yes, recalculate' }}
+      </button>
+      <button (click)="recalcConfirm = false" [disabled]="recalcBusy" style="padding: 5px 12px; margin-left: 4px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px;">Cancel</button>
+    </span>
+    <span *ngIf="recalcError" style="color: #c0392b; margin-left: 8px;">{{ recalcError }}</span>
+    <div *ngIf="recalcResult" style="margin-top: 6px; background: #f3faf4; border: 1px solid #cfe8d3; border-radius: 4px; padding: 8px 12px; color: #1e5e2c;">
+      Done - {{ recalcResult.updated }} updated, {{ recalcResult.unchanged }} already correct,
+      {{ recalcResult.skippedLocked }} skipped (locked), {{ recalcResult.notApplicable }} not applicable (no plan / not FCL).
+      <details *ngIf="recalcResult.changes.length > 0" style="margin-top: 4px; color: #333;">
+        <summary style="cursor: pointer;">Forecast changes ({{ recalcResult.changes.length }})</summary>
+        <table style="font-size: 11px; border-collapse: collapse; margin-top: 4px;">
+          <tr style="text-align: left; color: #666;"><th style="padding: 2px 8px;">BL</th><th style="padding: 2px 8px;">Demurrage (old &rarr; new)</th><th style="padding: 2px 8px;">Storage (old &rarr; new)</th></tr>
+          <tr *ngFor="let c of recalcResult.changes">
+            <td style="padding: 2px 8px;">{{ c.blAwbNo }}</td>
+            <td style="padding: 2px 8px;">{{ c.oldDemurrageSdg | number: '1.0-0' }} &rarr; {{ c.newDemurrageSdg | number: '1.0-0' }}</td>
+            <td style="padding: 2px 8px;">{{ c.oldStorageSdg | number: '1.0-0' }} &rarr; {{ c.newStorageSdg | number: '1.0-0' }}</td>
+          </tr>
+        </table>
+      </details>
+    </div>
+  </div>
+
   <!-- Filters -->
   <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center; background: #f7f7f7; padding: 12px; border-radius: 6px;">
     <select [(ngModel)]="periodType" (ngModelChange)="onFilterChange()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">

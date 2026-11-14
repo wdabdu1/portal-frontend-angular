@@ -103,6 +103,25 @@ export interface PoIdentityRequest {
   reason: string;
 }
 
+export interface LineCorrectionRow {
+  lineId: number; category: string; model: string; qty: number; uom: LookupRef; unitPrice: number; currency: LookupRef;
+  total: number; totalUsd: number; shippedQty: number; shipmentCount: number;
+}
+export interface LinesCorrection {
+  id: number; poNumber: string; status: string; moneyLocked: boolean; lockReason: string | null; poPaymentCount: number;
+  lines: LineCorrectionRow[];
+}
+export interface LineCorrectionInput { lineId: number; qty: number; unitPrice: number; currencyId: number; unitOfMeasureId: number; }
+
+export interface ChainRow { id: number; sequenceOrder: number; partner: LookupRef; }
+export interface ChainInfo {
+  id: number; poNumber: string; chain: ChainRow[]; tpEntryCount: number; erpInfoCount: number; shipmentCount: number; sharedWithOtherPos: boolean;
+}
+export interface ChainSaveResult { changed: number; needsConfirm: boolean; tpRows: number; erpRows: number; }
+
+export interface ForecastRecalcRow { blAwbNo: string; oldDemurrageSdg: number | null; newDemurrageSdg: number | null; oldStorageSdg: number | null; newStorageSdg: number | null; }
+export interface ForecastRecalcResult { updated: number; unchanged: number; skippedLocked: number; notApplicable: number; changes: ForecastRecalcRow[]; }
+
 export interface ChangeLogRow {
   id: number;
   fieldName: string;
@@ -129,6 +148,16 @@ export class CorrectionsService {
   }
   saveBlNumber(id: number, blAwbNo: string, reason: string) {
     return this.http.put<{ changed: number }>(`${API_URL}/corrections/shipments/${id}/bl-number`, { blAwbNo, reason });
+  }
+
+  // Phase 3 - SuperUser only
+  getLines(id: number) { return this.http.get<LinesCorrection>(`${API_URL}/corrections/orders/${id}/lines`); }
+  saveLines(id: number, lines: LineCorrectionInput[], reason: string) {
+    return this.http.put<{ changed: number }>(`${API_URL}/corrections/orders/${id}/lines`, { lines, reason });
+  }
+  getChain(id: number) { return this.http.get<ChainInfo>(`${API_URL}/corrections/orders/${id}/chain`); }
+  saveChain(id: number, partnerIds: number[], reason: string, confirm: boolean) {
+    return this.http.put<ChainSaveResult>(`${API_URL}/corrections/orders/${id}/chain`, { partnerIds, reason, confirm });
   }
 
   getHistory(entityType: 'orders' | 'shipments', id: number) {

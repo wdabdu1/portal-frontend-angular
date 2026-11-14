@@ -105,6 +105,13 @@ export interface DemurrageFilters {
   shippingLineId?: number;
 }
 
+export interface ForecastRecalcRow {
+  blAwbNo: string; oldDemurrageSdg: number | null; newDemurrageSdg: number | null; oldStorageSdg: number | null; newStorageSdg: number | null;
+}
+export interface ForecastRecalcResult {
+  updated: number; unchanged: number; skippedLocked: number; notApplicable: number; changes: ForecastRecalcRow[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class DemurrageAnalysisService {
   constructor(private http: HttpClient) {}
@@ -126,5 +133,10 @@ export class DemurrageAnalysisService {
 
   getShipmentsWithHits(filters: DemurrageFilters) {
     return this.http.get<ShipmentWithHitOption[]>(`${API_URL}/dashboards/demurrage-analysis/shipments-with-hits${this.buildParams(filters)}`);
+  }
+
+  // Manager / SuperUser: re-compute the SLA-plan forecast of every shipment that already has one.
+  recalculateAllForecasts() {
+    return this.http.post<ForecastRecalcResult>(`${API_URL}/clearance/recalculate-all-forecasts`, {});
   }
 }

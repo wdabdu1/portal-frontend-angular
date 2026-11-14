@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ChangeHistory } from '../change-history/change-history';
+import { OrderMoneyCorrections } from '../order-money/order-money';
 import { AuthService } from '../../auth/auth.service';
 import { CorrectionsService, LookupRef, PoCorrection, PoCorrectionRequest, PoIdentity } from '../corrections.service';
 
@@ -15,7 +16,7 @@ interface DivisionOption extends LookupEntity { businessUnitId: number; }
 // offshore chain are deliberately not here (see RecordCorrectionsController).
 @Component({
   selector: 'app-edit-order',
-  imports: [CommonModule, FormsModule, RouterLink, ChangeHistory],
+  imports: [CommonModule, FormsModule, RouterLink, ChangeHistory, OrderMoneyCorrections],
   templateUrl: './edit-order.html'
 })
 export class EditOrder implements OnInit {

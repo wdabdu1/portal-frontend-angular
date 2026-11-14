@@ -18,6 +18,7 @@ export class ChangeHistory implements OnChanges {
   @Input() refreshKey = 0;
 
   rows: ChangeLogRow[] = [];
+  display: { row: ChangeLogRow; reason: string | null; isNote: boolean }[] = [];
   loading = true;
   error = '';
 
@@ -27,9 +28,29 @@ export class ChangeHistory implements OnChanges {
     if (!this.entityId) return;
     this.loading = true;
     this.service.getHistory(this.entityType, this.entityId).subscribe({
-      next: (r) => { this.rows = r; this.loading = false; this.error = ''; this.cdr.markForCheck(); },
+      next: (r) => { this.rows = r; this.buildDisplay(); this.loading = false; this.error = ''; this.cdr.markForCheck(); },
       error: () => { this.error = 'Could not load history.'; this.loading = false; this.cdr.markForCheck(); }
     });
+  }
+
+  // Informational rows written next to a change (they have no "old value").
+  private static readonly NOTE_FIELDS = ['Transfer Pricing entries deleted', 'Offshore ERP info deleted', 'Shipment line subtotals recalculated'];
+
+  // Every save writes its changed fields plus one "Correction reason" row, all with the same timestamp.
+  // Show the reason once, under the first change of that save, instead of as a separate row with an "(empty)" old value.
+  private buildDisplay(): void {
+    const reasonOf = new Map<string, string>();
+    for (const r of this.rows)
+      if (r.fieldName === 'Correction reason') reasonOf.set(r.changedAt + '|' + r.changedByName, r.newValue ?? '');
+    const shown = new Set<string>();
+    this.display = [];
+    for (const r of this.rows) {
+      if (r.fieldName === 'Correction reason') continue;
+      const key = r.changedAt + '|' + r.changedByName;
+      const reason = !shown.has(key) ? (reasonOf.get(key) ?? null) : null;
+      shown.add(key);
+      this.display.push({ row: r, reason, isNote: ChangeHistory.NOTE_FIELDS.includes(r.fieldName) });
+    }
   }
 
   // Dates were stored as yyyy-MM-dd; show them as DD/MM/YYYY like the rest of the app.
