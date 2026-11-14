@@ -209,6 +209,52 @@
         <p style="font-size: 11px; color: #999; margin: 8px 0 0;">Combines the Pre-Arrival Document Chain above and the Clearance Steps table — one view of who's actually accountable for the days lost.</p>
       </div>
 
+      <!-- Logistics Dispatch (after clearance; outside the demurrage reconciliation above) -->
+      <div *ngIf="data.isSingleShipment && data.logisticsStep" style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Logistics — after clearance (not part of the demurrage period)</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 6px;">Step in Working Days</th><th style="padding: 6px;">Category</th>
+              <th style="padding: 6px;">Actual Days</th><th style="padding: 6px;">Target Days</th><th style="padding: 6px;">Gap (+/-)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 6px;">{{ data.logisticsStep.groupItem }}</td>
+              <td style="padding: 6px; color: #666;">{{ data.logisticsStep.category }}</td>
+              <td style="padding: 6px;">{{ data.logisticsStep.actualDaysTaken !== null ? (data.logisticsStep.actualDaysTaken | number: '1.0-1') : '—' }}</td>
+              <td style="padding: 6px;">{{ data.logisticsStep.targetDays !== null ? (data.logisticsStep.targetDays | number: '1.0-1') : '—' }}</td>
+              <td style="padding: 6px;">
+                <span *ngIf="data.logisticsStep.gap !== null" [style.color]="data.logisticsStep.gap > 0 ? '#c0392b' : (data.logisticsStep.gap < 0 ? '#1e7e34' : '#333')" style="font-weight: 600;">
+                  {{ data.logisticsStep.gap > 0 ? '+' : '' }}{{ data.logisticsStep.gap | number: '1.0-1' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="data.logisticsDelays && data.logisticsDelays.length > 0" style="margin-top: 12px;">
+          <p style="font-size: 12px; color: #666; margin: 0 0 6px;">Logged delay reasons (explain the wait; not added on top of it)</p>
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #555;">
+                <th style="padding: 4px;">Reason</th><th style="padding: 4px;">From</th><th style="padding: 4px;">To</th><th style="padding: 4px;">Days</th><th style="padding: 4px;">Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of data.logisticsDelays" style="border-bottom: 1px solid #eee;">
+                <td style="padding: 4px;">{{ d.reason }}</td>
+                <td style="padding: 4px;">{{ d.fromDate | date: 'dd/MM/yyyy' }}</td>
+                <td style="padding: 4px;">{{ d.toDate ? (d.toDate | date: 'dd/MM/yyyy') : '' }}<span *ngIf="d.ongoing" style="color: #a66a00;">ongoing</span></td>
+                <td style="padding: 4px; font-weight: 600;">{{ d.days }}</td>
+                <td style="padding: 4px; white-space: normal;">{{ d.note || '' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p *ngIf="!data.logisticsDelays || data.logisticsDelays.length === 0" style="font-size: 12px; color: #999; margin: 8px 0 0;">No delay reasons logged for this shipment.</p>
+      </div>
+
       <!-- Charge Calculations -->
       <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
         <p style="font-size: 12px; color: #888; margin: 0 0 12px; text-transform: uppercase;">Charge Calculations</p>

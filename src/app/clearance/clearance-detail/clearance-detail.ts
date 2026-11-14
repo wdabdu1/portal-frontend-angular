@@ -7,6 +7,7 @@ import { ThousandsInputDirective } from '../../shared/thousands-input.directive'
 import { SectionLockBadge } from '../../section-lock/section-lock-badge';
 import { SectionLockInfo, SectionLockService } from '../../section-lock/section-lock.service';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
+import { DelayLog } from '../../logistics/delay-log/delay-log';
 import { ShipmentInfoPanel } from '../../shared/shipment-info-panel/shipment-info-panel';
 import {
   ActualCharges, ClearanceCertificateEntry, ClearanceCostEstimate, ClearanceDeliveryOrder,
@@ -21,13 +22,13 @@ interface GroupItemDef {
 
 @Component({
   selector: 'app-clearance-detail',
-  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective, SectionLockBadge, ShipmentInfoPanel],
+  imports: [CommonModule, FormsModule, RouterLink, ThousandsInputDirective, SectionLockBadge, ShipmentInfoPanel, DelayLog],
   templateUrl: './clearance-detail.html'
 })
 export class ClearanceDetailComponent implements OnInit, AfterViewChecked {
   private cdr = inject(ChangeDetectorRef);
   private host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private auth = inject(AuthService);
+  readonly auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 

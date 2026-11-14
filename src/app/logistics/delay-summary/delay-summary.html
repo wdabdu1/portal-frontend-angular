@@ -1,0 +1,154 @@
+<div style="max-width: 1300px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1 style="font-size: 20px; font-weight: 500;">Delay Summary</h1>
+  <p style="color: #888; font-size: 13px;">
+    Where the wait between Clearance release and trucks loaded comes from, how long each shipment took to be fully dispatched,
+    and how delivery to each city compares with its target. Delay days explain the wait; they are not added on top of it.
+  </p>
+
+  <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin: 12px 0;">
+    <div><label style="display:block; font-size:12px; color:#555;">From</label><input type="date" [(ngModel)]="from" style="padding:6px;" /></div>
+    <div><label style="display:block; font-size:12px; color:#555;">To</label><input type="date" [(ngModel)]="to" style="padding:6px;" /></div>
+    <button (click)="load()" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">Apply</button>
+    <button (click)="clearFilters()" style="padding: 7px 12px; background: transparent; color: #555; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Clear</button>
+    <span style="font-size: 11px; color: #888;">Dates filter: delay entries by their From date, dispatch by release date, delivery by actual drop-off date.</span>
+  </div>
+
+  <p *ngIf="loading" style="color: #888; font-size: 13px;">Loading...</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px;">{{ error }}</p>
+
+  <div *ngIf="!loading && data">
+    <!-- Days lost per reason -->
+    <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+      <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Days lost per reason (business days)</p>
+      <p *ngIf="data.reasons.length === 0" style="color: #888; font-size: 13px; margin: 0;">No delays logged in this period.</p>
+      <table *ngIf="data.reasons.length > 0" style="width: 100%; max-width: 700px; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+            <th style="padding: 6px;">Reason</th><th style="padding: 6px;">Entries</th><th style="padding: 6px;">Shipments</th><th style="padding: 6px;">Days</th><th style="padding: 6px;">Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of data.reasons" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px;">{{ r.reason }}</td>
+            <td style="padding: 6px;">{{ r.entries }}</td>
+            <td style="padding: 6px;">{{ r.shipments }}</td>
+            <td style="padding: 6px; font-weight: 600;">{{ r.days }}</td>
+            <td style="padding: 6px; color: #666;">{{ totalReasonDays > 0 ? ((r.days / totalReasonDays) * 100 | number: '1.0-0') : 0 }}%</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="border-top: 2px solid #ccc; font-weight: 600;">
+            <td style="padding: 6px;">Total</td><td></td><td></td><td style="padding: 6px;">{{ totalReasonDays }}</td><td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Dispatch wait per shipment -->
+    <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <p style="font-size: 12px; color: #888; margin: 0; text-transform: uppercase;">
+          Dispatch: Clearance release (SPC Bill) → whole shipment on trucks — target {{ data.dispatchTargetDays }} business day(s)
+        </p>
+        <button (click)="exportDispatch()" style="padding: 5px 12px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Export to Excel</button>
+      </div>
+      <p *ngIf="data.dispatch.length === 0" style="color: #888; font-size: 13px; margin: 10px 0 0;">No released shipments in this period.</p>
+      <div *ngIf="data.dispatch.length > 0" style="overflow-x: auto; max-height: 60vh; overflow-y: auto; margin-top: 8px;">
+        <table style="width: 100%; min-width: 1100px; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">BL No.</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">BU</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Consignee</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Released</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">First truck</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Fully dispatched</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Days</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Gap (+/-)</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Reasons logged</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">No reason logged</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Loaded</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of data.dispatch" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 6px; font-family: monospace;">{{ d.blAwbNo }}</td>
+              <td style="padding: 6px;">{{ d.businessUnit }}</td>
+              <td style="padding: 6px;">{{ d.consignee }}</td>
+              <td style="padding: 6px;">{{ d.releaseDate | date: 'dd/MM/yyyy' }}</td>
+              <td style="padding: 6px;">{{ d.firstLoadDate ? (d.firstLoadDate | date: 'dd/MM/yyyy') : '—' }}</td>
+              <td style="padding: 6px;">{{ d.fullyDispatchedDate ? (d.fullyDispatchedDate | date: 'dd/MM/yyyy') : '' }}<span *ngIf="!d.dispatched" style="color: #a66a00;">in progress</span></td>
+              <td style="padding: 6px; font-weight: 600;">{{ d.days }}</td>
+              <td style="padding: 6px;"><span [style.color]="d.gap > 0 ? '#c0392b' : (d.gap < 0 ? '#1e7e34' : '#333')" style="font-weight: 600;">{{ d.gap > 0 ? '+' : '' }}{{ d.gap }}</span></td>
+              <td style="padding: 6px;">{{ d.loggedDays }}</td>
+              <td style="padding: 6px;" [style.color]="d.gap > 0 && d.unexplainedDays > 0 ? '#c0392b' : '#333'">{{ d.unexplainedDays }}</td>
+              <td style="padding: 6px; color: #666;">{{ d.loadedQty | number: '1.0-2' }} / {{ d.totalQty | number: '1.0-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Delivery performance by city -->
+    <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+      <p style="font-size: 12px; color: #888; margin: 0 0 10px; text-transform: uppercase;">Delivery performance by city (calendar days, truck load → actual drop-off)</p>
+      <p *ngIf="data.delivery.length === 0" style="color: #888; font-size: 13px; margin: 0;">No completed drops in this period.</p>
+      <table *ngIf="data.delivery.length > 0" style="width: 100%; max-width: 800px; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+            <th style="padding: 6px;">City</th><th style="padding: 6px;">Target (days)</th><th style="padding: 6px;">Drops</th>
+            <th style="padding: 6px;">Avg. days</th><th style="padding: 6px;">On time</th><th style="padding: 6px;">Late</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of data.delivery" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px;">{{ c.city }}</td>
+            <td style="padding: 6px;">{{ c.targetDays !== null ? c.targetDays : '— (not set)' }}</td>
+            <td style="padding: 6px;">{{ c.drops }}</td>
+            <td style="padding: 6px; font-weight: 600;" [style.color]="c.targetDays !== null && c.avgDays > c.targetDays ? '#c0392b' : '#333'">{{ c.avgDays | number: '1.0-1' }}</td>
+            <td style="padding: 6px; color: #1e7e34;">{{ c.targetDays !== null ? c.onTime : '—' }}</td>
+            <td style="padding: 6px; color: #c0392b;">{{ c.targetDays !== null ? c.late : '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size: 11px; color: #999; margin: 8px 0 0;">Set each city's target under Logistics - Settings &rarr; Logistics Cities.</p>
+    </div>
+
+    <!-- Every logged delay -->
+    <div style="background: white; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <p style="font-size: 12px; color: #888; margin: 0; text-transform: uppercase;">All logged delays</p>
+        <button (click)="exportEntries()" style="padding: 5px 12px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Export to Excel</button>
+      </div>
+      <p *ngIf="data.entries.length === 0" style="color: #888; font-size: 13px; margin: 10px 0 0;">Nothing logged in this period.</p>
+      <div *ngIf="data.entries.length > 0" style="overflow-x: auto; max-height: 60vh; overflow-y: auto; margin-top: 8px;">
+        <table style="width: 100%; min-width: 1000px; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">BL No.</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">BU</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Reason</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">From</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">To</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Days</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Note</th>
+              <th style="padding: 6px; position: sticky; top: 0; background: #fff; box-shadow: 0 1px 0 #ddd;">Logged by</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of data.entries" style="border-bottom: 1px solid #eee;">
+              <td style="padding: 6px; font-family: monospace;">{{ e.blAwbNo }}</td>
+              <td style="padding: 6px;">{{ e.businessUnit }}</td>
+              <td style="padding: 6px;">{{ e.reason }}</td>
+              <td style="padding: 6px;">{{ e.fromDate | date: 'dd/MM/yyyy' }}</td>
+              <td style="padding: 6px;">{{ e.toDate ? (e.toDate | date: 'dd/MM/yyyy') : '' }}<span *ngIf="e.ongoing" style="color: #a66a00;">ongoing</span></td>
+              <td style="padding: 6px; font-weight: 600;">{{ e.days }}</td>
+              <td style="padding: 6px; max-width: 280px; white-space: normal;">{{ e.note || '' }}</td>
+              <td style="padding: 6px; color: #777;">{{ e.createdBy }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -9,6 +9,7 @@ import { EditShipment } from './corrections/edit-shipment/edit-shipment';
 import { logisticsBoxGuard } from './auth/logistics-box.guard';
 import { clearanceScreenGuard } from './auth/clearance-screen.guard';
 import { LogisticsSettings } from './logistics/logistics-settings/logistics-settings';
+import { DelaySummaryPage } from './logistics/delay-summary/delay-summary';
 import { modelProductsAccessGuard } from './auth/model-products-access.guard';
 import { LogisticsVisibility } from './settings/logistics-visibility/logistics-visibility';
 import { CPricingList } from './c-pricing/c-pricing-list/c-pricing-list';
@@ -144,6 +145,20 @@ export const routes: Routes = [
   { path: 'logistics/truck-loads/:id', component: TruckLoadDetailComponent, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'logistics/truck-availability', component: TruckAvailability, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'logistics/truck-allocations', component: TruckAllocations, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
+  {
+    path: 'logistics/settings/delay-reasons',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard],
+    data: {
+      title: 'Logistics — Delay Reasons',
+      resource: 'logistics-delay-reasons',
+      fields: [{ key: 'name', label: 'Reason', type: 'text' }, { key: 'isActive', label: 'Active', type: 'checkbox' }],
+      backRoute: '/logistics/settings',
+      backLabel: 'Back to Logistics - Settings',
+      editRoles: ['Coordinator', 'Manager', 'SuperUser']
+    }
+  },
+  { path: 'logistics/delay-summary', component: DelaySummaryPage, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   { path: 'logistics/settings', component: LogisticsSettings, canActivate: [authGuard, cPricingLockGuard, logisticsBoxGuard] },
   {
     path: 'logistics/settings/drivers',
@@ -204,7 +219,7 @@ export const routes: Routes = [
     data: {
       title: 'Logistics — Cities',
       resource: 'logistics-cities',
-      fields: [{ key: 'name', label: 'Name', type: 'text' }],
+      fields: [{ key: 'name', label: 'Name', type: 'text' }, { key: 'targetDeliveryDays', label: 'Delivery Target (calendar days)', type: 'number' }],
       backRoute: '/logistics/settings',
       backLabel: 'Back to Logistics - Settings',
       editRoles: ['Coordinator', 'Manager', 'SuperUser']
@@ -429,7 +444,7 @@ export const routes: Routes = [
     data: {
       title: 'Logistics — Cities',
       resource: 'logistics-cities',
-      fields: [{ key: 'name', label: 'Name', type: 'text' }]
+      fields: [{ key: 'name', label: 'Name', type: 'text' }, { key: 'targetDeliveryDays', label: 'Delivery Target (calendar days)', type: 'number' }]
     }
   },
   {
@@ -471,6 +486,16 @@ export const routes: Routes = [
         { key: 'contactName', label: 'Default Contact Name', type: 'text' },
         { key: 'contactPhone', label: 'Default Contact Phone', type: 'text' }
       ]
+    }
+  },
+  {
+    path: 'settings/logistics-delay-reasons',
+    component: SimpleLookup,
+    canActivate: [authGuard, cPricingLockGuard, logisticsLockGuard],
+    data: {
+      title: 'Logistics — Delay Reasons',
+      resource: 'logistics-delay-reasons',
+      fields: [{ key: 'name', label: 'Reason', type: 'text' }, { key: 'isActive', label: 'Active', type: 'checkbox' }]
     }
   },
   {

@@ -86,12 +86,13 @@ export class SettingsMenu implements OnInit {
         { label: 'Trucks', path: '/settings/trucks', logisticsList: true },
         { label: 'Warehouses', path: '/settings/warehouses', logisticsList: true },
         { label: 'External Transporters', path: '/settings/external-transporters', logisticsList: true },
+        { label: 'Delay Reasons', path: '/settings/logistics-delay-reasons', logisticsList: true },
         // Moved out of the Logistics box on purpose: Coordinator could
         // previously reach and edit this from inside /logistics itself,
         // letting them widen their own reveal window. It now lives here
         // only, behind the same Manager/SuperUser-only Settings gate as
         // everything else in this menu.
-        { label: 'Logistics — Reveal Settings', path: '/settings/logistics-visibility' }
+        { label: 'Logistics — Reveal & Target Settings', path: '/settings/logistics-visibility' }
       ]
     },
     {

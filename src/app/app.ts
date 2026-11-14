@@ -71,6 +71,7 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Shipments for Dispatch', route: '/logistics', canAccess: (a) => a.canSeeLogisticsBox() },
       { label: 'Truck Allocation', route: '/logistics/truck-allocations', canAccess: (a) => a.canSeeLogisticsBox() },
       { label: 'Truck Availability', route: '/logistics/truck-availability', canAccess: (a) => a.canSeeLogisticsBox() },
+      { label: 'Delay Summary', route: '/logistics/delay-summary', canAccess: (a) => a.canSeeLogisticsBox() },
       { label: 'Logistics - Settings', route: '/logistics/settings', canAccess: (a) => a.canSeeLogisticsBox() }
       // "Cargo Under Delivery" deliberately removed from this group for
       // now — it pointed at the full item-level Goods in Transit

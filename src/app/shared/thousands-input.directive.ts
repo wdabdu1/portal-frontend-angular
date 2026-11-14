@@ -23,12 +23,44 @@ export class ThousandsInputDirective implements ControlValueAccessor {
     this.onTouched = fn;
   }
 
-  @HostListener('input', ['$event'])
-  onInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const raw = target.value.replace(/,/g, '').replace(/[^0-9.\-]/g, '');
-    this.renderer.setProperty(this.el.nativeElement, 'value', raw);
-    this.onChange(raw === '' ? null : Number(raw));
+  // Formats with thousands separators WHILE typing (1234567.5 -> 1,234,567.5), keeping the
+  // caret where the user was typing. The model always receives the plain number.
+  @HostListener('input')
+  onInput(): void {
+    const el = this.el.nativeElement;
+    const caret = el.selectionStart;
+    const meaningfulBeforeCaret = caret === null ? null : el.value.slice(0, caret).replace(/[^0-9.\-]/g, '').length;
+
+    let raw = el.value.replace(/,/g, '').replace(/[^0-9.\-]/g, '');
+    const negative = raw.startsWith('-');
+    raw = raw.replace(/-/g, '');
+    const firstDot = raw.indexOf('.');
+    if (firstDot !== -1) raw = raw.slice(0, firstDot + 1) + raw.slice(firstDot + 1).replace(/\./g, '');
+
+    const hasDot = raw.includes('.');
+    let intPart = hasDot ? raw.slice(0, raw.indexOf('.')) : raw;
+    const decPart = hasDot ? raw.slice(raw.indexOf('.') + 1) : '';
+    intPart = intPart.replace(/^0+(?=\d)/, '');
+    const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const display = (negative ? '-' : '') + grouped + (hasDot ? '.' + decPart : '');
+
+    this.renderer.setProperty(el, 'value', display);
+
+    if (meaningfulBeforeCaret !== null && document.activeElement === el) {
+      let seen = 0;
+      let pos = 0;
+      while (pos < display.length && seen < meaningfulBeforeCaret) {
+        if (/[0-9.\-]/.test(display[pos])) seen++;
+        pos++;
+      }
+      // Don't leave the caret just before a freshly inserted comma.
+      if (display[pos] === ',') pos++;
+      try { el.setSelectionRange(pos, pos); } catch { /* input type does not support selection */ }
+    }
+
+    // '', '-', '.', '-.' mean "nothing typed yet" -> null; anything else is a real number.
+    const numericText = (negative ? '-' : '') + (hasDot ? (intPart || '0') + '.' + decPart : intPart);
+    this.onChange(intPart === '' && decPart === '' ? null : Number(numericText));
   }
 
   @HostListener('blur')

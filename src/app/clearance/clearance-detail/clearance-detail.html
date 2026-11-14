@@ -383,6 +383,8 @@
             <button (click)="saveTruckContainers(true, 'Actual Charges')" [disabled]="savingRouteDetail || isLocked('route1TruckContainers')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Actual Charges')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
+          <app-delay-log *ngIf="auth.canSeeDelayLog()" [shipmentId]="shipmentId" [canEdit]="auth.canEditDelayLog()" />
+
         </div>
       </div>
 
@@ -537,6 +539,8 @@
             <button (click)="saveTruckContainers(true, 'Actual Charges')" [disabled]="savingRouteDetail || isLocked('route2TruckContainers')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save & Next' }}</button>
             <button (click)="toggle('Actual Charges')" style="padding:6px 14px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; cursor:pointer;">Next</button>
           </div>
+          <app-delay-log *ngIf="auth.canSeeDelayLog()" [shipmentId]="shipmentId" [canEdit]="auth.canEditDelayLog()" />
+
         </div>
       </div>
 
@@ -777,6 +781,8 @@
           <div style="margin-top:16px;">
             <button (click)="saveTruckContainers(false, null)" [disabled]="savingRouteDetail || isLocked('route3TruckContainers')" style="padding:6px 14px; background:#0a3d62; color:white; border:none; border-radius:4px; cursor:pointer;">{{ savingRouteDetail ? 'Saving...' : 'Save' }}</button>
           </div>
+          <app-delay-log *ngIf="auth.canSeeDelayLog()" [shipmentId]="shipmentId" [canEdit]="auth.canEditDelayLog()" />
+
         </div>
       </div>
     </ng-container>

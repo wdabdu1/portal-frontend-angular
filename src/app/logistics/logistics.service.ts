@@ -18,6 +18,9 @@ export interface LogisticsItemRow {
   // SLA-projected date, shown until the real one is entered.
   clearanceReleaseDate?: string | null;
   releaseIsForecast?: boolean;
+  // Owning shipment (and withdrawal for FZ rows) - opens the Delay Log.
+  shipmentId?: number;
+  withdrawalId?: number | null;
   qty: number;
   unit: string;
   clearanceRoute: string;

@@ -58,8 +58,14 @@ export class TruckLoadList implements OnInit {
 
   trucks: LookupEntity[] = [];
   drivers: LookupEntity[] = [];
+  transporters: LookupEntity[] = [];
 
   showNewForm = false;
+  newMode: 'internal' | 'external' = 'internal';
+  newTransporterId: number | null = null;
+  newExtTruckNo = '';
+  newExtDriverName = '';
+  newExtDriverPhone = '';
   newTruckId: number | null = null;
   newDriverId: number | null = null;
   newLoadDate = '';
@@ -75,6 +81,7 @@ export class TruckLoadList implements OnInit {
 
   ngOnInit(): void {
     this.lookups.getAll<LookupEntity>('trucks').subscribe({ next: (r) => { this.trucks = r.filter((t) => t['isActive']); this.cdr.markForCheck(); } });
+    this.lookups.getAll<LookupEntity>('external-transporters').subscribe({ next: (r) => { this.transporters = r.filter((t) => t['isActive'] !== false); this.cdr.markForCheck(); } });
     this.lookups.getAll<LookupEntity>('drivers').subscribe({ next: (r) => { this.drivers = r; this.cdr.markForCheck(); } });
 
     this.tablePrefs.get('truckLoads').subscribe({
@@ -206,17 +213,31 @@ export class TruckLoadList implements OnInit {
     this.newDriverId = (truck?.['driverId'] as number) ?? null;
   }
 
+  get canCreate(): boolean {
+    if (!this.newLoadDate) return false;
+    return this.newMode === 'internal'
+      ? !!this.newTruckId
+      : !!this.newTransporterId && !!this.newExtTruckNo.trim() && !!this.newExtDriverName.trim();
+  }
+
   createLoad(): void {
-    if (!this.newTruckId || !this.newLoadDate) return;
+    if (!this.canCreate) return;
     this.creating = true;
-    this.service.create({
-      truckId: this.newTruckId, driverId: this.newDriverId, loadDate: this.newLoadDate, notes: this.newNotes || null
-    }).subscribe({
+    const external = this.newMode === 'external';
+    this.service.create(external
+      ? {
+          truckId: null, driverId: null, loadDate: this.newLoadDate, notes: this.newNotes || null,
+          isExternal: true, externalTransporterId: this.newTransporterId,
+          externalTruckNo: this.newExtTruckNo.trim(), externalDriverName: this.newExtDriverName.trim(),
+          externalDriverPhone: this.newExtDriverPhone.trim() || null
+        }
+      : { truckId: this.newTruckId, driverId: this.newDriverId, loadDate: this.newLoadDate, notes: this.newNotes || null }
+    ).subscribe({
       next: (r) => {
         this.creating = false;
         this.router.navigate(['/logistics/truck-loads', r.id]);
       },
-      error: () => { this.creating = false; this.error = 'Could not create truck load.'; this.cdr.markForCheck(); }
+      error: (e) => { this.creating = false; this.error = e?.error?.message || 'Could not create truck load.'; this.cdr.markForCheck(); }
     });
   }
 

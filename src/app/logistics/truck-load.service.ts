@@ -123,7 +123,11 @@ export class TruckLoadService {
     return this.http.get<TruckLoadSummary[]>(`${API_URL}/truck-loads`);
   }
 
-  create(req: { truckId: number; driverId: number | null; loadDate: string; notes: string | null }) {
+  create(req: {
+    truckId: number | null; driverId: number | null; loadDate: string; notes: string | null;
+    isExternal?: boolean; externalTransporterId?: number | null; externalTruckNo?: string | null;
+    externalDriverName?: string | null; externalDriverPhone?: string | null;
+  }) {
     return this.http.post<TruckLoadSummary>(`${API_URL}/truck-loads`, req);
   }
 

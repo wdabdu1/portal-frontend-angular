@@ -11,6 +11,7 @@ interface LogisticsVisibilitySettingsDto {
   preClearanceCatQtyRevealDays: number;
   postDeliveryRehideDays: number;
   showLogisticsListsInMainSettings: boolean;
+  dispatchTargetBusinessDays: number;
   updatedAt: string;
 }
 
@@ -53,7 +54,8 @@ export class LogisticsVisibility implements OnInit {
       arrivalLeadTimeDays: this.settings.arrivalLeadTimeDays,
       preClearanceCatQtyRevealDays: this.settings.preClearanceCatQtyRevealDays,
       postDeliveryRehideDays: this.settings.postDeliveryRehideDays,
-      showLogisticsListsInMainSettings: this.settings.showLogisticsListsInMainSettings
+      showLogisticsListsInMainSettings: this.settings.showLogisticsListsInMainSettings,
+      dispatchTargetBusinessDays: this.settings.dispatchTargetBusinessDays
     }).subscribe({
       next: (r) => {
         this.settings = r;

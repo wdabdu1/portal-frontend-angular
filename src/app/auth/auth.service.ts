@@ -167,6 +167,15 @@ export class AuthService {
     return this.hasAnyRole(['Coordinator', 'Manager', 'SuperUser']);
   }
 
+  // Logistics Delay Log. Read: Logistics box roles + the Clearance team. Write: Clearance team
+  // + Coordinator (+ SuperUser). Mirrors backend AppRoles.DelayLogViewers / DelayLogEditors.
+  canSeeDelayLog(): boolean {
+    return this.hasAnyRole(['LogisticsOfficer', 'Coordinator', 'Manager', 'SuperUser', 'CLR_Usr', 'CLR_Supervisor']);
+  }
+  canEditDelayLog(): boolean {
+    return this.hasAnyRole(['Coordinator', 'CLR_Usr', 'CLR_Supervisor', 'SuperUser']);
+  }
+
   // Who may open the Logistics box at all (route guard + menu gating).
   canSeeLogisticsBox(): boolean {
     return this.hasAnyRole(['LogisticsOfficer', 'Coordinator', 'Manager', 'SuperUser']);

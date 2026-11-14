@@ -110,6 +110,8 @@
                   {{ allocating ? 'Saving...' : 'Allocate' }}
                 </button>
               </div>
+
+              <app-delay-log *ngIf="auth.canSeeDelayLog() && item.shipmentId" [shipmentId]="item.shipmentId!" [withdrawalId]="item.withdrawalId ?? null" [canEdit]="auth.canEditDelayLog()" />
             </td>
           </tr>
         </ng-container>

@@ -1,5 +1,5 @@
 <div style="max-width: 640px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
-  <h1 style="font-size: 20px; font-weight: 500;">Logistics — Reveal Settings</h1>
+  <h1 style="font-size: 20px; font-weight: 500;">Logistics — Reveal &amp; Target Settings</h1>
   <p style="color: #888; font-size: 13px;">
     Controls when a shipment first becomes visible to Logistics/Coordinator, when Category+Quantity detail reveals for a
     De-stuff shipment, and when that detail re-hides again after delivery. Full truck/trip history is never deleted —
@@ -47,6 +47,22 @@
         [disabled]="!canEdit"
         style="width: 120px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
       />
+    </div>
+
+    <div style="border-top: 1px solid #eee; padding-top: 14px;">
+      <label style="display: block; font-size: 13px; color: #555; margin-bottom: 4px;">
+        Dispatch target (business days from Clearance release / SPC Bill settlement until the whole shipment is on trucks)
+      </label>
+      <input
+        type="number"
+        min="0"
+        [(ngModel)]="settings.dispatchTargetBusinessDays"
+        [disabled]="!canEdit"
+        style="width: 120px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+      />
+      <span style="display: block; color: #888; font-size: 12px; margin-top: 4px;">
+        Used by the Logistics Dispatch step in Process Performance, Demurrage Analysis and the Delay Summary. Delivery targets per city are set under Logistics Cities.
+      </span>
     </div>
 
     <div style="border-top: 1px solid #eee; padding-top: 14px;">

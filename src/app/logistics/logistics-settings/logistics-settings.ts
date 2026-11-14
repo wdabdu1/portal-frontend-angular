@@ -32,6 +32,7 @@ export class LogisticsSettings {
     { label: 'Trucks', path: '/logistics/settings/trucks' },
     { label: 'Warehouses', path: '/logistics/settings/warehouses' },
     { label: 'External Transporters', path: '/logistics/settings/external-transporters' },
-    { label: 'Logistics Cities', path: '/logistics/settings/logistics-cities' }
+    { label: 'Logistics Cities (delivery targets)', path: '/logistics/settings/logistics-cities' },
+    { label: 'Delay Reasons', path: '/logistics/settings/delay-reasons' }
   ];
 }

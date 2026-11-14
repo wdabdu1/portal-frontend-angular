@@ -7,6 +7,8 @@ import { applyFilters, columnOptions } from '../../shared/table-filter.util';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { TablePreferencesService } from '../../table-preferences/table-preferences.service';
 import { exportToExcel } from '../../shared/excel-export.util';
+import { AuthService } from '../../auth/auth.service';
+import { DelayLog } from '../delay-log/delay-log';
 import { AllocationResponse, LogisticsItemRow, LogisticsService } from '../logistics.service';
 
 type SortColumn = keyof LogisticsItemRow;
@@ -39,7 +41,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
 
 @Component({
   selector: 'app-logistics-list',
-  imports: [CommonModule, FormsModule, RouterLink, ExcelHeaderFilter],
+  imports: [CommonModule, FormsModule, RouterLink, ExcelHeaderFilter, DelayLog],
   templateUrl: './logistics-list.html'
 })
 export class LogisticsList implements OnInit {
@@ -77,7 +79,8 @@ export class LogisticsList implements OnInit {
   constructor(
     private service: LogisticsService,
     private lookups: SettingsLookupService,
-    private tablePrefs: TablePreferencesService
+    private tablePrefs: TablePreferencesService,
+    public auth: AuthService
   ) {}
 
   ngOnInit(): void {

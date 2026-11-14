@@ -23,19 +23,49 @@
   <div *ngIf="showNewForm" style="border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-top: 1rem; background: #f9f9f9;">
     <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
       <div>
-        <label style="display:block; font-size:12px; color:#555;">Truck</label>
-        <select [(ngModel)]="newTruckId" (change)="onTruckChange()" style="padding: 6px;">
-          <option [ngValue]="null">-- select --</option>
-          <option *ngFor="let t of trucks" [ngValue]="t.id">{{ t['plateNo'] }}</option>
+        <label style="display:block; font-size:12px; color:#555;">Carried by</label>
+        <select [(ngModel)]="newMode" style="padding: 6px;">
+          <option value="internal">In-house truck</option>
+          <option value="external">External transporter</option>
         </select>
       </div>
-      <div>
-        <label style="display:block; font-size:12px; color:#555;">Driver</label>
-        <select [(ngModel)]="newDriverId" style="padding: 6px;">
-          <option [ngValue]="null">-- select --</option>
-          <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d['name'] }}</option>
-        </select>
-      </div>
+      <ng-container *ngIf="newMode === 'internal'">
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Truck</label>
+          <select [(ngModel)]="newTruckId" (change)="onTruckChange()" style="padding: 6px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let t of trucks" [ngValue]="t.id">{{ t['plateNo'] }}</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Driver</label>
+          <select [(ngModel)]="newDriverId" style="padding: 6px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d['name'] }}</option>
+          </select>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="newMode === 'external'">
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Transporter</label>
+          <select [(ngModel)]="newTransporterId" style="padding: 6px;">
+            <option [ngValue]="null">-- select --</option>
+            <option *ngFor="let t of transporters" [ngValue]="t.id">{{ t['name'] }}</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Truck No.</label>
+          <input [(ngModel)]="newExtTruckNo" maxlength="40" style="padding: 6px; width: 120px;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Driver Name</label>
+          <input [(ngModel)]="newExtDriverName" maxlength="120" style="padding: 6px;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:#555;">Driver Phone</label>
+          <input [(ngModel)]="newExtDriverPhone" maxlength="60" style="padding: 6px; width: 130px;" />
+        </div>
+      </ng-container>
       <div>
         <label style="display:block; font-size:12px; color:#555;">Load Date</label>
         <input type="date" [(ngModel)]="newLoadDate" style="padding: 6px;" />
@@ -44,7 +74,7 @@
         <label style="display:block; font-size:12px; color:#555;">Notes</label>
         <input [(ngModel)]="newNotes" style="padding: 6px;" />
       </div>
-      <button (click)="createLoad()" [disabled]="creating || !newTruckId || !newLoadDate" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      <button (click)="createLoad()" [disabled]="creating || !canCreate" style="padding: 7px 14px; background: #0a3d62; color: white; border: none; border-radius: 4px; cursor: pointer;">
         {{ creating ? 'Creating...' : 'Create' }}
       </button>
     </div>
