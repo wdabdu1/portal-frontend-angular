@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ChangeHistory } from '../change-history/change-history';
+import { ShipmentLinesCorrections } from '../shipment-lines/shipment-lines';
 import { AuthService } from '../../auth/auth.service';
 import { CorrectionsService, LookupRef, ShipmentCorrection, ShipmentCorrectionRequest } from '../corrections.service';
 
@@ -13,7 +14,7 @@ import { CorrectionsService, LookupRef, ShipmentCorrection, ShipmentCorrectionRe
 // BL/AWB number, PO link, quantities/values and Ship-on-Board date are not here.
 @Component({
   selector: 'app-edit-shipment',
-  imports: [CommonModule, FormsModule, RouterLink, ChangeHistory],
+  imports: [CommonModule, FormsModule, RouterLink, ChangeHistory, ShipmentLinesCorrections],
   templateUrl: './edit-shipment.html'
 })
 export class EditShipment implements OnInit {

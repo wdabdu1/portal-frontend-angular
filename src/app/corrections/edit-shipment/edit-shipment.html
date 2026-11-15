@@ -9,8 +9,7 @@
     <p style="color: #888; font-size: 13px;">{{ data.businessUnit }} — PO {{ data.poNumber }} — Status: {{ data.status }}</p>
 
     <p style="background: #fff8e1; border: 1px solid #f0e0a0; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #7a5c00;">
-      Corrections are recorded in the Change History below (who, when, old &rarr; new). The PO link, quantities and values
-      can't be changed here (SuperUser can correct the BL/AWB number at the bottom), and the Ship-on-Board date is still edited from Update Shipment. Changing container counts doesn't recalculate
+      Corrections are recorded in the Change History below (who, when, old &rarr; new). The PO link can't be changed here. A SuperUser can correct the BL/AWB number, the quantities in the BL and add missing items in the red sections at the bottom, and the Ship-on-Board date is still edited from Update Shipment. Changing container counts doesn't recalculate
       anything already saved elsewhere (e.g. a clearance cost estimate that was already created).
     </p>
 
@@ -86,6 +85,8 @@
         <span *ngIf="blError" style="color: #c0392b; font-size: 13px;">{{ blError }}</span>
       </div>
     </div>
+
+    <app-shipment-lines-corrections *ngIf="isSuperUser" [shipmentId]="shipmentId" (saved)="historyKey = historyKey + 1" />
 
     <app-change-history [entityType]="'shipments'" [entityId]="shipmentId" [refreshKey]="historyKey" />
   </div>

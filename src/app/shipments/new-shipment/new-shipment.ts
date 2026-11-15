@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { ConfirmedOrderOption, LineItemRemaining, ShipmentsService } from '../shipments.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
+import { NoEnterSubmitDirective } from '../../shared/no-enter-submit.directive';
 
 interface LineItemSelection extends LineItemRemaining {
   selected: boolean;
@@ -21,7 +22,7 @@ interface LineItemSelection extends LineItemRemaining {
 
 @Component({
   selector: 'app-new-shipment',
-  imports: [CommonModule, FormsModule, ThousandsInputDirective],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective, NoEnterSubmitDirective],
   templateUrl: './new-shipment.html'
 })
 export class NewShipment implements OnInit {
@@ -33,6 +34,7 @@ export class NewShipment implements OnInit {
   error = '';
   invalidFields = new Set<string>();
   success = '';
+  reviewing = false;
 
   // Open purchase orders only: confirmed AND still carrying at least one
   // line with quantity left to ship (openCategories is the comma-joined list
@@ -199,7 +201,8 @@ export class NewShipment implements OnInit {
     });
   }
 
-  submit(): void {
+  // Step 1 of saving: validate, then show a read-only summary. Nothing is saved until the user confirms.
+  review(): void {
     this.error = '';
     this.success = '';
     this.invalidFields = new Set<string>();
@@ -230,6 +233,37 @@ export class NewShipment implements OnInit {
       this.error = `Quantity for ${overLimit.modelProduct} exceeds the remaining ${overLimit.qtyRemaining}.`;
       return;
     }
+    this.reviewing = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  backToEdit(): void {
+    this.reviewing = false;
+    this.error = '';
+  }
+
+  get selectedItems(): LineItemSelection[] {
+    return this.lineItems.filter((li) => li.selected && li.qtyToShip && li.qtyToShip > 0);
+  }
+
+  // Lines of the chosen order(s) that still have quantity left but are NOT on this shipment.
+  get leftOutItems(): LineItemSelection[] {
+    return this.lineItems.filter((li) => li.qtyRemaining > 0 && !(li.selected && li.qtyToShip && li.qtyToShip > 0));
+  }
+
+  get selectedOrderNumbers(): string {
+    return this.selectedOrders.map((o) => o.poNumber).join(', ');
+  }
+
+  get shippingLineName(): string {
+    return String(this.shippingLines.find((l) => l.id === this.shippingLineId)?.['name'] ?? '');
+  }
+
+  // Step 2: only reached from the review screen's Confirm button.
+  submit(): void {
+    this.error = '';
+    this.success = '';
+    const selectedItems = this.selectedItems;
 
     this.saving = true;
 
@@ -262,6 +296,7 @@ export class NewShipment implements OnInit {
         },
         error: (err) => {
           this.saving = false;
+          this.reviewing = false;   // back to the form so the problem can be fixed
           this.error = err?.error?.message || 'Could not create shipment.';
           this.cdr.markForCheck();
         }

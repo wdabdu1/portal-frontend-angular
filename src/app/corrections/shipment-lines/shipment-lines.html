@@ -1,0 +1,90 @@
+<!-- SuperUser only: quantities in the BL + add missing items -->
+<div style="border: 1px solid #e0b0a8; border-radius: 6px; margin-top: 1rem; padding: 16px; background: #fffafa;">
+  <h3 style="font-size: 14px; margin: 0 0 4px; color: #8a2a1f;">Items &amp; Quantities in the BL (SuperUser only)</h3>
+  <p style="font-size: 12px; color: #666; margin: 0 0 10px;">
+    Change the quantity of a line, or add items that were left off when the shipment was created. The shipment value and the planned
+    payment lines are recalculated. A quantity can't exceed what is left on the order, nor go below what is already allocated to warehouses / withdrawn.
+  </p>
+
+  <p *ngIf="data?.locked" style="background: #fdf1f0; border: 1px solid #f0c9c4; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #8a2a1f;">{{ data?.lockReason }}</p>
+  <p *ngIf="data && data.confirmedSections.length > 0" style="font-size: 12px; color: #7a5c00; background: #fff8e1; border: 1px solid #f0e0a0; border-radius: 4px; padding: 6px 12px;">
+    Already confirmed sections on this shipment ({{ data.confirmedSections.join(', ') }}) are <strong>not</strong> re-opened or recalculated - check them after changing quantities.
+  </p>
+
+  <div *ngIf="data && !reviewing">
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #666;">
+          <th style="padding: 6px;">Item</th>
+          <th style="padding: 6px; text-align: right;">Ordered</th>
+          <th style="padding: 6px; text-align: right;">On other BLs</th>
+          <th style="padding: 6px;">Qty in this BL</th>
+          <th style="padding: 6px; text-align: right;">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of edits" style="border-bottom: 1px solid #eee; vertical-align: middle;">
+          <td style="padding: 6px;">{{ e.row.model }}<div style="color: #999; font-size: 11px;">{{ e.row.poNumber }} &middot; {{ e.row.category }}</div></td>
+          <td style="padding: 6px; text-align: right;">{{ e.row.orderedQty | number: '1.0-4' }} {{ e.row.uom }}</td>
+          <td style="padding: 6px; text-align: right; color: #888;">{{ e.row.otherShipmentsQty | number: '1.0-4' }}</td>
+          <td style="padding: 6px;">
+            <input type="text" appThousands [(ngModel)]="e.qty" [disabled]="data.locked" style="width: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"
+                   [style.background]="num(e.qty) !== e.row.qtyInBl ? '#fff8e1' : '#fff'" />
+            <div style="font-size: 11px; color: #999;">{{ hint(e) }}</div>
+          </td>
+          <td style="padding: 6px; text-align: right; color: #666;">{{ num(e.qty) * e.row.unitPrice | number: '1.2-2' }} {{ e.row.currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 *ngIf="adds.length > 0" style="font-size: 13px; margin: 16px 0 6px; color: #333;">Items of this shipment's order(s) that are not on it yet</h4>
+    <table *ngIf="adds.length > 0" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #ddd; color: #666;">
+          <th style="padding: 6px;"></th><th style="padding: 6px;">Item</th>
+          <th style="padding: 6px; text-align: right;">Left on order</th><th style="padding: 6px;">Qty in this BL</th><th style="padding: 6px;">HS Code</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of adds" style="border-bottom: 1px solid #eee; vertical-align: middle;">
+          <td style="padding: 6px;"><input type="checkbox" [(ngModel)]="a.add" [disabled]="data.locked" /></td>
+          <td style="padding: 6px;">{{ a.item.model }}<div style="color: #999; font-size: 11px;">{{ a.item.poNumber }} &middot; {{ a.item.category }}</div></td>
+          <td style="padding: 6px; text-align: right;">{{ a.item.remainingQty | number: '1.0-4' }} {{ a.item.uom }}</td>
+          <td style="padding: 6px;"><input type="text" appThousands [(ngModel)]="a.qty" [disabled]="!a.add" style="width: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" /></td>
+          <td style="padding: 6px;"><input [(ngModel)]="a.hsCode" [disabled]="!a.add" style="width: 110px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="adds.length === 0" style="font-size: 12px; color: #888; margin: 12px 0 0;">Every item of this shipment's order(s) with quantity left is already on it.</p>
+
+    <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <input [(ngModel)]="reason" maxlength="480" placeholder="Reason for correction (required, kept in Change History)" style="flex: 1; min-width: 260px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" />
+      <button (click)="review()" [disabled]="!anyChange || data.locked" style="padding: 8px 18px; background: #8a2a1f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Review changes</button>
+    </div>
+  </div>
+
+  <!-- Review step -->
+  <div *ngIf="reviewing">
+    <p style="font-size: 13px; color: #7a5c00; background: #fff8e1; border: 1px solid #f0e0a0; border-radius: 4px; padding: 8px 12px;">
+      <strong>Please check.</strong> Nothing is saved until you press Confirm.
+    </p>
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+      <tr *ngFor="let e of changedEdits" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 6px;">{{ e.row.model }}</td>
+        <td style="padding: 6px; text-align: right;"><span style="color: #a33;">{{ e.row.qtyInBl | number: '1.0-4' }}</span> &rarr; <strong style="color: #1e7e34; font-size: 15px;">{{ num(e.qty) | number: '1.0-4' }}</strong> {{ e.row.uom }}</td>
+      </tr>
+      <tr *ngFor="let a of chosenAdds" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 6px;">{{ a.item.model }} <span style="color: #1e7e34;">(added)</span></td>
+        <td style="padding: 6px; text-align: right;"><strong style="color: #1e7e34; font-size: 15px;">{{ num(a.qty) | number: '1.0-4' }}</strong> {{ a.item.uom }}</td>
+      </tr>
+    </table>
+    <p style="font-size: 12px; color: #666;">Reason: <em>{{ reason }}</em></p>
+    <div style="display: flex; gap: 10px;">
+      <button (click)="save()" [disabled]="saving" style="padding: 8px 18px; background: #1e7e34; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">{{ saving ? 'Saving...' : 'Confirm & Save' }}</button>
+      <button (click)="back()" [disabled]="saving" style="padding: 8px 18px; background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 13px;">Back to edit</button>
+    </div>
+  </div>
+
+  <p *ngIf="message" style="color: #1e7e34; font-size: 13px; margin: 8px 0 0;">{{ message }}</p>
+  <p *ngIf="error" style="color: #c0392b; font-size: 13px; margin: 8px 0 0;">{{ error }}</p>
+</div>

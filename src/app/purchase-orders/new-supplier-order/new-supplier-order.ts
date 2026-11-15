@@ -6,6 +6,7 @@ import { forkJoin } from 'rxjs';
 import { LookupEntity, SettingsLookupService } from '../../settings/settings-lookup.service';
 import { PurchaseOrdersService } from '../purchase-orders.service';
 import { ThousandsInputDirective } from '../../shared/thousands-input.directive';
+import { NoEnterSubmitDirective } from '../../shared/no-enter-submit.directive';
 
 interface Division extends LookupEntity {
   businessUnitId: number;
@@ -37,7 +38,7 @@ interface OffshoreRow {
 
 @Component({
   selector: 'app-new-supplier-order',
-  imports: [CommonModule, FormsModule, ThousandsInputDirective],
+  imports: [CommonModule, FormsModule, ThousandsInputDirective, NoEnterSubmitDirective],
   templateUrl: './new-supplier-order.html'
 })
 export class NewSupplierOrder implements OnInit {
@@ -47,6 +48,7 @@ export class NewSupplierOrder implements OnInit {
   saving = false;
   error = '';
   success = '';
+  reviewing = false;
   invalidFields = new Set<string>();
 
   businessUnits: LookupEntity[] = [];
@@ -202,7 +204,8 @@ export class NewSupplierOrder implements OnInit {
     });
   }
 
-  submit(): void {
+  // Step 1 of saving: validate, then show a read-only summary. Nothing is saved until the user confirms.
+  review(): void {
     this.error = '';
     this.success = '';
     this.invalidFields = new Set<string>();
@@ -222,6 +225,64 @@ export class NewSupplierOrder implements OnInit {
       this.scrollToFirstError();
       return;
     }
+
+    if (this.completeLineItems.length === 0) {
+      this.error = 'At least one complete line item is required.';
+      return;
+    }
+    this.reviewing = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  backToEdit(): void {
+    this.reviewing = false;
+    this.error = '';
+  }
+
+  private nameOf(list: LookupEntity[], id: number | null): string {
+    if (id === null || id === undefined) return '-';
+    const hit = list.find((x) => x.id === id);
+    return hit ? String(hit['code'] && !hit['name'] ? hit['code'] : (hit['name'] ?? hit['code'] ?? '-')) : '-';
+  }
+
+  get rv() {
+    return {
+      bu: this.nameOf(this.businessUnits, this.businessUnitId),
+      division: this.nameOf(this.divisions, this.divisionId),
+      supplier: this.nameOf(this.suppliers, this.supplierId),
+      brand: this.nameOf(this.brands, this.brandManufacturerId),
+      approval: this.nameOf(this.approvalTypes, this.approvalTypeId),
+      consignee: this.nameOf(this.consignees, this.consigneeId),
+      payTerm: this.nameOf(this.paymentTerms, this.supplierPaymentTermId),
+      incoterm: this.nameOf(this.incoterms, this.incotermId),
+      origin: this.nameOf(this.originCountries, this.originCountryId),
+      mode: this.nameOf(this.shipmentModes, this.shipmentModeId),
+      pol: this.nameOf(this.ports, this.portOfLoadingId),
+      pod: this.nameOf(this.ports, this.portOfDischargeId)
+    };
+  }
+
+  // Rows that are complete (these are saved) vs. started-but-incomplete (these would be silently dropped).
+  get completeLineItems(): LineItemRow[] {
+    return this.lineItems.filter((li) => li.productCategoryId && li.modelProductId && li.productTypeId && li.qty && li.unitOfMeasureId && li.unitPrice && li.currencyId);
+  }
+
+  get incompleteLineItems(): LineItemRow[] {
+    const done = new Set(this.completeLineItems);
+    return this.lineItems.filter((li) => !done.has(li) && (li.productCategoryText || li.modelProductText || li.productTypeText || li.qty || li.unitPrice));
+  }
+
+  lineTotal(li: LineItemRow): number { return (li.qty ?? 0) * (li.unitPrice ?? 0); }
+  unitCode(id: number | null): string { return String(this.unitsOfMeasure.find((u) => u.id === id)?.['code'] ?? ''); }
+  currencyCode(id: number | null): string { return String(this.currencies.find((c) => c.id === id)?.['code'] ?? ''); }
+  partnerName(id: number | null): string { return this.nameOf(this.offshoreEntities, id); }
+
+  get chosenOffshore(): OffshoreRow[] { return this.offshoreRows.filter((r) => r.businessPartnerId); }
+
+  // Step 2: only reached from the review screen's Confirm button.
+  submit(): void {
+    this.error = '';
+    this.success = '';
 
     const validLineItems = this.lineItems
       .filter((li) => li.productCategoryId && li.modelProductId && li.productTypeId && li.qty && li.unitOfMeasureId && li.unitPrice && li.currencyId)
@@ -282,6 +343,7 @@ export class NewSupplierOrder implements OnInit {
         },
         error: (err) => {
           this.saving = false;
+          this.reviewing = false;   // back to the form so the problem can be fixed
           this.error = err?.status === 403
             ? "You don't have permission to create orders."
             : (err?.error?.message || 'Could not create purchase order.');
